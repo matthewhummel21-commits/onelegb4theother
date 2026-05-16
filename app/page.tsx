@@ -330,7 +330,7 @@ export default function DonationPage() {
                 <p>They gave everything. The least we can do is show up.</p>
               </blockquote>
               <div className="mt-8 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-xl">🎖️</div>
+                <img src="/images/veteran-pants-fitting.jpg" alt="Matthew Hummel" className="w-12 h-12 rounded-full object-cover object-top" />
                 <div>
                   <p className="font-bold text-foreground">Matthew Hummel</p>
                   <p className="text-sm text-muted-foreground">President &middot; U.S. Air Force Veteran &middot; 20 Years of Service</p>
