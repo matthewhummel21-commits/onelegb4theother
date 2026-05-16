@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "motion/react";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { BlurFade } from "@/components/ui/blur-fade";
 
 const SIZES = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
