@@ -29,6 +29,26 @@ export default function DonationPage() {
   const [selected, setSelected] = useState<number | null>(35);
   const [custom, setCustom] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [merchSize, setMerchSize] = useState<string | null>(null);
+  const [merchLoading, setMerchLoading] = useState(false);
+
+  const handleMerchCheckout = async () => {
+    if (!merchSize || merchLoading) return;
+    setMerchLoading(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ size: merchSize }),
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch {
+      alert("Something went wrong. Try again.");
+    } finally {
+      setMerchLoading(false);
+    }
+  };
 
   // Close menu on scroll
   useEffect(() => {
@@ -607,22 +627,31 @@ export default function DonationPage() {
                     {["XS", "S", "M", "L", "XL", "2XL", "3XL"].map((size) => (
                       <button
                         key={size}
-                        className="border border-border rounded-lg px-3 py-1.5 text-sm font-semibold hover:border-primary hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+                        onClick={() => setMerchSize(size)}
+                        className={`border rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors focus:outline-none ${
+                          merchSize === size
+                            ? "bg-primary border-primary text-white"
+                            : "border-border hover:border-primary hover:text-primary"
+                        }`}
                       >
                         {size}
                       </button>
                     ))}
                   </div>
+                  {!merchSize && <p className="text-xs text-amber-500 mt-2 font-semibold">👆 Pick a size to unlock checkout</p>}
                 </div>
 
-                <ShimmerButton
-                  background="rgb(39,49,95)"
-                  shimmerColor="#B22532"
-                  borderRadius="12px"
-                  className="w-full py-3 font-bold text-base"
+                <button
+                  onClick={handleMerchCheckout}
+                  disabled={!merchSize || merchLoading}
+                  className="w-full py-3 rounded-xl font-bold text-base text-white transition-all"
+                  style={{
+                    background: merchSize && !merchLoading ? "rgb(178,34,52)" : "rgb(150,150,150)",
+                    cursor: merchSize && !merchLoading ? "pointer" : "not-allowed",
+                  }}
                 >
-                  Buy Now — $55
-                </ShimmerButton>
+                  {merchLoading ? "Redirecting..." : merchSize ? `Buy Now — ${merchSize} / $55` : "Select a Size"}
+                </button>
 
                 <p className="text-xs text-muted-foreground text-center mt-3">
                   Ships via Printful · Print on demand · No inventory
