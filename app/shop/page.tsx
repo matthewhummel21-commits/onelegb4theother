@@ -71,14 +71,33 @@ export default function ShopPage() {
         </BlurFade>
 
         <div className="grid md:grid-cols-2 gap-12 items-start">
-          {/* Product Image */}
+          {/* Product Images */}
           <BlurFade delay={0.2}>
-            <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-8">
-              <img
-                src="https://files.cdn.printful.com/files/844/844011d92c81ab651408cb0aa7b88076_preview.png"
-                alt="Issued With Honor Tee"
-                className="w-full h-full object-contain"
-              />
+            <div className="space-y-3">
+              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-6">
+                <img
+                  src="https://files.cdn.printful.com/files/844/844011d92c81ab651408cb0aa7b88076_preview.png"
+                  alt="Issued With Honor Tee — Front"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-3">
+                  <img
+                    src="https://files.cdn.printful.com/files/2f7/2f711ba9243f8c05399977fd7d8e9f32_preview.png"
+                    alt="Front design"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-3">
+                  <img
+                    src="https://files.cdn.printful.com/files/41d/41da7341d45d419700c8d017bfd67428_preview.png"
+                    alt="Back design"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              </div>
+              <p className="text-center text-xs text-white/30">Front &amp; back design shown</p>
             </div>
           </BlurFade>
 
@@ -126,24 +145,28 @@ export default function ShopPage() {
               </div>
 
               {/* CTA */}
+              {!selectedSize && (
+                <p className="text-yellow-400 text-sm font-semibold">👆 Select a size above to continue</p>
+              )}
+
               {error && (
                 <p className="text-red-400 text-sm">{error}</p>
               )}
 
-              <motion.div whileTap={{ scale: 0.97 }}>
+              <motion.div whileTap={{ scale: selectedSize ? 0.97 : 1 }}>
                 <ShimmerButton
-                  background="rgb(178,34,52)"
+                  background={selectedSize ? "rgb(178,34,52)" : "rgb(80,80,80)"}
                   shimmerColor="#ffffff"
                   borderRadius="14px"
-                  className="w-full py-4 text-base font-extrabold disabled:opacity-50"
-                  onClick={handleCheckout}
-                  disabled={!selectedSize || loading}
+                  className="w-full py-4 text-base font-extrabold"
+                  onClick={selectedSize ? handleCheckout : undefined}
+                  style={{ cursor: selectedSize ? "pointer" : "not-allowed", opacity: loading ? 0.7 : 1 }}
                 >
                   {loading
                     ? "Redirecting..."
                     : selectedSize
                     ? `Buy Now — ${selectedSize} / $55`
-                    : "Select a Size"}
+                    : "Select a Size to Continue"}
                 </ShimmerButton>
               </motion.div>
 
