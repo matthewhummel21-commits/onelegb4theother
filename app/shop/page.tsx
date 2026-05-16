@@ -102,8 +102,7 @@ export default function ShopPage() {
           </BlurFade>
 
           {/* Purchase Panel */}
-          <BlurFade delay={0.3}>
-            <div className="space-y-8">
+          <div className="space-y-8">
               <div>
                 <h2 className="text-2xl font-extrabold text-white mb-1">
                   Issued With Honor Tee
@@ -173,7 +172,7 @@ export default function ShopPage() {
                 Secure checkout via Stripe · Sales tax may apply
               </p>
             </div>
-          </BlurFade>
+          </div>
         </div>
       </div>
     </main>
