@@ -16,11 +16,11 @@ const PRESET_AMOUNTS = [20, 35, 50, 100, 500, 1000];
 const RAISED = 11340;
 const GOAL = 20000;
 const PROGRESS = Math.round((RAISED / GOAL) * 100);
-const VETERANS_WAITING = 60;
+const VETERANS_WAITING = 33;
 
 const STATS = [
   { value: 500, suffix: "+", label: "Veterans Supported" },
-  { value: 60, suffix: "+", label: "On the Waitlist Now" },
+  { value: 33, suffix: "+", label: "On the Waitlist Now" },
   { value: 94, suffix: "¢", label: "Of every $1 to veterans" },
 ];
 
