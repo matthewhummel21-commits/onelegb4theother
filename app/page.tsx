@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +28,14 @@ export default function DonationPage() {
   const [mode, setMode] = useState<"monthly" | "once">("monthly");
   const [selected, setSelected] = useState<number | null>(35);
   const [custom, setCustom] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Close menu on scroll
+  useEffect(() => {
+    const handler = () => setMobileMenuOpen(false);
+    window.addEventListener("scroll", handler);
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
 
   const finalAmount = custom ? parseFloat(custom) : selected;
   const isJeansPair = finalAmount === 35;
@@ -53,6 +61,16 @@ export default function DonationPage() {
             <a href="#request" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
               Request Pants
             </a>
+            {/* Mobile hamburger */}
+            <button
+              className="sm:hidden flex flex-col gap-1.5 p-2"
+              onClick={() => setMobileMenuOpen((o) => !o)}
+              aria-label="Menu"
+            >
+              <span className={`block w-6 h-0.5 bg-white transition-all ${mobileMenuOpen ? "rotate-45 translate-y-2" : ""}`} />
+              <span className={`block w-6 h-0.5 bg-white transition-all ${mobileMenuOpen ? "opacity-0" : ""}`} />
+              <span className={`block w-6 h-0.5 bg-white transition-all ${mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
+            </button>
             <a href="#donate">
               <ShimmerButton
                 background="rgb(178,34,52)"
@@ -66,6 +84,23 @@ export default function DonationPage() {
           </div>
         </div>
       </motion.nav>
+
+      {/* MOBILE MENU */}
+      {mobileMenuOpen && (
+        <div className="fixed top-[65px] left-0 right-0 z-40 bg-black/95 backdrop-blur-md border-b border-white/10 sm:hidden">
+          <div className="flex flex-col p-4 gap-3">
+            <a href="/shop" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
+              🛍️ Shop — Issued With Honor Tee
+            </a>
+            <a href="#request" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
+              👖 Request Pants
+            </a>
+            <a href="#donate" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-[#b22234] text-white font-bold hover:bg-[#8b0000] transition-colors">
+              ❤️ Donate Now
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* HERO */}
       <section className="relative min-h-screen flex items-end pb-24 overflow-hidden bg-black pt-16">
