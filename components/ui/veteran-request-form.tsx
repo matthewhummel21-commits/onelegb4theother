@@ -20,6 +20,7 @@ interface FormData {
   yearsServed: string;
   householdSize: string;
   annualIncome: string;
+  pantType: string;
   pantSize: string;
   waist: string;
   inseam: string;
@@ -33,7 +34,7 @@ const INITIAL: FormData = {
   firstName: "", lastName: "", email: "", phone: "",
   address: "", city: "", state: "", zip: "",
   branch: "", yearsServed: "", householdSize: "", annualIncome: "",
-  pantSize: "", waist: "", inseam: "", referredBy: "", notes: "",
+  pantType: "", pantSize: "", waist: "", inseam: "", referredBy: "", notes: "",
 };
 
 export function VeteranRequestForm() {
@@ -47,13 +48,19 @@ export function VeteranRequestForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    // Store to localStorage for now — replace with API call later
-    const requests = JSON.parse(localStorage.getItem("olb4o_requests") || "[]");
-    requests.push({ ...form, submittedAt: new Date().toISOString() });
-    localStorage.setItem("olb4o_requests", JSON.stringify(requests));
-    await new Promise((r) => setTimeout(r, 800));
-    setSubmitting(false);
-    setSubmitted(true);
+    try {
+      const res = await fetch("/api/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("Failed");
+      setSubmitted(true);
+    } catch {
+      alert("Something went wrong. Please try again or call (605) 277-2721.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputClass = "h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm";
@@ -176,10 +183,38 @@ export function VeteranRequestForm() {
         </div>
       </div>
 
-      {/* Sizing */}
+      {/* Pant Type */}
       <div>
         <p className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">5</span>
+          Type of Pants Needed
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          {[
+            { value: "jeans", label: "👖 Jeans", desc: "Lee jeans, denim" },
+            { value: "sweatpants", label: "🩳 Sweatpants", desc: "Athletic, comfortable" },
+          ].map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setForm((prev) => ({ ...prev, pantType: opt.value }))}
+              className={`p-4 rounded-xl border-2 text-left transition-all ${
+                form.pantType === opt.value
+                  ? "border-primary bg-primary/10"
+                  : "border-border hover:border-primary/50"
+              }`}
+            >
+              <p className="font-bold text-sm">{opt.label}</p>
+              <p className="text-xs text-muted-foreground mt-1">{opt.desc}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Sizing */}
+      <div>
+        <p className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">6</span>
           Pant Sizing
         </p>
         <div className="grid grid-cols-3 gap-4">
