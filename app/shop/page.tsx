@@ -153,22 +153,21 @@ export default function ShopPage() {
                 <p className="text-red-400 text-sm">{error}</p>
               )}
 
-              <motion.div whileTap={{ scale: selectedSize ? 0.97 : 1 }}>
-                <ShimmerButton
-                  background={selectedSize ? "rgb(178,34,52)" : "rgb(80,80,80)"}
-                  shimmerColor="#ffffff"
-                  borderRadius="14px"
-                  className="w-full py-4 text-base font-extrabold"
-                  onClick={selectedSize ? handleCheckout : undefined}
-                  style={{ cursor: selectedSize ? "pointer" : "not-allowed", opacity: loading ? 0.7 : 1 }}
-                >
-                  {loading
-                    ? "Redirecting..."
-                    : selectedSize
-                    ? `Buy Now — ${selectedSize} / $55`
-                    : "Select a Size to Continue"}
-                </ShimmerButton>
-              </motion.div>
+              <button
+                onClick={handleCheckout}
+                disabled={!selectedSize || loading}
+                className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
+                style={{
+                  background: selectedSize && !loading ? "rgb(178,34,52)" : "rgb(80,80,80)",
+                  cursor: selectedSize && !loading ? "pointer" : "not-allowed",
+                }}
+              >
+                {loading
+                  ? "Redirecting to checkout..."
+                  : selectedSize
+                  ? `Buy Now — ${selectedSize} / $55`
+                  : "Select a Size to Continue"}
+              </button>
 
               <p className="text-white/30 text-xs text-center">
                 Secure checkout via Stripe · Sales tax may apply
