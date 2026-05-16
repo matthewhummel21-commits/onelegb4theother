@@ -47,6 +47,9 @@ export default function DonationPage() {
             <span className="text-white font-extrabold text-lg tracking-tight">One Leg B4 the Other</span>
           </div>
           <div className="flex items-center gap-3">
+            <a href="/shop" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
+              Shop
+            </a>
             <a href="#request" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
               Request Pants
             </a>
@@ -183,6 +186,25 @@ export default function DonationPage() {
         </div>
       </section>
 
+      {/* AS SEEN ON */}
+      <section className="py-10 px-6 bg-black border-b border-white/10">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-center text-xs font-bold uppercase tracking-widest text-white/30 mb-6">As Seen On</p>
+          <div className="grid grid-cols-2 gap-4">
+            <BlurFade inView delay={0}>
+              <div className="rounded-2xl overflow-hidden aspect-video">
+                <img src="/images/news-interview-1.jpg" alt="News coverage" className="w-full h-full object-cover" />
+              </div>
+            </BlurFade>
+            <BlurFade inView delay={0.15}>
+              <div className="rounded-2xl overflow-hidden aspect-video">
+                <img src="/images/news-interview-2.jpg" alt="News coverage" className="w-full h-full object-cover" />
+              </div>
+            </BlurFade>
+          </div>
+        </div>
+      </section>
+
       {/* ANIMATED STATS */}
       <section className="bg-primary py-14 px-6">
         <div className="max-w-4xl mx-auto grid grid-cols-3 gap-8 text-center">
@@ -231,7 +253,11 @@ export default function DonationPage() {
                 </p>
                 <Separator className="mb-6" />
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-xl">🙏</div>
+                  <img
+                    src="/images/joseph-christmas-sponsor.jpg"
+                    alt="Joseph Powell"
+                    className="w-12 h-12 rounded-full object-cover object-right"
+                  />
                   <div>
                     <p className="font-bold text-foreground">Joseph Powell</p>
                     <p className="text-sm text-muted-foreground">Founder, One Leg B4 the Other</p>
@@ -584,29 +610,30 @@ export default function DonationPage() {
             </div>
           </BlurFade>
 
-          {/* Photo grid — swap src with real photos */}
+          {/* Photo grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {[
-              { placeholder: true, label: "Delivery Day" },
-              { placeholder: true, label: "Smiles & Handshakes" },
-              { placeholder: true, label: "The Team" },
-              { placeholder: true, label: "Community Event" },
-              { placeholder: true, label: "Veteran Recipients" },
-              { placeholder: true, label: "Behind the Scenes" },
+              { src: "/images/delivery-day-kevin.jpg", label: "Delivery Day" },
+              { src: "/images/team-office-shirts.jpg", label: "Smiles & Handshakes" },
+              { src: "/images/team-selfie-office.jpg", label: "The Team" },
+              { src: "/images/booth-car-show.jpg", label: "Community Event" },
+              { src: "/images/joseph-christmas-sponsor.jpg", label: "Veteran Recipients" },
+              { src: "/images/sorting-pants.jpg", label: "Behind the Scenes" },
             ].map((photo, i) => (
               <BlurFade key={i} inView delay={i * 0.1}>
-                <div className="aspect-square rounded-2xl bg-muted border-2 border-dashed border-border flex flex-col items-center justify-center text-center p-4 group">
-                  <span className="text-3xl mb-2">📸</span>
-                  <p className="text-xs text-muted-foreground font-semibold">{photo.label}</p>
-                  <p className="text-xs text-muted-foreground/60 mt-1">Photo coming soon</p>
+                <div className="aspect-square rounded-2xl overflow-hidden relative group">
+                  <img
+                    src={photo.src}
+                    alt={photo.label}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+                    <p className="text-xs text-white font-semibold">{photo.label}</p>
+                  </div>
                 </div>
               </BlurFade>
             ))}
           </div>
-
-          <p className="text-center text-xs text-muted-foreground mt-6">
-            Real photos being added soon — follow us for updates.
-          </p>
         </div>
       </section>
 
