@@ -42,19 +42,21 @@ export async function POST(req: NextRequest) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function fulfillPrintfulOrder(session: any) {
   const { size, printful_variant_id } = session.metadata || {};
-  const shipping = session.shipping_details;
   const customer = session.customer_details;
 
-  if (!shipping?.address || !customer) {
-    console.error("Missing shipping/customer details", session.id);
+  // Stripe puts address in shipping_details when collected separately,
+  // or in customer_details.address when collected as billing/combined
+  const addr = session.shipping_details?.address || customer?.address;
+  const recipientName = session.shipping_details?.name || customer?.name || "Customer";
+
+  if (!addr || !customer) {
+    console.error("Missing address/customer details", session.id);
     return;
   }
 
-  const addr = shipping.address;
-
   const orderPayload = {
     recipient: {
-      name: shipping.name || customer.name || "Customer",
+      name: recipientName,
       email: customer.email,
       address1: addr.line1,
       address2: addr.line2 || "",
