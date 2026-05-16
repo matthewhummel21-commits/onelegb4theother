@@ -211,26 +211,52 @@ export function VeteranRequestForm() {
         </div>
       </div>
 
-      {/* Sizing */}
+      {/* Sizing — changes based on pant type */}
       <div>
         <p className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">6</span>
-          Pant Sizing
+          {form.pantType === "sweatpants" ? "Sweatpants Size" : "Jeans Size"}
         </p>
-        <div className="grid grid-cols-3 gap-4">
+
+        {form.pantType === "sweatpants" ? (
           <div>
-            <label className={labelClass}>Waist (inches) *</label>
-            <Input required value={form.waist} onChange={set("waist")} className={inputClass} placeholder="32" />
+            <p className="text-xs text-muted-foreground mb-3">Select your size</p>
+            <div className="flex flex-wrap gap-2">
+              {["S", "M", "L", "XL", "2XL", "3XL"].map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  onClick={() => setForm((prev) => ({ ...prev, pantSize: size }))}
+                  className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                    form.pantSize === size
+                      ? "bg-primary border-primary text-white"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+            {!form.pantSize && form.pantType === "sweatpants" && (
+              <p className="text-xs text-amber-500 mt-2">Please select a size</p>
+            )}
           </div>
-          <div>
-            <label className={labelClass}>Inseam (inches) *</label>
-            <Input required value={form.inseam} onChange={set("inseam")} className={inputClass} placeholder="30" />
+        ) : (
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className={labelClass}>Waist (inches) *</label>
+              <Input required={form.pantType === "jeans"} value={form.waist} onChange={set("waist")} className={inputClass} placeholder="32" />
+            </div>
+            <div>
+              <label className={labelClass}>Inseam (inches) *</label>
+              <Input required={form.pantType === "jeans"} value={form.inseam} onChange={set("inseam")} className={inputClass} placeholder="30" />
+            </div>
+            <div>
+              <label className={labelClass}>General Size</label>
+              <Input value={form.pantSize} onChange={set("pantSize")} className={inputClass} placeholder="e.g. 32x30" />
+            </div>
           </div>
-          <div>
-            <label className={labelClass}>General Size</label>
-            <Input value={form.pantSize} onChange={set("pantSize")} className={inputClass} placeholder="e.g. 32x30" />
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Referral + Notes */}
