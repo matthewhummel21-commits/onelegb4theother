@@ -277,22 +277,15 @@ export default function DonationPage() {
 
       {/* WHAT WE DO */}
       <section className="py-16 px-6 bg-card border-y border-border">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            {[
-              { icon: "👖", title: "Brand New Pants", desc: "Veterans receive as many pairs as they need — brand new, never used, chosen with their dignity in mind.", delay: 0 },
-              { icon: "🎖️", title: "Honor & Respect", desc: "Every veteran receives their pants with the recognition and respect they earned through their service.", delay: 0.15 },
-              { icon: "🚶", title: "A First Step", desc: "Getting dressed with confidence is the first step back. We open that door for veterans every time.", delay: 0.3 },
-            ].map((item) => (
-              <BlurFade key={item.title} delay={item.delay} inView>
-                <div className="rounded-2xl border border-border bg-background p-8 h-full">
-                  <div className="text-4xl mb-4">{item.icon}</div>
-                  <h3 className="font-bold text-lg mb-2">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-                </div>
-              </BlurFade>
-            ))}
-          </div>
+        <div className="max-w-3xl mx-auto">
+          <BlurFade inView delay={0}>
+            <div className="rounded-3xl border border-border bg-background p-10 md:p-14 text-center">
+              <div className="text-5xl mb-6">👖</div>
+              <p className="text-xl md:text-2xl font-semibold leading-relaxed text-foreground">
+                Veterans receive a brand new pair of civilian pants, issued from a place of honor and respect. Getting dressed with confidence is something they earned in uniform &mdash; we&rsquo;re making sure they carry it into civilian life.
+              </p>
+            </div>
+          </BlurFade>
         </div>
       </section>
 
