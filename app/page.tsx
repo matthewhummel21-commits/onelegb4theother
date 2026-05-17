@@ -331,7 +331,7 @@ export default function DonationPage() {
               <div className="grid grid-cols-3 gap-4">
                 {[
                   { value: 12, label: "States Reached" },
-                  { value: 60, suffix: "+", label: "On the Waitlist" },
+                  { value: 33, suffix: "+", label: "On the Waitlist" },
                   { value: 933, label: "Community Supporters" },
                 ].map((s) => (
                   <div key={s.label} className="text-center p-4 rounded-2xl bg-card border border-border">
