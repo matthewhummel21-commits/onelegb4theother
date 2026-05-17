@@ -338,8 +338,8 @@ export default function DonationPage() {
               <div className="grid grid-cols-3 gap-4">
                 {[
                   { value: 12, label: "States Reached" },
-                  { value: 60, suffix: "+", label: "On the waitlist" },
-                  { value: 933, label: "Community supporters" },
+                  { value: 60, suffix: "+", label: "On the Waitlist" },
+                  { value: 933, label: "Community Supporters" },
                 ].map((s) => (
                   <div key={s.label} className="text-center p-4 rounded-2xl bg-card border border-border">
                     <p className="text-2xl font-extrabold text-primary">
@@ -378,11 +378,10 @@ export default function DonationPage() {
             <div className="relative">
               <div className="absolute -top-6 -left-4 text-9xl text-primary/10 font-serif leading-none select-none">&ldquo;</div>
               <blockquote className="relative z-10 space-y-4 text-lg leading-relaxed text-foreground">
-                <p>I proudly served as an aircraft maintenance and crash recovery technician for 20 years. When a jet went down, I led the team that went out there. We had a great team &mdash; one that hoped we never had to work. Nobody wants a situation like that to happen.</p>
-                <p>Coming home, I saw veterans struggling with stuff that also shouldn&rsquo;t be happening. Basic stuff. Nobody was really focusing on something a lot of people take for granted &mdash; having clothing that fits. We understand how what we wear makes us feel, and we saw a real opportunity to do more community outreach than most.</p>
+                <p>I proudly served as an aircraft maintenance and crash recovery technician for 20 years. When a jet went down, I led the team that went out there. We had a great team &mdash; one that hoped we&rsquo;d never be needed. Nobody wants a situation like that to happen.</p>
+                <p>Coming home, I saw veterans struggling with things that also shouldn&rsquo;t be happening. Basic things. Nobody was really focusing on something a lot of people take for granted &mdash; having clothing that fits. We know what we wear affects how we feel, and we saw a real opportunity to do more for our community than most.</p>
                 <p>So we did something about it.</p>
-                <p>It&rsquo;s not complicated. A veteran needs pants, we get them pants. We show up, share some stories, and hope those pants help spark that inner soldier or airman in them. Afterall,</p>
-                <p>They gave everything. The least we can do is show up.</p>
+                <p>It&rsquo;s not complicated. A veteran needs pants &mdash; we get them pants. We show up, share some stories, and hope those pants help spark that inner soldier or airman in them. After all, they gave everything. The least we can do is show up.</p>
               </blockquote>
               <div className="mt-8 flex items-center gap-4">
                 <img src="/images/veteran-pants-fitting.jpg" alt="Matthew Hummel" className="w-12 h-12 rounded-full object-cover object-top" />
@@ -733,10 +732,10 @@ export default function DonationPage() {
         <p className="mb-1">(605) 277-2721</p>
         <p className="mb-3">EIN: 99-3332965 · 501(c)(3) Nonprofit · Veteran-Led</p>
         <div className="flex justify-center gap-6 mb-4">
-          <a href="https://onelegb4theother.org" className="hover:text-white transition-colors">Website</a>
-          <a href="https://onelegb4theother.org/donate" className="hover:text-white transition-colors">Donate</a>
-          <a href="https://onelegb4theother.org/volunteer-4a-purpose" className="hover:text-white transition-colors">Volunteer</a>
-          <a href="https://onelegb4theother.org/buy-pants-4a-veteran" className="hover:text-white transition-colors">Shop</a>
+          <a href="https://onelegb4theother.com" className="hover:text-white transition-colors">Home</a>
+          <a href="https://onelegb4theother.com/#donate" className="hover:text-white transition-colors">Donate</a>
+          <a href="https://onelegb4theother.com/#request" className="hover:text-white transition-colors">Request Pants</a>
+          <a href="https://onelegb4theother.com/shop" className="hover:text-white transition-colors">Shop</a>
         </div>
         <p>© {new Date().getFullYear()} One Leg B4 the Other · All rights reserved</p>
       </footer>
