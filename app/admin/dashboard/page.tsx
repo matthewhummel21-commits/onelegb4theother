@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getDb, RequestRow } from "@/lib/db";
+import { initDb, getAllRequests, RequestRow } from "@/lib/db";
 import DashboardClient from "./DashboardClient";
 
 export const dynamic = "force-dynamic";
@@ -14,11 +14,11 @@ export default async function DashboardPage() {
     redirect("/admin");
   }
 
+  // Ensure DB table exists
+  await initDb();
+
   // Load all requests
-  const db = getDb();
-  const rows = db
-    .prepare("SELECT * FROM requests ORDER BY created_at DESC")
-    .all() as RequestRow[];
+  const rows: RequestRow[] = await getAllRequests();
 
   const needsCall = rows.filter((r) => r.status === "needs_call");
   const pending = rows.filter((r) => r.status === "pending");

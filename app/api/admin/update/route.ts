@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getDb } from "@/lib/db";
+import { getRequestById, updateRequestStatus } from "@/lib/db";
 
 // ─── Telegram helper ─────────────────────────────────────────────────────────
 async function sendTelegram(message: string) {
@@ -38,10 +38,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing id or action" }, { status: 400 });
     }
 
-    const db = getDb();
-    const row = db.prepare("SELECT * FROM requests WHERE id = ?").get(id) as
-      | { first_name: string; last_name: string; pant_type: string; pant_size: string; waist: string; inseam: string; address: string; city: string; state: string; zip: string; phone: string; status: string }
-      | undefined;
+    const row = await getRequestById(Number(id));
 
     if (!row) {
       return NextResponse.json({ error: "Request not found" }, { status: 404 });
@@ -56,14 +53,15 @@ export async function POST(req: NextRequest) {
 
     switch (action) {
       case "approve": {
-        const searchQuery = type === "Sweatpants"
-          ? `mens+sweatpants+${encodeURIComponent(size)}`
-          : `Lee+jeans+mens+${encodeURIComponent(size)}`;
-        amazonLink = `https://www.amazon.com/s?k=${searchQuery}`;
+        const searchTerm = encodeURIComponent(
+          `${row.pant_type === "sweatpants" ? "mens sweatpants" : "Lee jeans mens"} ${size}`
+        );
+        amazonLink = `https://www.amazon.com/s?k=${searchTerm}`;
 
-        db.prepare(
-          "UPDATE requests SET status = 'approved', amazon_link = ?, verified_by = COALESCE(verified_by, 'manual') WHERE id = ?"
-        ).run(amazonLink, id);
+        await updateRequestStatus(Number(id), "approved", {
+          amazonLink,
+          verifiedBy: "manual",
+        });
 
         await sendTelegram(
           `✅ <b>Request Approved</b> [#${id}]\n` +
@@ -76,26 +74,25 @@ export async function POST(req: NextRequest) {
       }
 
       case "flag_call": {
-        db.prepare("UPDATE requests SET status = 'needs_call' WHERE id = ?").run(id);
+        await updateRequestStatus(Number(id), "needs_call");
         break;
       }
 
       case "verify_call": {
-        db.prepare(
-          "UPDATE requests SET status = 'pending', call_notes = ?, verified_by = 'call' WHERE id = ?"
-        ).run(callNotes || null, id);
+        await updateRequestStatus(Number(id), "pending", {
+          callNotes: callNotes || null,
+          verifiedBy: "call",
+        });
         break;
       }
 
       case "deny": {
-        db.prepare("UPDATE requests SET status = 'denied' WHERE id = ?").run(id);
+        await updateRequestStatus(Number(id), "denied");
         break;
       }
 
       case "mark_shipped": {
-        db.prepare(
-          "UPDATE requests SET status = 'shipped', shipped_at = datetime('now') WHERE id = ?"
-        ).run(id);
+        await updateRequestStatus(Number(id), "shipped", { shippedAt: "now" });
         break;
       }
 

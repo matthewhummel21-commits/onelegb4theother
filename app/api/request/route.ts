@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import path from "path";
-import fs from "fs";
-import { getDb } from "@/lib/db";
+import { put } from "@vercel/blob";
+import { initDb, insertRequest } from "@/lib/db";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -12,16 +11,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// ─── Telegram helper ────────────────────────────────────────────────────────
-// To get your TELEGRAM_CHAT_ID:
-//   1. Message your bot on Telegram
-//   2. Visit: https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getUpdates
-//   3. Copy the "id" from the "chat" object in the first result
-//   4. Set TELEGRAM_CHAT_ID in .env.local
+// ─── Telegram helper ─────────────────────────────────────────────────────────
 async function sendTelegram(message: string) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) return; // Skip if not configured
+  if (!token || !chatId) return;
 
   try {
     await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -57,7 +51,7 @@ function buildEmailHtml(fields: Record<string, string>) {
 
   <div style="border: 2px solid #b22234; border-top: none; border-radius: 0 0 12px 12px; padding: 24px;">
 
-    ${idUploaded === "1"
+    ${idUploaded === "true"
       ? `<div style="background: #e8f5e9; border: 1px solid #4caf50; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px;">
           ✅ <strong>ID/DD-214 uploaded</strong> — ready for review
          </div>`
@@ -124,23 +118,21 @@ function buildEmailHtml(fields: Record<string, string>) {
 
 export async function POST(req: NextRequest) {
   try {
+    // Ensure DB table exists
+    await initDb();
+
     const contentType = req.headers.get("content-type") || "";
     const isMultipart = contentType.includes("multipart/form-data");
 
-    // ── Parse form data (supports both JSON and multipart) ──────────────────
+    // ── Parse form data (supports both multipart and JSON) ───────────────────
     let fields: Record<string, string> = {};
-    let idFileBuffer: Buffer | null = null;
-    let idFileExt = "";
-    let idFileOriginalName = "";
+    let idFile: File | null = null;
 
     if (isMultipart) {
       const formData = await req.formData();
       for (const [key, value] of formData.entries()) {
         if (key === "idFile" && value instanceof File && value.size > 0) {
-          const bytes = await value.arrayBuffer();
-          idFileBuffer = Buffer.from(bytes);
-          idFileOriginalName = value.name;
-          idFileExt = path.extname(value.name).toLowerCase() || ".bin";
+          idFile = value;
         } else if (typeof value === "string") {
           fields[key] = value;
         }
@@ -158,36 +150,33 @@ export async function POST(req: NextRequest) {
       referredBy, notes,
     } = fields;
 
-    const fullName = `${firstName} ${lastName}`;
-    const fullAddress = `${address}, ${city}, ${state} ${zip}`;
-    const size = pantSize || `${waist}x${inseam}`;
+    const fullName = `${firstName || ""} ${lastName || ""}`.trim();
+    const fullAddress = `${address || ""}, ${city || ""}, ${state || ""} ${zip || ""}`.trim();
+    const size = pantSize || (waist && inseam ? `${waist}x${inseam}` : "?");
     const type = pantType === "sweatpants" ? "Sweatpants" : "Lee Jeans";
-    const idUploaded = idFileBuffer ? 1 : 0;
+
+    // ── Upload ID to Vercel Blob (if provided) ───────────────────────────────
+    let idFilePath: string | null = null;
+    let idUploaded = false;
+
+    if (idFile) {
+      try {
+        const ext = idFile.name.split(".").pop()?.toLowerCase() || "bin";
+        const blobName = `vet-ids/${Date.now()}-${firstName || "unknown"}-${lastName || "unknown"}.${ext}`;
+        const blob = await put(blobName, idFile, { access: "public" });
+        idFilePath = blob.url;
+        idUploaded = true;
+        console.log(`Uploaded ID to Vercel Blob: ${idFilePath}`);
+      } catch (blobErr) {
+        console.error("Vercel Blob upload error:", blobErr);
+        // Continue without file — degrade gracefully
+      }
+    }
+
     const status = idUploaded ? "pending" : "needs_call";
 
-    // ── Save to SQLite ───────────────────────────────────────────────────────
-    const db = getDb();
-    const insert = db.prepare(`
-      INSERT INTO requests (
-        status, first_name, last_name, email, phone,
-        address, city, state, zip,
-        branch, years_served,
-        household_size, annual_income,
-        pant_type, pant_size, waist, inseam,
-        referred_by, notes,
-        id_uploaded
-      ) VALUES (
-        @status, @firstName, @lastName, @email, @phone,
-        @address, @city, @state, @zip,
-        @branch, @yearsServed,
-        @householdSize, @annualIncome,
-        @pantType, @pantSize, @waist, @inseam,
-        @referredBy, @notes,
-        @idUploaded
-      )
-    `);
-
-    const result = insert.run({
+    // ── Save to Neon Postgres ────────────────────────────────────────────────
+    const requestId = await insertRequest({
       status,
       firstName: firstName || null,
       lastName: lastName || null,
@@ -208,26 +197,8 @@ export async function POST(req: NextRequest) {
       referredBy: referredBy || null,
       notes: notes || null,
       idUploaded,
+      idFilePath,
     });
-
-    const requestId = result.lastInsertRowid as number;
-
-    // ── Save uploaded ID file ────────────────────────────────────────────────
-    let idFilePath: string | null = null;
-    if (idFileBuffer && idFileExt) {
-      const uploadsDir = path.join(process.cwd(), "public", "uploads");
-      if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-      }
-      const fileName = `${requestId}-id${idFileExt}`;
-      const filePath = path.join(uploadsDir, fileName);
-      fs.writeFileSync(filePath, idFileBuffer);
-      idFilePath = `/uploads/${fileName}`;
-      console.log(`Saved ID file: ${filePath} (original: ${idFileOriginalName})`);
-
-      // Update DB with file path
-      db.prepare("UPDATE requests SET id_file_path = ? WHERE id = ?").run(idFilePath, requestId);
-    }
 
     // ── Send email notification ──────────────────────────────────────────────
     const recipients = (process.env.NOTIFY_EMAILS || "")
@@ -245,7 +216,7 @@ export async function POST(req: NextRequest) {
       annualIncome: annualIncome || "",
       referredBy: referredBy || "",
       notes: notes || "",
-      idUploaded: idUploaded.toString(),
+      idUploaded: String(idUploaded),
     });
 
     if (recipients.length > 0) {
