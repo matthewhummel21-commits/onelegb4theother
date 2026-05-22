@@ -40,3 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .git-standalone
+
+# SQLite database
+/data/
+
+# Uploaded veteran ID files
+/public/uploads/

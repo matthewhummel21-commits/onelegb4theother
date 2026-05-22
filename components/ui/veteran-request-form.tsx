@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { useState, useRef } from "react";
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { BlurFade } from "@/components/ui/blur-fade";
 
 interface FormData {
   firstName: string;
@@ -41,19 +39,39 @@ export function VeteranRequestForm() {
   const [form, setForm] = useState<FormData>(INITIAL);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [idFile, setIdFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const set = (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setIdFile(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
+      const formData = new FormData();
+
+      // Append all form fields
+      Object.entries(form).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+
+      // Append file if provided
+      if (idFile) {
+        formData.append("idFile", idFile);
+      }
+
       const res = await fetch("/api/request", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: formData,
+        // No Content-Type header — browser sets it with boundary for multipart
       });
+
       if (!res.ok) throw new Error("Failed");
       setSubmitted(true);
     } catch {
@@ -76,7 +94,9 @@ export function VeteranRequestForm() {
         <div className="text-6xl mb-6">🎖️</div>
         <h3 className="text-2xl font-extrabold mb-3">Request Received. Thank You for Your Service.</h3>
         <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">
-          We&rsquo;ll review your request and reach out within a few days. If you qualify, we&rsquo;ll ship directly to you at no cost.
+          {idFile
+            ? "We received your ID and will review your request shortly. If approved, we'll ship directly to you at no cost."
+            : "We'll give you a call to verify your service, then ship directly to you at no cost if you qualify."}
         </p>
       </motion.div>
     );
@@ -84,7 +104,7 @@ export function VeteranRequestForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Personal Info */}
+      {/* Step 1 — Personal Info */}
       <div>
         <p className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">1</span>
@@ -110,7 +130,7 @@ export function VeteranRequestForm() {
         </div>
       </div>
 
-      {/* Shipping Address */}
+      {/* Step 2 — Shipping Address */}
       <div>
         <p className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">2</span>
@@ -138,7 +158,7 @@ export function VeteranRequestForm() {
         </div>
       </div>
 
-      {/* Service Info */}
+      {/* Step 3 — Military Service */}
       <div>
         <p className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">3</span>
@@ -164,7 +184,7 @@ export function VeteranRequestForm() {
         </div>
       </div>
 
-      {/* Financial */}
+      {/* Step 4 — Household Info */}
       <div>
         <p className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">4</span>
@@ -183,7 +203,7 @@ export function VeteranRequestForm() {
         </div>
       </div>
 
-      {/* Pant Type */}
+      {/* Step 5 — Pant Type */}
       <div>
         <p className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">5</span>
@@ -211,7 +231,7 @@ export function VeteranRequestForm() {
         </div>
       </div>
 
-      {/* Sizing — changes based on pant type */}
+      {/* Step 6 — Sizing */}
       <div>
         <p className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
           <span className="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">6</span>
@@ -257,6 +277,69 @@ export function VeteranRequestForm() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Step 7 — Verify Service (Optional) */}
+      <div>
+        <p className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">7</span>
+          Verify Service
+          <span className="text-xs font-normal text-muted-foreground">(Optional — but speeds up approval)</span>
+        </p>
+
+        <div className="rounded-xl border-2 border-border bg-muted/30 p-5 space-y-4">
+          <p className="text-sm text-foreground leading-relaxed">
+            Upload your <strong>DD-214</strong> or <strong>Veteran ID card</strong> to speed up your approval.
+            If you can&apos;t provide one right now, no problem — we&apos;ll give you a quick call to verify.
+          </p>
+
+          {!idFile ? (
+            <div className="flex flex-col items-start gap-3">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-dashed border-primary/50 text-primary text-sm font-semibold hover:border-primary hover:bg-primary/5 transition-all"
+              >
+                <span>📎</span> Choose File (PDF, JPG, PNG)
+              </button>
+              <p className="text-xs text-muted-foreground">
+                No problem if you can&apos;t — we&apos;ll call you to verify instead.
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 bg-green-50 border border-green-300 rounded-xl px-4 py-2.5 text-sm text-green-700 font-semibold">
+                <span>✅</span>
+                <span>ID uploaded: {idFile.name}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIdFile(null);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
+                className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+              >
+                Remove
+              </button>
+            </div>
+          )}
+
+          {!idFile && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              <span>📞</span>
+              <span>No file? We&apos;ll call you to verify — just make sure your phone number above is correct.</span>
+            </div>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+        </div>
       </div>
 
       {/* Referral + Notes */}
