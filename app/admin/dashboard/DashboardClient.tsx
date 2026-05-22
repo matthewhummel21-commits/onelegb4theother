@@ -107,9 +107,9 @@ function RequestCard({
           href={req.amazon_link}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs text-orange-300 hover:text-orange-200 bg-orange-900/20 border border-orange-800/40 px-3 py-1.5 rounded-lg transition-colors"
+          className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 text-white font-bold text-sm transition-colors shadow-lg"
         >
-          🛒 Open Amazon Search
+          🛒 Order on Amazon — Ship to Veteran
         </a>
       )}
 
