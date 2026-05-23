@@ -3,7 +3,16 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "One Leg B4 the Other — Support Veterans",
-  description: "Help us restore dignity and mobility to veterans who need it most.",
+  description: "Providing new pants to veterans in need — with dignity. Donate, shop, or request pants.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "OneLeg",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export default function RootLayout({
@@ -14,6 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="theme-color" content="#b22234" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
         <script
           async
           crossOrigin="anonymous"
