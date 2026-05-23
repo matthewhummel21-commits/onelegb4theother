@@ -103,14 +103,29 @@ function RequestCard({
 
       {/* Amazon link (approved) */}
       {isApproved && req.amazon_link && (
-        <a
-          href={req.amazon_link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 text-white font-bold text-sm transition-colors shadow-lg"
-        >
-          🛒 Order on Amazon — Ship to Veteran
-        </a>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-800 border border-slate-600">
+            <div className="flex-1">
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wide mb-0.5">Ship To</p>
+              <p className="text-sm text-white font-bold">{req.first_name} {req.last_name}</p>
+              <p className="text-xs text-slate-300">{fullAddress}</p>
+            </div>
+            <button
+              onClick={() => navigator.clipboard.writeText(`${req.first_name} ${req.last_name}\n${fullAddress}`)}
+              className="px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold transition-colors shrink-0"
+            >
+              📋 Copy
+            </button>
+          </div>
+          <a
+            href={req.amazon_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 text-white font-bold text-sm transition-colors shadow-lg"
+          >
+            🛒 Order on Amazon — Ship to Veteran
+          </a>
+        </div>
       )}
 
       {/* Call verification form */}
