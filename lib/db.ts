@@ -24,6 +24,7 @@ export type RequestRow = {
   household_size: string | null;
   annual_income: string | null;
   pant_type: string | null;
+  pant_fit: string | null;
   pant_size: string | null;
   waist: string | null;
   inseam: string | null;
@@ -58,6 +59,7 @@ export async function initDb(): Promise<void> {
         household_size TEXT,
         annual_income TEXT,
         pant_type TEXT,
+        pant_fit TEXT,
         pant_size TEXT,
         waist TEXT,
         inseam TEXT,
@@ -92,6 +94,7 @@ export async function insertRequest(data: {
   householdSize?: string | null;
   annualIncome?: string | null;
   pantType?: string | null;
+  pantFit?: string | null;
   pantSize?: string | null;
   waist?: string | null;
   inseam?: string | null;
@@ -107,7 +110,7 @@ export async function insertRequest(data: {
       address, city, state, zip,
       branch, years_served,
       household_size, annual_income,
-      pant_type, pant_size, waist, inseam,
+      pant_type, pant_fit, pant_size, waist, inseam,
       referred_by, notes,
       id_uploaded, id_file_path
     ) VALUES (
@@ -125,6 +128,7 @@ export async function insertRequest(data: {
       ${data.householdSize ?? null},
       ${data.annualIncome ?? null},
       ${data.pantType ?? null},
+      ${data.pantFit ?? null},
       ${data.pantSize ?? null},
       ${data.waist ?? null},
       ${data.inseam ?? null},

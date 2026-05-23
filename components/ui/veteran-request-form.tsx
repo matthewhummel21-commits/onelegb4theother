@@ -19,6 +19,7 @@ interface FormData {
   householdSize: string;
   annualIncome: string;
   pantType: string;
+  pantFit: string;
   pantSize: string;
   waist: string;
   inseam: string;
@@ -32,7 +33,7 @@ const INITIAL: FormData = {
   firstName: "", lastName: "", email: "", phone: "",
   address: "", city: "", state: "", zip: "",
   branch: "", yearsServed: "", householdSize: "", annualIncome: "",
-  pantType: "", pantSize: "", waist: "", inseam: "", referredBy: "", notes: "",
+  pantType: "", pantFit: "", pantSize: "", waist: "", inseam: "", referredBy: "", notes: "",
 };
 
 export function VeteranRequestForm() {
@@ -262,18 +263,39 @@ export function VeteranRequestForm() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className={labelClass}>Waist (inches) *</label>
-              <Input required={form.pantType === "jeans"} value={form.waist} onChange={set("waist")} className={inputClass} placeholder="32" />
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className={labelClass}>Waist (inches) *</label>
+                <Input required={form.pantType === "jeans"} value={form.waist} onChange={set("waist")} className={inputClass} placeholder="32" />
+              </div>
+              <div>
+                <label className={labelClass}>Inseam (inches) *</label>
+                <Input required={form.pantType === "jeans"} value={form.inseam} onChange={set("inseam")} className={inputClass} placeholder="30" />
+              </div>
+              <div>
+                <label className={labelClass}>General Size</label>
+                <Input value={form.pantSize} onChange={set("pantSize")} className={inputClass} placeholder="e.g. 32x30" />
+              </div>
             </div>
             <div>
-              <label className={labelClass}>Inseam (inches) *</label>
-              <Input required={form.pantType === "jeans"} value={form.inseam} onChange={set("inseam")} className={inputClass} placeholder="30" />
-            </div>
-            <div>
-              <label className={labelClass}>General Size</label>
-              <Input value={form.pantSize} onChange={set("pantSize")} className={inputClass} placeholder="e.g. 32x30" />
+              <label className={labelClass}>Fit Style</label>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {["Relaxed", "Boot Cut", "Straight", "Slim", "Athletic"].map((fit) => (
+                  <button
+                    key={fit}
+                    type="button"
+                    onClick={() => setForm((prev) => ({ ...prev, pantFit: fit }))}
+                    className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                      form.pantFit === fit
+                        ? "bg-primary border-primary text-white"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    {fit}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}

@@ -80,7 +80,7 @@ function RequestCard({
         <InfoRow label="Phone" value={req.phone} />
         <InfoRow label="Email" value={req.email} />
         <InfoRow label="Branch" value={[req.branch, req.years_served].filter(Boolean).join(" · ")} />
-        <InfoRow label="Pants" value={`${type} · ${size}`} />
+        <InfoRow label="Pants" value={`${type} · ${size}${req.pant_fit ? ` · ${req.pant_fit}` : ""}`} />
         <InfoRow label="Address" value={fullAddress} className="col-span-2" />
         {req.household_size && <InfoRow label="Household" value={`${req.household_size} people · ${req.annual_income}/yr`} className="col-span-2" />}
         {req.referred_by && <InfoRow label="Referred by" value={req.referred_by} className="col-span-2" />}
