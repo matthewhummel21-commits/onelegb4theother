@@ -25,6 +25,7 @@ interface FormData {
   inseam: string;
   referredBy: string;
   notes: string;
+  wantsFollowUpCall: boolean;
 }
 
 const BRANCHES = ["Army", "Navy", "Marine Corps", "Air Force", "Space Force", "Coast Guard", "National Guard", "Reserves"];
@@ -33,7 +34,7 @@ const INITIAL: FormData = {
   firstName: "", lastName: "", email: "", phone: "",
   address: "", city: "", state: "", zip: "",
   branch: "", yearsServed: "", householdSize: "", annualIncome: "",
-  pantType: "", pantFit: "", pantSize: "", waist: "", inseam: "", referredBy: "", notes: "",
+  pantType: "", pantFit: "", pantSize: "", waist: "", inseam: "", referredBy: "", notes: "", wantsFollowUpCall: false,
 };
 
 export function VeteranRequestForm() {
@@ -380,6 +381,27 @@ export function VeteranRequestForm() {
             placeholder="Share your situation, any special needs, etc."
           />
         </div>
+
+        {/* Follow-up call opt-in */}
+        <button
+          type="button"
+          onClick={() => setForm((prev) => ({ ...prev, wantsFollowUpCall: !prev.wantsFollowUpCall }))}
+          className={`w-full flex items-start gap-4 p-4 rounded-2xl border-2 text-left transition-all ${
+            form.wantsFollowUpCall
+              ? "border-primary bg-primary/10"
+              : "border-border hover:border-primary/40 bg-muted/30"
+          }`}
+        >
+          <div className={`mt-0.5 w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
+            form.wantsFollowUpCall ? "bg-primary border-primary" : "border-muted-foreground"
+          }`}>
+            {form.wantsFollowUpCall && <span className="text-white text-xs font-bold">✓</span>}
+          </div>
+          <div>
+            <p className="font-bold text-sm text-foreground">I&apos;d welcome a follow-up call 📞</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Sometimes we just want to say hello and hear your story. Check this if you&apos;re open to us reaching out — no obligation, just a conversation.</p>
+          </div>
+        </button>
       </div>
 
       <button

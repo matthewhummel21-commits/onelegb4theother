@@ -87,6 +87,13 @@ function RequestCard({
         {req.notes && <InfoRow label="Notes" value={req.notes} className="col-span-2" />}
         {req.call_notes && <InfoRow label="Call Notes" value={req.call_notes} className="col-span-2 text-amber-300" />}
         {req.verified_by && <InfoRow label="Verified via" value={req.verified_by} />}
+        {req.wants_follow_up_call && (
+          <div className="col-span-2 mt-1">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-900/40 border border-green-600/40 text-green-400 text-xs font-bold">
+              📞 Open to a follow-up call
+            </span>
+          </div>
+        )}
       </div>
 
       {/* ID file link */}

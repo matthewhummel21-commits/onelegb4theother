@@ -30,6 +30,7 @@ export type RequestRow = {
   inseam: string | null;
   referred_by: string | null;
   notes: string | null;
+  wants_follow_up_call: boolean;
   id_uploaded: boolean;
   id_file_path: string | null;
   call_notes: string | null;
@@ -65,6 +66,7 @@ export async function initDb(): Promise<void> {
         inseam TEXT,
         referred_by TEXT,
         notes TEXT,
+        wants_follow_up_call BOOLEAN DEFAULT FALSE,
         id_uploaded BOOLEAN DEFAULT FALSE,
         id_file_path TEXT,
         call_notes TEXT,
@@ -100,6 +102,7 @@ export async function insertRequest(data: {
   inseam?: string | null;
   referredBy?: string | null;
   notes?: string | null;
+  wantsFollowUpCall?: boolean;
   idUploaded?: boolean;
   idFilePath?: string | null;
 }): Promise<number> {
@@ -112,7 +115,7 @@ export async function insertRequest(data: {
       household_size, annual_income,
       pant_type, pant_fit, pant_size, waist, inseam,
       referred_by, notes,
-      id_uploaded, id_file_path
+      wants_follow_up_call, id_uploaded, id_file_path
     ) VALUES (
       ${data.status},
       ${data.firstName ?? null},
@@ -134,6 +137,7 @@ export async function insertRequest(data: {
       ${data.inseam ?? null},
       ${data.referredBy ?? null},
       ${data.notes ?? null},
+      ${data.wantsFollowUpCall ?? false},
       ${data.idUploaded ?? false},
       ${data.idFilePath ?? null}
     )
