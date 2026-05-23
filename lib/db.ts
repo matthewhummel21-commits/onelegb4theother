@@ -76,13 +76,8 @@ export async function initDb(): Promise<void> {
       )
     `;
     // Migrations — add columns that may not exist on older tables
-    const migrations = [
-      `ALTER TABLE requests ADD COLUMN IF NOT EXISTS pant_fit TEXT`,
-      `ALTER TABLE requests ADD COLUMN IF NOT EXISTS wants_follow_up_call BOOLEAN DEFAULT FALSE`,
-    ];
-    for (const m of migrations) {
-      await sql.unsafe(m);
-    }
+    await sql`ALTER TABLE requests ADD COLUMN IF NOT EXISTS pant_fit TEXT`;
+    await sql`ALTER TABLE requests ADD COLUMN IF NOT EXISTS wants_follow_up_call BOOLEAN DEFAULT FALSE`;
   } catch (err) {
     console.error("initDb error:", err);
     throw err;
