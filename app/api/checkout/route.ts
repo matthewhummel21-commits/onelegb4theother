@@ -9,6 +9,13 @@ const SHIRT_VARIANTS: Record<string, number> = {
   XL: 5308241181, "2XL": 5308241182, "3XL": 5308241183,
 };
 
+// Hat variants
+const HAT_VARIANTS: Record<string, number> = {
+  "Black/White/Black": 5327641776,
+  "All Black": 5327644094,
+  "Red/White/Blue": 5327644163,
+};
+
 // Sweatpants variants — Black and Vintage Heather Grey, S-3XL
 const SWEATS_VARIANTS: Record<string, Record<string, number>> = {
   Black: {
@@ -25,10 +32,16 @@ export async function POST(req: NextRequest) {
   try {
     const { product, size, color, promoCode } = await req.json();
     const isSweatpants = product === "sweatpants";
+    const isHat = product === "hat";
 
     // Validate variant
     let syncVariantId: number;
-    if (isSweatpants) {
+    if (isHat) {
+      if (!color || !HAT_VARIANTS[color]) {
+        return NextResponse.json({ error: "Invalid hat color" }, { status: 400 });
+      }
+      syncVariantId = HAT_VARIANTS[color];
+    } else if (isSweatpants) {
       const colorMap = SWEATS_VARIANTS[color];
       if (!colorMap || !colorMap[size]) {
         return NextResponse.json({ error: "Invalid color or size" }, { status: 400 });
@@ -42,8 +55,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate promo code
-    const PROMO_CODES: Record<string, { label: string; shirtPrice: number; sweatsPrice: number }> = {
-      TEAM: { label: "Team / Nonprofit Discount", shirtPrice: 2999, sweatsPrice: 4444 },
+    const PROMO_CODES: Record<string, { label: string; shirtPrice: number; sweatsPrice: number; hatPrice: number }> = {
+      TEAM: { label: "Team / Nonprofit Discount", shirtPrice: 2999, sweatsPrice: 4444, hatPrice: 2800 },
     };
     const promo = promoCode ? PROMO_CODES[promoCode.toUpperCase().trim()] : null;
     if (promoCode && !promo) {
@@ -59,10 +72,14 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: isSweatpants
+              name: isHat
+                ? `One Leg B4 the Other — Foam Trucker Hat (${color})`
+                : isSweatpants
                 ? `One Leg B4 the Other — Issued With Honor Sweatpants (${color} / ${size})`
                 : `One Leg B4 the Other — Issued With Honor Tee (${size})`,
-              description: isSweatpants
+              description: isHat
+                ? "Otto Cap foam trucker hat. Your purchase helps fund adaptive pants for veterans in need."
+                : isSweatpants
                 ? "Bella + Canvas heavyweight fleece. Your purchase helps fund adaptive pants for veterans in need."
                 : promo
                   ? "Team / nonprofit price — thank you for your support!"
@@ -71,7 +88,9 @@ export async function POST(req: NextRequest) {
                 "https://files.cdn.printful.com/files/844/844011d92c81ab651408cb0aa7b88076_preview.png",
               ],
             },
-            unit_amount: isSweatpants
+            unit_amount: isHat
+                ? (promo ? promo.hatPrice : 3800)
+                : isSweatpants
                 ? (promo ? promo.sweatsPrice : 5500)
                 : (promo ? promo.shirtPrice : 5500),
           },
@@ -86,7 +105,7 @@ export async function POST(req: NextRequest) {
         color: color || "",
         product: product || "shirt",
         printful_variant_id: String(syncVariantId),
-        printful_product_id: isSweatpants ? "435175071" : "432664066",
+        printful_product_id: isHat ? "435178002" : isSweatpants ? "435175071" : "432664066",
       },
       shipping_address_collection: {
         allowed_countries: ["US"],
