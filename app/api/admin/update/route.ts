@@ -53,10 +53,11 @@ export async function POST(req: NextRequest) {
 
     switch (action) {
       case "approve": {
-        const searchTerm = encodeURIComponent(
-          `${row.pant_type === "sweatpants" ? "mens sweatpants" : "Lee jeans mens"} ${size}`
-        );
-        amazonLink = `https://www.amazon.com/s?k=${searchTerm}`;
+        const color = row.pant_color || "";
+        const searchQuery = row.pant_type === "sweatpants"
+          ? `Hanes mens sweatpants ${size}${color ? " " + color : ""}`
+          : `Lee jeans mens ${size}`;
+        amazonLink = `https://www.amazon.com/s?k=${encodeURIComponent(searchQuery)}&ref=olb4other`;
 
         await updateRequestStatus(Number(id), "approved", {
           amazonLink,
