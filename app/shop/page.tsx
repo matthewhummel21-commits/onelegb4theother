@@ -118,13 +118,13 @@ export default function ShopPage() {
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex flex-col items-center justify-center p-3">
-                  <img src="https://files.cdn.printful.com/files/2f7/2f711ba9243f8c05399977fd7d8e9f32_preview.png" alt="Front logo" className="w-full h-full object-contain" />
-                  <p className="text-white/40 text-xs mt-2">Front</p>
+                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex flex-col items-center justify-center p-0 relative">
+                  <img src="/shirt-front-mockup.jpg" alt="Front" className="w-full h-full object-cover rounded-xl" />
+                  <span className="absolute bottom-2 left-0 right-0 text-center text-white/60 text-xs">Front</span>
                 </div>
-                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex flex-col items-center justify-center p-3">
-                  <img src="https://files.cdn.printful.com/files/391/391ffcce82d769ddf1a5a3642f1a6612_preview.png" alt="Back design" className="w-full h-full object-contain" />
-                  <p className="text-white/40 text-xs mt-2">Back</p>
+                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex flex-col items-center justify-center p-0 relative">
+                  <img src="/shirt-back-mockup.jpg" alt="Back" className="w-full h-full object-cover rounded-xl" />
+                  <span className="absolute bottom-2 left-0 right-0 text-center text-white/60 text-xs">Back</span>
                 </div>
               </div>
             </div>
