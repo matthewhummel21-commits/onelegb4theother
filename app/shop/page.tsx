@@ -75,24 +75,14 @@ const PRODUCTS = [
     tag: "",
   },
 
-  {
-    id: "sticker",
-    name: "Die-Cut Vinyl Sticker",
-    subtitle: "3\"×3\" premium vinyl · Weather resistant",
-    price: 700,
-    colors: [
-      { key: "Logo", label: "Logo", hex: "#0D1B3E", img: "/sticker-logo.png" },
-    ],
-    sizes: [],
-    tag: "",
-  },
+
 ] as const;
 
 type Product = typeof PRODUCTS[number];
 type Color = Product["colors"][number];
 
 const PROMO_CODES: Record<string, Record<string, number>> = {
-  TEAM: { tee: 2999, largetee: 2999, hoodie: 5500, sweatpants: 4444, hat: 2800, sticker: 500 },
+  TEAM: { tee: 2999, largetee: 2999, hoodie: 5500, sweatpants: 4444, hat: 2800 },
 };
 
 // ─── Product Card ─────────────────────────────────────────────────────────────
