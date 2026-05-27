@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { BlurFade } from "@/components/ui/blur-fade";
 
-const SIZES = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
+const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
+const SWEATS_SIZES = ["S", "M", "L", "XL", "2XL", "3XL"];
+const SWEATS_COLORS = ["Black", "Vintage Heather Grey"];
 
 export default function ShopPage() {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -30,6 +32,30 @@ export default function ShopPage() {
   const finalPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode] : 5500;
   const displayPrice = (finalPrice / 100).toFixed(2);
 
+  const [sweatsSize, setSweatsSize] = useState<string | null>(null);
+  const [sweatsColor, setSweatsColor] = useState<string>("Black");
+  const [sweatsLoading, setSweatsLoading] = useState(false);
+  const [sweatsError, setSweatsError] = useState<string | null>(null);
+
+  const handleSweatsCheckout = async () => {
+    if (!sweatsSize || sweatsLoading) return;
+    setSweatsLoading(true);
+    setSweatsError(null);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product: "sweatpants", size: sweatsSize, color: sweatsColor }),
+      });
+      const data = await res.json();
+      if (data.url) { window.location.href = data.url; }
+      else { setSweatsError(data.error || "Something went wrong."); setSweatsLoading(false); }
+    } catch {
+      setSweatsError("Network error. Please try again.");
+      setSweatsLoading(false);
+    }
+  };
+
   const handleCheckout = async () => {
     if (!selectedSize || loading) return;
     setLoading(true);
@@ -38,7 +64,7 @@ export default function ShopPage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ size: selectedSize, promoCode: appliedCode || undefined }),
+        body: JSON.stringify({ product: "shirt", size: selectedSize, promoCode: appliedCode || undefined }),
       });
       const data = await res.json();
       if (data.url) {
@@ -119,7 +145,7 @@ export default function ShopPage() {
             <div>
               <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Select Size</p>
               <div className="flex flex-wrap gap-3">
-                {SIZES.map((size) => (
+                {SHIRT_SIZES.map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
@@ -199,6 +225,82 @@ export default function ShopPage() {
             </button>
 
             <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
+          </div>
+        </div>
+
+        {/* SWEATPANTS */}
+        <div className="mt-20 border-t border-white/10 pt-16">
+          <BlurFade delay={0.1}>
+            <div className="text-center mb-12">
+              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Issued With Honor Sweatpants</h2>
+              <p className="text-white/60 text-lg max-w-xl mx-auto">Bella + Canvas heavyweight fleece. Primary emblem on the left leg. Black or grey.</p>
+            </div>
+          </BlurFade>
+
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            <BlurFade delay={0.2}>
+              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-10">
+                <div className="text-center">
+                  <img src="https://files.cdn.printful.com/files/2f7/2f711ba9243f8c05399977fd7d8e9f32_preview.png" alt="Logo" className="w-32 h-32 object-contain mx-auto mb-4 opacity-60" />
+                  <p className="text-white/40 text-sm">Mockup generating — check Printful dashboard</p>
+                </div>
+              </div>
+            </BlurFade>
+
+            <BlurFade delay={0.3}>
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-2xl font-extrabold text-white mb-1">Issued With Honor Sweatpants</h3>
+                  <p className="text-3xl font-bold text-[#b22234]">$44.00</p>
+                  <p className="text-white/50 text-sm mt-1">Free shipping · Bella + Canvas 4737 · Ships in 3–5 days</p>
+                </div>
+
+                <div>
+                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Color</p>
+                  <div className="flex gap-3">
+                    {SWEATS_COLORS.map((c) => (
+                      <button key={c} onClick={() => setSweatsColor(c)}
+                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                          sweatsColor === c ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
+                        }`}>
+                        {c === "Vintage Heather Grey" ? "Heather Grey" : c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Size</p>
+                  <div className="flex flex-wrap gap-3">
+                    {SWEATS_SIZES.map((size) => (
+                      <button key={size} onClick={() => setSweatsSize(size)}
+                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                          sweatsSize === size ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400 hover:text-white"
+                        }`}>
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-white/30 text-xs mt-2">Need 4XL? <a href="/#contact" className="underline hover:text-white">Contact us</a> — we’ll handle it.</p>
+                </div>
+
+                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $44</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
+                </div>
+
+                {!sweatsSize && <p className="text-yellow-400 text-sm font-semibold">👆 Select a size above to continue</p>}
+                {sweatsError && <p className="text-red-400 text-sm">{sweatsError}</p>}
+
+                <button onClick={handleSweatsCheckout} disabled={!sweatsSize || sweatsLoading}
+                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
+                  style={{ background: sweatsSize && !sweatsLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: sweatsSize && !sweatsLoading ? "pointer" : "not-allowed" }}>
+                  {sweatsLoading ? "Redirecting..." : sweatsSize ? `Buy Now — ${sweatsColor === "Vintage Heather Grey" ? "Grey" : sweatsColor} / ${sweatsSize} / $44.00` : "Select a Size to Continue"}
+                </button>
+
+                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
+              </div>
+            </BlurFade>
           </div>
         </div>
       </div>

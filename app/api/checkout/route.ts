@@ -3,31 +3,50 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-// Printful variant ID → size label
-const VARIANTS: Record<string, { variantId: number; label: string }> = {
-  XS:  { variantId: 5308241175, label: "XS" },
-  S:   { variantId: 5308241177, label: "S" },
-  M:   { variantId: 5308241178, label: "M" },
-  L:   { variantId: 5308241179, label: "L" },
-  XL:  { variantId: 5308241181, label: "XL" },
-  "2XL": { variantId: 5308241182, label: "2XL" },
-  "3XL": { variantId: 5308241183, label: "3XL" },
+// T-shirt variants
+const SHIRT_VARIANTS: Record<string, number> = {
+  XS: 5308241175, S: 5308241177, M: 5308241178, L: 5308241179,
+  XL: 5308241181, "2XL": 5308241182, "3XL": 5308241183,
+};
+
+// Sweatpants variants — Black and Vintage Heather Grey, S-3XL
+const SWEATS_VARIANTS: Record<string, Record<string, number>> = {
+  Black: {
+    S: 5327615160, M: 5327615161, L: 5327615162,
+    XL: 5327615163, "2XL": 5327615164, "3XL": 5327615165,
+  },
+  "Vintage Heather Grey": {
+    S: 5327615166, M: 5327615167, L: 5327615168,
+    XL: 5327615169, "2XL": 5327615170, "3XL": 5327615171,
+  },
 };
 
 export async function POST(req: NextRequest) {
   try {
-    const { size, promoCode } = await req.json();
+    const { product, size, color, promoCode } = await req.json();
+    const isSweatpants = product === "sweatpants";
 
-    if (!size || !VARIANTS[size]) {
-      return NextResponse.json({ error: "Invalid size" }, { status: 400 });
+    // Validate variant
+    let syncVariantId: number;
+    if (isSweatpants) {
+      const colorMap = SWEATS_VARIANTS[color];
+      if (!colorMap || !colorMap[size]) {
+        return NextResponse.json({ error: "Invalid color or size" }, { status: 400 });
+      }
+      syncVariantId = colorMap[size];
+    } else {
+      if (!size || !SHIRT_VARIANTS[size]) {
+        return NextResponse.json({ error: "Invalid size" }, { status: 400 });
+      }
+      syncVariantId = SHIRT_VARIANTS[size];
     }
 
-    // Validate promo code
+    // Validate promo code (shirts only — sweatpants margin too thin)
     const PROMO_CODES: Record<string, { stripeId: string; label: string; finalPrice: number }> = {
       TEAM: { stripeId: "promo_1TbYKvRrTSxjAtlBF9aDLhS8", label: "Team / Nonprofit Discount", finalPrice: 2999 },
     };
-    const promo = promoCode ? PROMO_CODES[promoCode.toUpperCase().trim()] : null;
-    if (promoCode && !promo) {
+    const promo = (!isSweatpants && promoCode) ? PROMO_CODES[promoCode.toUpperCase().trim()] : null;
+    if (!isSweatpants && promoCode && !promo) {
       return NextResponse.json({ error: "Invalid promo code" }, { status: 400 });
     }
 
@@ -40,15 +59,19 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `One Leg B4 the Other — Issued With Honor Tee (${size})`,
-              description: promo
-                ? "Team / nonprofit price — thank you for your support!"
-                : "Your purchase funds a pair of adaptive pants for a veteran in need.",
+              name: isSweatpants
+                ? `One Leg B4 the Other — Issued With Honor Sweatpants (${color} / ${size})`
+                : `One Leg B4 the Other — Issued With Honor Tee (${size})`,
+              description: isSweatpants
+                ? "Bella + Canvas heavyweight fleece. Your purchase helps fund adaptive pants for veterans in need."
+                : promo
+                  ? "Team / nonprofit price — thank you for your support!"
+                  : "Your purchase funds a pair of adaptive pants for a veteran in need.",
               images: [
                 "https://files.cdn.printful.com/files/844/844011d92c81ab651408cb0aa7b88076_preview.png",
               ],
             },
-            unit_amount: promo ? promo.finalPrice : 5500,
+            unit_amount: isSweatpants ? 4400 : promo ? promo.finalPrice : 5500,
           },
           quantity: 1,
         },
@@ -58,8 +81,10 @@ export async function POST(req: NextRequest) {
       cancel_url: `${origin}/shop`,
       metadata: {
         size,
-        printful_variant_id: String(VARIANTS[size].variantId),
-        printful_product_id: "432664066",
+        color: color || "",
+        product: product || "shirt",
+        printful_variant_id: String(syncVariantId),
+        printful_product_id: isSweatpants ? "435175071" : "432664066",
       },
       shipping_address_collection: {
         allowed_countries: ["US"],
