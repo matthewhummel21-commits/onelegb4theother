@@ -41,12 +41,12 @@ export async function POST(req: NextRequest) {
       syncVariantId = SHIRT_VARIANTS[size];
     }
 
-    // Validate promo code (shirts only — sweatpants margin too thin)
-    const PROMO_CODES: Record<string, { stripeId: string; label: string; finalPrice: number }> = {
-      TEAM: { stripeId: "promo_1TbYKvRrTSxjAtlBF9aDLhS8", label: "Team / Nonprofit Discount", finalPrice: 2999 },
+    // Validate promo code
+    const PROMO_CODES: Record<string, { label: string; shirtPrice: number; sweatsPrice: number }> = {
+      TEAM: { label: "Team / Nonprofit Discount", shirtPrice: 2999, sweatsPrice: 4444 },
     };
-    const promo = (!isSweatpants && promoCode) ? PROMO_CODES[promoCode.toUpperCase().trim()] : null;
-    if (!isSweatpants && promoCode && !promo) {
+    const promo = promoCode ? PROMO_CODES[promoCode.toUpperCase().trim()] : null;
+    if (promoCode && !promo) {
       return NextResponse.json({ error: "Invalid promo code" }, { status: 400 });
     }
 
@@ -71,7 +71,9 @@ export async function POST(req: NextRequest) {
                 "https://files.cdn.printful.com/files/844/844011d92c81ab651408cb0aa7b88076_preview.png",
               ],
             },
-            unit_amount: isSweatpants ? 4400 : promo ? promo.finalPrice : 5500,
+            unit_amount: isSweatpants
+                ? (promo ? promo.sweatsPrice : 5500)
+                : (promo ? promo.shirtPrice : 5500),
           },
           quantity: 1,
         },

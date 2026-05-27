@@ -19,7 +19,7 @@ export default function ShopPage() {
 
   const handleApplyPromo = () => {
     const code = promoCode.toUpperCase().trim();
-    if (VALID_CODES[code] !== undefined) {
+    if (VALID_CODES[code]) {
       setPromoApplied(true);
       setPromoError("");
     } else {
@@ -45,7 +45,7 @@ export default function ShopPage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product: "sweatpants", size: sweatsSize, color: sweatsColor }),
+        body: JSON.stringify({ product: "sweatpants", size: sweatsSize, color: sweatsColor, promoCode: appliedCode || undefined }),
       });
       const data = await res.json();
       if (data.url) { window.location.href = data.url; }
@@ -253,7 +253,11 @@ export default function ShopPage() {
               <div className="space-y-8">
                 <div>
                   <h3 className="text-2xl font-extrabold text-white mb-1">Issued With Honor Sweatpants</h3>
-                  <p className="text-3xl font-bold text-[#b22234]">$44.00</p>
+                  <div className="flex items-baseline gap-3">
+                    <p className="text-3xl font-bold text-[#b22234]">${sweatsDisplayPrice}</p>
+                    {promoApplied && <span className="text-lg line-through text-white/30">$55.00</span>}
+                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
+                  </div>
                   <p className="text-white/50 text-sm mt-1">Free shipping · Bella + Canvas 4737 · Ships in 3–5 days</p>
                 </div>
 
@@ -296,7 +300,7 @@ export default function ShopPage() {
                 <button onClick={handleSweatsCheckout} disabled={!sweatsSize || sweatsLoading}
                   className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
                   style={{ background: sweatsSize && !sweatsLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: sweatsSize && !sweatsLoading ? "pointer" : "not-allowed" }}>
-                  {sweatsLoading ? "Redirecting..." : sweatsSize ? `Buy Now — ${sweatsColor === "Vintage Heather Grey" ? "Grey" : sweatsColor} / ${sweatsSize} / $44.00` : "Select a Size to Continue"}
+                  {sweatsLoading ? "Redirecting..." : sweatsSize ? `Buy Now — ${sweatsColor === "Vintage Heather Grey" ? "Grey" : sweatsColor} / ${sweatsSize} / $${sweatsDisplayPrice}` : "Select a Size to Continue"}
                 </button>
 
                 <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
