@@ -16,10 +16,19 @@ const VARIANTS: Record<string, { variantId: number; label: string }> = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { size } = await req.json();
+    const { size, promoCode } = await req.json();
 
     if (!size || !VARIANTS[size]) {
       return NextResponse.json({ error: "Invalid size" }, { status: 400 });
+    }
+
+    // Validate promo code
+    const PROMO_CODES: Record<string, { stripeId: string; label: string; finalPrice: number }> = {
+      TEAM: { stripeId: "promo_1TbYKvRrTSxjAtlBF9aDLhS8", label: "Team / Nonprofit Discount", finalPrice: 2999 },
+    };
+    const promo = promoCode ? PROMO_CODES[promoCode.toUpperCase().trim()] : null;
+    if (promoCode && !promo) {
+      return NextResponse.json({ error: "Invalid promo code" }, { status: 400 });
     }
 
     const origin = req.headers.get("origin") || "https://onelegb4theother.org";
@@ -32,12 +41,14 @@ export async function POST(req: NextRequest) {
             currency: "usd",
             product_data: {
               name: `One Leg B4 the Other — Issued With Honor Tee (${size})`,
-              description: "Your purchase funds a pair of adaptive pants for a veteran in need.",
+              description: promo
+                ? "Team / nonprofit price — thank you for your support!"
+                : "Your purchase funds a pair of adaptive pants for a veteran in need.",
               images: [
                 "https://files.cdn.printful.com/files/844/844011d92c81ab651408cb0aa7b88076_preview.png",
               ],
             },
-            unit_amount: 5500, // $55.00
+            unit_amount: promo ? promo.finalPrice : 5500,
           },
           quantity: 1,
         },

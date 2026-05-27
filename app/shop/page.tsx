@@ -9,6 +9,26 @@ export default function ShopPage() {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [promoError, setPromoError] = useState("");
+
+  const VALID_CODES: Record<string, number> = { TEAM: 2999 };
+
+  const handleApplyPromo = () => {
+    const code = promoCode.toUpperCase().trim();
+    if (VALID_CODES[code] !== undefined) {
+      setPromoApplied(true);
+      setPromoError("");
+    } else {
+      setPromoApplied(false);
+      setPromoError("Invalid code. Try again.");
+    }
+  };
+
+  const appliedCode = promoApplied ? promoCode.toUpperCase().trim() : null;
+  const finalPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode] : 5500;
+  const displayPrice = (finalPrice / 100).toFixed(2);
 
   const handleCheckout = async () => {
     if (!selectedSize || loading) return;
@@ -18,7 +38,7 @@ export default function ShopPage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ size: selectedSize }),
+        body: JSON.stringify({ size: selectedSize, promoCode: appliedCode || undefined }),
       });
       const data = await res.json();
       if (data.url) {
@@ -87,7 +107,11 @@ export default function ShopPage() {
           <div className="space-y-8">
             <div>
               <h2 className="text-2xl font-extrabold text-white mb-1">Issued With Honor Tee</h2>
-              <p className="text-3xl font-bold text-[#b22234]">$55</p>
+              <div className="flex items-baseline gap-3">
+                <p className="text-3xl font-bold text-[#b22234]">${displayPrice}</p>
+                {promoApplied && <span className="text-lg line-through text-white/30">$55.00</span>}
+                {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
+              </div>
               <p className="text-white/50 text-sm mt-1">Free shipping · Printful fulfilled · Ships in 3–5 days</p>
             </div>
 
@@ -111,10 +135,49 @@ export default function ShopPage() {
               </div>
             </div>
 
+            {/* Promo Code */}
+            <div>
+              <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Promo Code</p>
+              {!promoApplied ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => { setPromoCode(e.target.value); setPromoError(""); }}
+                    onKeyDown={(e) => e.key === "Enter" && handleApplyPromo()}
+                    placeholder="Enter code..."
+                    className="flex-1 h-11 rounded-xl bg-gray-800 border border-gray-600 text-white text-sm px-4 focus:outline-none focus:border-[#b22234] uppercase placeholder:normal-case placeholder:text-white/30"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyPromo}
+                    className="h-11 px-5 rounded-xl bg-gray-700 hover:bg-gray-600 text-white text-sm font-bold transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between h-11 px-4 rounded-xl bg-green-900/30 border border-green-700/50">
+                  <span className="text-green-400 text-sm font-bold">✓ Code TEAM applied — $29.99</span>
+                  <button
+                    type="button"
+                    onClick={() => { setPromoApplied(false); setPromoCode(""); }}
+                    className="text-white/40 hover:text-white text-xs transition-colors"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+              {promoError && <p className="text-red-400 text-xs mt-1.5">{promoError}</p>}
+            </div>
+
             {/* Impact callout */}
             <div className="rounded-xl border border-white/10 bg-white/5 p-4">
               <p className="text-white/80 text-sm">
-                <span className="text-white font-bold">Your $55</span> directly funds a pair of adaptive pants for a veteran on our waitlist. That&apos;s it. No overhead theater.
+                {promoApplied
+                  ? <><span className="text-white font-bold">Team price applied.</span> Thank you for being part of the mission. 🎖️</>
+                  : <><span className="text-white font-bold">Your $55</span> directly funds a pair of adaptive pants for a veteran on our waitlist. That&apos;s it. No overhead theater.</>
+                }
               </p>
             </div>
 
@@ -132,7 +195,7 @@ export default function ShopPage() {
                 cursor: selectedSize && !loading ? "pointer" : "not-allowed",
               }}
             >
-              {loading ? "Redirecting to checkout..." : selectedSize ? `Buy Now — ${selectedSize} / $55` : "Select a Size to Continue"}
+              {loading ? "Redirecting to checkout..." : selectedSize ? `Buy Now — ${selectedSize} / $${displayPrice}` : "Select a Size to Continue"}
             </button>
 
             <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
