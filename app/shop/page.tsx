@@ -13,8 +13,14 @@ const NAV_ITEMS = [
 ];
 
 const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
-const SWEATS_SIZES = ["S", "M", "L", "XL", "2XL", "3XL"];
-const SWEATS_COLORS = ["Black", "Vintage Heather Grey"];
+const SWEATS_SIZES_FULL = ["S", "M", "L", "XL", "2XL", "3XL"];
+const SWEATS_SIZES_GD   = ["S", "M", "L", "XL", "2XL"]; // garment-dyed max 2XL
+const SWEATS_COLORS = [
+  { key: "Black",       label: "Black",        img: "/sweats-black-mockup.jpg",    tag: "" },
+  { key: "Heather Grey", label: "Heather Grey", img: "/sweats-grey-mockup.jpg",     tag: "" },
+  { key: "Pepper",      label: "Pepper",       img: "/sweats-pepper-mockup.jpg",   tag: "Garment-Dyed" },
+  { key: "Espresso",    label: "Espresso",     img: "/sweats-espresso-mockup.jpg", tag: "Garment-Dyed" },
+];
 const HAT_COLORS = ["Black/White/Black", "All Black", "Red/White/Blue"];
 const SOCK_SIZES = ["S", "M", "L"];
 
@@ -391,7 +397,7 @@ export default function ShopPage() {
             <BlurFade delay={0.2}>
               <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-0">
                 <img
-                  src={sweatsColor === "Vintage Heather Grey" ? "/sweats-grey-mockup.jpg" : "/sweats-black-mockup.jpg"}
+                  src={SWEATS_COLORS.find(c => c.key === sweatsColor)?.img || "/sweats-black-mockup.jpg"}
                   alt={`Issued With Honor Sweatpants — ${sweatsColor}`}
                   className="w-full h-full object-contain"
                 />
@@ -407,18 +413,21 @@ export default function ShopPage() {
                     {promoApplied && <span className="text-lg line-through text-white/30">$55.00</span>}
                     {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
                   </div>
-                  <p className="text-white/50 text-sm mt-1">Free shipping · Bella + Canvas 4737 · Ships in 3–5 days</p>
+                  <p className="text-white/50 text-sm mt-1">
+                    Free shipping · {sweatsColor === "Pepper" || sweatsColor === "Espresso" ? "Comfort Colors 1469 ✦ Garment-Dyed" : "Bella + Canvas 4737"} · Ships in 3–5 days
+                  </p>
                 </div>
 
                 <div>
                   <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Color</p>
                   <div className="flex gap-3">
                     {SWEATS_COLORS.map((c) => (
-                      <button key={c} onClick={() => { setSweatsColor(c); setSweatsSize(null); }}
+                      <button key={c.key} onClick={() => { setSweatsColor(c.key); setSweatsSize(null); }}
                         className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                          sweatsColor === c ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
+                          sweatsColor === c.key ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
                         }`}>
-                        {c === "Vintage Heather Grey" ? "Heather Grey" : c}
+                        {c.label}
+                        {c.tag && <span className="ml-1 text-xs opacity-70">✦</span>}
                       </button>
                     ))}
                   </div>
@@ -427,7 +436,7 @@ export default function ShopPage() {
                 <div>
                   <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Size</p>
                   <div className="flex flex-wrap gap-3">
-                    {SWEATS_SIZES.map((size) => (
+                    {(sweatsColor === "Pepper" || sweatsColor === "Espresso" ? SWEATS_SIZES_GD : SWEATS_SIZES_FULL).map((size) => (
                       <button key={size} onClick={() => setSweatsSize(size)}
                         className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
                           sweatsSize === size ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400 hover:text-white"
@@ -449,7 +458,7 @@ export default function ShopPage() {
                 <button onClick={handleSweatsCheckout} disabled={!sweatsSize || sweatsLoading}
                   className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
                   style={{ background: sweatsSize && !sweatsLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: sweatsSize && !sweatsLoading ? "pointer" : "not-allowed" }}>
-                  {sweatsLoading ? "Redirecting..." : sweatsSize ? `Buy Now — ${sweatsColor === "Vintage Heather Grey" ? "Grey" : sweatsColor} / ${sweatsSize} / $${sweatsDisplayPrice}` : "Select a Size to Continue"}
+                  {sweatsLoading ? "Redirecting..." : sweatsSize ? `Buy Now — ${sweatsColor} / ${sweatsSize} / $${sweatsDisplayPrice}` : "Select a Size to Continue"}
                 </button>
 
                 <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>

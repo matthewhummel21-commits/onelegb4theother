@@ -30,16 +30,14 @@ const HAT_VARIANTS: Record<string, number> = {
   "Red/White/Blue": 5327644163,
 };
 
-// Sweatpants variants — Black and Vintage Heather Grey, S-3XL
+// Sweatpants variants
 const SWEATS_VARIANTS: Record<string, Record<string, number>> = {
-  Black: {
-    S: 5327615160, M: 5327615161, L: 5327615162,
-    XL: 5327615163, "2XL": 5327615164, "3XL": 5327615165,
-  },
-  "Vintage Heather Grey": {
-    S: 5327615166, M: 5327615167, L: 5327615168,
-    XL: 5327615169, "2XL": 5327615170, "3XL": 5327615171,
-  },
+  // Bella+Canvas 4737 heavyweight
+  Black: { S: 5327615160, M: 5327615161, L: 5327615162, XL: 5327615163, "2XL": 5327615164, "3XL": 5327615165 },
+  "Heather Grey": { S: 5327615166, M: 5327615167, L: 5327615168, XL: 5327615169, "2XL": 5327615170, "3XL": 5327615171 },
+  // Comfort Colors 1469 garment-dyed
+  Pepper: { S: 5327672970, M: 5327672977, L: 5327672978, XL: 5327672979, "2XL": 5327672980 },
+  Espresso: { S: 5327672975, M: 5327672971, L: 5327672972, XL: 5327672973, "2XL": 5327672974 },
 };
 
 export async function POST(req: NextRequest) {
