@@ -15,7 +15,9 @@ export default function ShopPage() {
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState("");
 
-  const VALID_CODES: Record<string, number> = { TEAM: 2999 };
+  const VALID_CODES: Record<string, { shirt: number; sweats: number }> = {
+    TEAM: { shirt: 2999, sweats: 4444 },
+  };
 
   const handleApplyPromo = () => {
     const code = promoCode.toUpperCase().trim();
@@ -29,8 +31,10 @@ export default function ShopPage() {
   };
 
   const appliedCode = promoApplied ? promoCode.toUpperCase().trim() : null;
-  const finalPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode] : 5500;
-  const displayPrice = (finalPrice / 100).toFixed(2);
+  const shirtPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].shirt : 5500;
+  const sweatsPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].sweats : 5500;
+  const displayPrice = (shirtPrice / 100).toFixed(2);
+  const sweatsDisplayPrice = (sweatsPrice / 100).toFixed(2);
 
   const [sweatsSize, setSweatsSize] = useState<string | null>(null);
   const [sweatsColor, setSweatsColor] = useState<string>("Black");
