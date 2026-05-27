@@ -118,12 +118,12 @@ export default function ShopPage() {
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex flex-col items-center justify-center p-0 relative">
-                  <img src="/shirt-front-mockup.jpg" alt="Front" className="w-full h-full object-cover rounded-xl" />
+                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex flex-col items-center justify-center p-2 relative">
+                  <img src="/shirt-front-mockup.jpg" alt="Front" className="w-full h-full object-contain" />
                   <span className="absolute bottom-2 left-0 right-0 text-center text-white/60 text-xs">Front</span>
                 </div>
-                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex flex-col items-center justify-center p-0 relative">
-                  <img src="/shirt-back-mockup.jpg" alt="Back" className="w-full h-full object-cover rounded-xl" />
+                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex flex-col items-center justify-center p-2 relative">
+                  <img src="/shirt-back-mockup.jpg" alt="Back" className="w-full h-full object-contain" />
                   <span className="absolute bottom-2 left-0 right-0 text-center text-white/60 text-xs">Back</span>
                 </div>
               </div>
