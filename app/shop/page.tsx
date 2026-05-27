@@ -235,6 +235,12 @@ export default function ShopPage() {
         </div>
       </div>
 
+      {promoApplied && (
+        <div className="sticky top-[113px] z-30 bg-green-900/90 backdrop-blur-sm border-b border-green-700/50 text-center py-2 text-green-300 text-sm font-bold">
+          ✓ TEAM code active — discounted prices applied on all items
+        </div>
+      )}
+
       <div className="pt-12 pb-20 px-6 max-w-5xl mx-auto">
         <BlurFade delay={0.1}>
           <div className="text-center mb-12">
@@ -408,7 +414,7 @@ export default function ShopPage() {
                   <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Color</p>
                   <div className="flex gap-3">
                     {SWEATS_COLORS.map((c) => (
-                      <button key={c} onClick={() => setSweatsColor(c)}
+                      <button key={c} onClick={() => { setSweatsColor(c); setSweatsSize(null); }}
                         className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
                           sweatsColor === c ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
                         }`}>
@@ -465,7 +471,15 @@ export default function ShopPage() {
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <BlurFade delay={0.2}>
               <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-6">
-                <img src="/hat-bwb-mockup.jpg" alt="Foam Trucker Hat" className="w-full h-full object-contain" />
+                <img
+                  src={
+                    hatColor === "All Black" ? "/hat-black-mockup.jpg"
+                    : hatColor === "Red/White/Blue" ? "/hat-rwb-mockup.jpg"
+                    : "/hat-bwb-mockup.jpg"
+                  }
+                  alt={`Foam Trucker Hat — ${hatColor}`}
+                  className="w-full h-full object-contain transition-opacity duration-300"
+                />
               </div>
             </BlurFade>
 
@@ -504,7 +518,7 @@ export default function ShopPage() {
                 <button onClick={handleHatCheckout} disabled={hatLoading}
                   className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
                   style={{ background: !hatLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: !hatLoading ? "pointer" : "not-allowed" }}>
-                  {hatLoading ? "Redirecting..." : `Buy Now — ${hatColor} / $${hatDisplayPrice}`}
+                  {hatLoading ? "Redirecting..." : `Buy Now — ${hatColor === "Black/White/Black" ? "Classic" : hatColor === "All Black" ? "All Black" : "Red/White/Blue"} / $${hatDisplayPrice}`}
                 </button>
 
                 <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
@@ -587,11 +601,8 @@ export default function ShopPage() {
           </BlurFade>
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <BlurFade delay={0.2}>
-              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-10">
-                <div className="text-center text-white/40">
-                  <div className="text-7xl mb-4">🧢</div>
-                  <p className="text-sm">Mockup generating — check Printful dashboard</p>
-                </div>
+              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-4">
+                <img src="/richardson-mockup.jpg" alt="Richardson 112 Snapback" className="w-full h-full object-contain" />
               </div>
             </BlurFade>
             <BlurFade delay={0.3}>
