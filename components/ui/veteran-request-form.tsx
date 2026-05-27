@@ -372,9 +372,8 @@ export function VeteranRequestForm() {
             className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
           >
             <option value="">Select color...</option>
-            <option value="Dark (Black / Dark Wash / Navy)">Dark — Black, Dark Wash, or Navy</option>
-            <option value="Medium (Medium Wash / Khaki / Grey)">Medium — Medium Wash, Khaki, or Grey</option>
-            <option value="Light (Light Wash / Tan)">Light — Light Wash or Tan</option>
+            <option value="Dark">Dark</option>
+            <option value="Medium">Medium</option>
             <option value="No preference">No preference</option>
           </select>
           <p className="text-xs text-muted-foreground mt-1">We default to darker colors when unsure.</p>
