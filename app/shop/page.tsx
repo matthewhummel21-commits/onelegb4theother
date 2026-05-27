@@ -21,17 +21,7 @@ const PRODUCTS = [
     sizes: SIZES_FULL,
     tag: "Bestseller",
   },
-  {
-    id: "largetee",
-    name: "Issued With Honor Tee — Large Logo",
-    subtitle: "Next Level 3600 · Large center logo · Left sleeve flag",
-    price: 5500,
-    colors: [
-      { key: "White", label: "White", hex: "#FFFFFF", img: "/shirt-large-logo-mockup.jpg" },
-    ],
-    sizes: SIZES_FULL,
-    tag: "New",
-  },
+
   {
     id: "hoodie",
     name: "Garment-Dyed Hoodie",
@@ -82,7 +72,7 @@ type Product = typeof PRODUCTS[number];
 type Color = Product["colors"][number];
 
 const PROMO_CODES: Record<string, Record<string, number>> = {
-  TEAM: { tee: 2999, largetee: 2999, hoodie: 5500, sweatpants: 4444, hat: 2800 },
+  TEAM: { tee: 2999, hoodie: 5500, sweatpants: 4444, hat: 2800 },
 };
 
 // ─── Product Card ─────────────────────────────────────────────────────────────
