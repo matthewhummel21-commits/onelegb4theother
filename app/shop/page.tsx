@@ -1,7 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BlurFade } from "@/components/ui/blur-fade";
+
+const NAV_ITEMS = [
+  { id: "tee",        label: "Tee" },
+  { id: "sweatpants", label: "Sweatpants" },
+  { id: "hats",       label: "Hats" },
+  { id: "socks",      label: "Socks" },
+  { id: "snapback",   label: "Snapback" },
+  { id: "stickers",   label: "Stickers" },
+];
 
 const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
 const SWEATS_SIZES = ["S", "M", "L", "XL", "2XL", "3XL"];
@@ -10,6 +19,32 @@ const HAT_COLORS = ["Black/White/Black", "All Black", "Red/White/Blue"];
 const SOCK_SIZES = ["S", "M", "L"];
 
 export default function ShopPage() {
+  const [activeSection, setActiveSection] = useState("tee");
+  const navRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+    NAV_ITEMS.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActiveSection(id); },
+        { rootMargin: "-40% 0px -50% 0px", threshold: 0 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+    return () => observers.forEach((o) => o.disconnect());
+  }, []);
+
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const navH = navRef.current?.offsetHeight || 60;
+    const top = el.getBoundingClientRect().top + window.scrollY - navH - 16;
+    window.scrollTo({ top, behavior: "smooth" });
+  };
+
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -179,7 +214,28 @@ export default function ShopPage() {
         </div>
       </nav>
 
-      <div className="pt-28 pb-20 px-6 max-w-5xl mx-auto">
+      {/* SHOP NAV */}
+      <div ref={navRef} className="sticky top-[65px] z-40 bg-black/95 backdrop-blur-md border-b border-white/10">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex overflow-x-auto scrollbar-hide">
+            {NAV_ITEMS.map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => scrollTo(id)}
+                className={`flex-shrink-0 px-5 py-4 text-sm font-bold tracking-wide uppercase transition-all border-b-2 ${
+                  activeSection === id
+                    ? "text-[#b22234] border-[#b22234]"
+                    : "text-white/40 border-transparent hover:text-white/80 hover:border-white/20"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="pt-12 pb-20 px-6 max-w-5xl mx-auto">
         <BlurFade delay={0.1}>
           <div className="text-center mb-12">
             <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">
@@ -192,7 +248,7 @@ export default function ShopPage() {
           </div>
         </BlurFade>
 
-        <div className="grid md:grid-cols-2 gap-12 items-start">
+        <div id="tee" className="grid md:grid-cols-2 gap-12 items-start">
           {/* Product Images */}
           <BlurFade delay={0.2}>
             <div className="space-y-3">
@@ -316,7 +372,7 @@ export default function ShopPage() {
         </div>
 
         {/* SWEATPANTS */}
-        <div className="mt-20 border-t border-white/10 pt-16">
+        <div id="sweatpants" className="mt-20 border-t border-white/10 pt-16">
           <BlurFade delay={0.1}>
             <div className="text-center mb-12">
               <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
@@ -397,7 +453,7 @@ export default function ShopPage() {
         </div>
 
         {/* HATS */}
-        <div className="mt-20 border-t border-white/10 pt-16">
+        <div id="hats" className="mt-20 border-t border-white/10 pt-16">
           <BlurFade delay={0.1}>
             <div className="text-center mb-12">
               <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
@@ -458,7 +514,7 @@ export default function ShopPage() {
         </div>
 
         {/* SOCKS */}
-        <div className="mt-20 border-t border-white/10 pt-16">
+        <div id="socks" className="mt-20 border-t border-white/10 pt-16">
           <BlurFade delay={0.1}>
             <div className="text-center mb-12">
               <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
@@ -521,7 +577,7 @@ export default function ShopPage() {
         </div>
 
         {/* RICHARDSON 112 */}
-        <div className="mt-20 border-t border-white/10 pt-16">
+        <div id="snapback" className="mt-20 border-t border-white/10 pt-16">
           <BlurFade delay={0.1}>
             <div className="text-center mb-12">
               <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
@@ -565,7 +621,7 @@ export default function ShopPage() {
         </div>
 
         {/* STICKERS */}
-        <div className="mt-20 border-t border-white/10 pt-16">
+        <div id="stickers" className="mt-20 border-t border-white/10 pt-16">
           <BlurFade delay={0.1}>
             <div className="text-center mb-12">
               <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
