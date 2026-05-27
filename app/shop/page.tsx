@@ -42,10 +42,10 @@ const PRODUCTS = [
     subtitle: "Bella+Canvas or Comfort Colors · Garment-Dyed",
     price: 5500,
     colors: [
-      { key: "Black",        label: "Black",        hex: "#1A1A1A", img: "/sweats-black-mockup.jpg" },
-      { key: "Heather Grey", label: "Heather Grey", hex: "#9B9B9B", img: "/sweats-grey-mockup.jpg" },
       { key: "Pepper",       label: "Pepper",       hex: "#3D3635", img: "/sweats-pepper-mockup.jpg",   gd: true },
       { key: "Espresso",     label: "Espresso",     hex: "#2C1A0E", img: "/sweats-espresso-mockup.jpg", gd: true },
+      { key: "Black",        label: "Black",        hex: "#1A1A1A", img: "/sweats-black-mockup.jpg" },
+      { key: "Heather Grey", label: "Heather Grey", hex: "#9B9B9B", img: "/sweats-grey-mockup.jpg" },
     ],
     sizes: SIZES_GD,
     tag: "New",
