@@ -118,14 +118,15 @@ export default function ShopPage() {
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-3">
-                  <img src="https://files.cdn.printful.com/files/2f7/2f711ba9243f8c05399977fd7d8e9f32_preview.png" alt="Front design" className="w-full h-full object-contain" />
+                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex flex-col items-center justify-center p-3">
+                  <img src="https://files.cdn.printful.com/files/2f7/2f711ba9243f8c05399977fd7d8e9f32_preview.png" alt="Front logo" className="w-full h-full object-contain" />
+                  <p className="text-white/40 text-xs mt-2">Front</p>
                 </div>
-                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-3">
-                  <img src="https://files.cdn.printful.com/files/41d/41da7341d45d419700c8d017bfd67428_preview.png" alt="Back design" className="w-full h-full object-contain" />
+                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex flex-col items-center justify-center p-3">
+                  <img src="https://files.cdn.printful.com/files/391/391ffcce82d769ddf1a5a3642f1a6612_preview.png" alt="Back design" className="w-full h-full object-contain" />
+                  <p className="text-white/40 text-xs mt-2">Back</p>
                 </div>
               </div>
-              <p className="text-center text-xs text-white/30">Front &amp; back design shown</p>
             </div>
           </BlurFade>
 
