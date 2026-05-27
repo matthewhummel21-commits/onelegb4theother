@@ -57,8 +57,8 @@ const PRODUCTS = [
     subtitle: "Otto Cap 39-165 · One size",
     price: 3800,
     colors: [
-      { key: "Black/White/Black", label: "Classic",       hex: "#222222", img: "/hat-bwb-mockup.jpg" },
       { key: "All Black",         label: "All Black",     hex: "#0A0A0A", img: "/hat-black-mockup.jpg" },
+      { key: "Black/White/Black", label: "Classic",       hex: "#222222", img: "/hat-bwb-mockup.jpg" },
       { key: "Red/White/Blue",    label: "Red/White/Blue",hex: "#B22234", img: "/hat-rwb-mockup.jpg" },
     ],
     sizes: [],
