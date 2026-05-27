@@ -154,6 +154,7 @@ export async function POST(req: NextRequest) {
     const fullAddress = `${address || ""}, ${city || ""}, ${state || ""} ${zip || ""}`.trim();
     const size = pantSize || (waist && inseam ? `${waist}x${inseam}` : "?");
     const type = pantType === "sweatpants" ? "Sweatpants" : "Lee Jeans";
+    const resolvedBrand = pantType === "sweatpants" ? "Hanes" : (pantBrand || "Lee");
 
     // ── Upload ID to Vercel Blob (if provided) ───────────────────────────────
     let idFilePath: string | null = null;
