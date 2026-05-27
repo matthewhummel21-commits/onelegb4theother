@@ -38,6 +38,7 @@ export type RequestRow = {
   call_notes: string | null;
   verified_by: string | null;
   amazon_link: string | null;
+  printful_order_id: string | null;
   shipped_at: string | null;
 };
 
@@ -84,6 +85,7 @@ export async function initDb(): Promise<void> {
     await sql`ALTER TABLE requests ADD COLUMN IF NOT EXISTS pant_color TEXT`;
     await sql`ALTER TABLE requests ADD COLUMN IF NOT EXISTS pant_brand TEXT`;
     await sql`ALTER TABLE requests ADD COLUMN IF NOT EXISTS wants_follow_up_call BOOLEAN DEFAULT FALSE`;
+    await sql`ALTER TABLE requests ADD COLUMN IF NOT EXISTS printful_order_id TEXT`;
   } catch (err) {
     console.error("initDb error:", err);
     throw err;
@@ -194,11 +196,20 @@ export async function updateRequestStatus(
     return;
   }
 
-  const { callNotes, verifiedBy, amazonLink, shippedAt } = extra;
-
   // Build update conditionally — Neon tagged template doesn't support dynamic field lists,
   // so we handle each combination explicitly.
-  if (amazonLink !== undefined && verifiedBy !== undefined) {
+  const { callNotes, verifiedBy, amazonLink, shippedAt } = extra;
+  const printfulOrderId = (extra as { printfulOrderId?: string | null }).printfulOrderId;
+
+  if (printfulOrderId !== undefined && verifiedBy !== undefined) {
+    await sql`
+      UPDATE requests
+      SET status = ${status},
+          printful_order_id = ${printfulOrderId ?? null},
+          verified_by = COALESCE(verified_by, ${verifiedBy ?? "manual"})
+      WHERE id = ${id}
+    `;
+  } else if (amazonLink !== undefined && verifiedBy !== undefined) {
     await sql`
       UPDATE requests
       SET status = ${status},

@@ -49,28 +49,81 @@ export async function POST(req: NextRequest) {
     const size = row.pant_size || (row.waist && row.inseam ? `${row.waist}x${row.inseam}` : "?");
     const fullAddress = [row.address, row.city, row.state, row.zip].filter(Boolean).join(", ");
 
+    // Printful variant map — BC sweatpants 435175062
+    const SWEATS_VARIANTS: Record<string, Record<string, number>> = {
+      Black:  { S: 5327615052, M: 5327615053, L: 5327615054, XL: 5327615055, "2XL": 5327615056, "3XL": 5327615057 },
+      Grey:   { S: 5327615058, M: 5327615059, L: 5327615060, XL: 5327615061, "2XL": 5327615062, "3XL": 5327615063 },
+    };
+
+    const safeRow = row!;
+    async function placePrintfulOrder(): Promise<string | null> {
+      const color = safeRow.pant_color === "Grey" ? "Grey" : "Black";
+      const colorMap = SWEATS_VARIANTS[color];
+      const variantId = colorMap?.[size];
+      if (!variantId) return null;
+
+      const res = await fetch("https://api.printful.com/orders", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.PRINTFUL_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recipient: {
+            name: fullName,
+            address1: safeRow.address,
+            city: safeRow.city,
+            state_code: safeRow.state,
+            country_code: "US",
+            zip: safeRow.zip,
+            phone: safeRow.phone || undefined,
+            email: safeRow.email || undefined,
+          },
+          items: [{ sync_variant_id: variantId, quantity: 1 }],
+          confirm: true,
+        }),
+      });
+      const data = await res.json();
+      if (data.code === 200) return String(data.result.id);
+      console.error("Printful order error:", data);
+      return null;
+    }
+
     let amazonLink: string | null = null;
 
     switch (action) {
       case "approve": {
-        const color = row.pant_color || "";
-        const searchQuery = row.pant_type === "sweatpants"
-          ? `Hanes mens sweatpants ${size}${color ? " " + color : ""}`
-          : `Lee jeans mens ${size}`;
-        amazonLink = `https://www.amazon.com/s?k=${encodeURIComponent(searchQuery)}&ref=olb4other`;
+        if (safeRow.pant_type === "sweatpants") {
+          // Auto-fulfill via Printful
+          const printfulOrderId = await placePrintfulOrder();
+          await updateRequestStatus(Number(id), "approved", {
+            printfulOrderId,
+            verifiedBy: "manual",
+          } as Parameters<typeof updateRequestStatus>[2] & { printfulOrderId: string | null });
 
-        await updateRequestStatus(Number(id), "approved", {
-          amazonLink,
-          verifiedBy: "manual",
-        });
+          await sendTelegram(
+            printfulOrderId
+              ? `✅ <b>Approved + Printful Order Placed</b> [#${id}]\n` +
+                `👤 ${fullName}\n` +
+                `👖 Sweatpants · ${size} · ${safeRow.pant_color || "Black"}\n` +
+                `📦 Printful Order #${printfulOrderId} — shipping to ${fullAddress}`
+              : `✅ <b>Approved</b> [#${id}] — ⚠️ Printful order failed, check size/color\n` +
+                `👤 ${fullName} · ${fullAddress}`
+          );
+        } else {
+          // Jeans — generate Amazon search link
+          const searchQuery = `Lee jeans mens ${size}`;
+          amazonLink = `https://www.amazon.com/s?k=${encodeURIComponent(searchQuery)}&ref=olb4other`;
+          await updateRequestStatus(Number(id), "approved", { amazonLink, verifiedBy: "manual" });
 
-        await sendTelegram(
-          `✅ <b>Request Approved</b> [#${id}]\n` +
-          `👤 ${fullName}\n` +
-          `👖 ${type} · ${size}\n` +
-          `📍 Ship to: ${fullAddress}\n` +
-          `🛒 <a href="${amazonLink}">Amazon Search</a>`
-        );
+          await sendTelegram(
+            `✅ <b>Request Approved</b> [#${id}]\n` +
+            `👤 ${fullName}\n` +
+            `👖 ${type} · ${size}\n` +
+            `📍 Ship to: ${fullAddress}\n` +
+            `🛒 <a href="${amazonLink}">Amazon Search</a>`
+          );
+        }
         break;
       }
 

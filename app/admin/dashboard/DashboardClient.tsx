@@ -112,7 +112,26 @@ function RequestCard({
         </a>
       )}
 
-      {/* Amazon link (approved) */}
+      {/* Printful auto-fulfilled (sweatpants) */}
+      {isApproved && (req as RequestRow & { printful_order_id?: string | null }).printful_order_id && (
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-green-900/30 border border-green-700/50">
+          <span className="text-xl">📦</span>
+          <div>
+            <p className="text-sm font-bold text-green-400">Printful Order Placed</p>
+            <p className="text-xs text-slate-400">Order #{(req as RequestRow & { printful_order_id?: string | null }).printful_order_id} · Shipping to {fullAddress}</p>
+          </div>
+          <a
+            href="https://www.printful.com/dashboard/orders"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto text-xs text-green-400 hover:text-green-300 underline shrink-0"
+          >
+            View →
+          </a>
+        </div>
+      )}
+
+      {/* Amazon link (jeans) */}
       {isApproved && req.amazon_link && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-800 border border-slate-600">
@@ -306,6 +325,7 @@ function ManualAddModal({ onClose, onAdded }: { onClose: () => void; onAdded: (r
         verified_by: "referral",
         call_notes: null,
         amazon_link: null,
+        printful_order_id: null,
         shipped_at: null,
         created_at: new Date().toISOString(),
       };
