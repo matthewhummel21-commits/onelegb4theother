@@ -1,264 +1,281 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { BlurFade } from "@/components/ui/blur-fade";
+import { useState, useEffect, useRef, useCallback } from "react";
 
-const NAV_ITEMS = [
-  { id: "tee",        label: "Tee" },
-  { id: "hoodie",     label: "Hoodie" },
-  { id: "crewneck",   label: "Crewneck" },
-  { id: "sweatpants", label: "Sweatpants" },
-  { id: "hats",       label: "Hats" },
-  { id: "socks",      label: "Socks" },
-  { id: "stickers",   label: "Stickers" },
-];
+// ─── Product catalog ──────────────────────────────────────────────────────────
 
-const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
-const SWEATS_SIZES_FULL = ["S", "M", "L", "XL", "2XL", "3XL"];
-const SWEATS_SIZES_GD   = ["S", "M", "L", "XL", "2XL"]; // garment-dyed max 2XL
-const SWEATS_COLORS = [
-  { key: "Black",       label: "Black",        img: "/sweats-black-mockup.jpg",    tag: "" },
-  { key: "Heather Grey", label: "Heather Grey", img: "/sweats-grey-mockup.jpg",     tag: "" },
-  { key: "Pepper",      label: "Pepper",       img: "/sweats-pepper-mockup.jpg",   tag: "Garment-Dyed" },
-  { key: "Espresso",    label: "Espresso",     img: "/sweats-espresso-mockup.jpg", tag: "Garment-Dyed" },
-];
-const HAT_COLORS = ["Black/White/Black", "All Black", "Red/White/Blue"];
-const SOCK_SIZES = ["S", "M", "L"];
+const SIZES_FULL  = ["XS","S","M","L","XL","2XL","3XL"];
+const SIZES_GD    = ["S","M","L","XL","2XL","3XL"];
+const SIZES_SWEATS_GD = ["S","M","L","XL","2XL"];
+const SIZES_SOCKS = ["S","M","L"];
 
-export default function ShopPage() {
-  const [activeSection, setActiveSection] = useState("tee");
-  const navRef = useRef<HTMLDivElement>(null);
+const PRODUCTS = [
+  {
+    id: "tee",
+    name: "Issued With Honor Tee",
+    subtitle: "Next Level 3600 · Fitted crew",
+    price: 5500,
+    colors: [
+      { key: "White", label: "White", hex: "#FFFFFF", img: "/shirt-front-mockup.jpg", backImg: "/shirt-back-mockup.jpg" },
+    ],
+    sizes: SIZES_FULL,
+    tag: "Bestseller",
+  },
+  {
+    id: "hoodie",
+    name: "Garment-Dyed Hoodie",
+    subtitle: "Comfort Colors 1567 · Heavyweight",
+    price: 6500,
+    colors: [
+      { key: "Pepper",    label: "Pepper",     hex: "#3D3635", img: "/hoodie-pepper-mockup.jpg" },
+      { key: "Grey",      label: "Grey",        hex: "#9B9B9B", img: "/hoodie-grey-mockup.jpg" },
+      { key: "True Navy", label: "True Navy",   hex: "#1B2A4A", img: "/hoodie-navy-mockup.jpg" },
+    ],
+    sizes: SIZES_GD,
+    tag: "🔥 Trending",
+  },
+  {
+    id: "crew",
+    name: "Garment-Dyed Crewneck",
+    subtitle: "Comfort Colors 1466 · Lightweight",
+    price: 5500,
+    colors: [
+      { key: "Pepper",   label: "Pepper",   hex: "#3D3635", img: "/crew-pepper-mockup.jpg" },
+      { key: "Espresso", label: "Espresso", hex: "#2C1A0E", img: "/crew-espresso-mockup.jpg" },
+      { key: "Black",    label: "Black",    hex: "#1A1A1A", img: "/crew-black-mockup.jpg" },
+    ],
+    sizes: SIZES_GD,
+    tag: "New",
+  },
+  {
+    id: "sweatpants",
+    name: "Sweatpants",
+    subtitle: "Bella+Canvas or Comfort Colors · Garment-Dyed",
+    price: 5500,
+    colors: [
+      { key: "Black",        label: "Black",        hex: "#1A1A1A", img: "/sweats-black-mockup.jpg" },
+      { key: "Heather Grey", label: "Heather Grey", hex: "#9B9B9B", img: "/sweats-grey-mockup.jpg" },
+      { key: "Pepper",       label: "Pepper",       hex: "#3D3635", img: "/sweats-pepper-mockup.jpg",   gd: true },
+      { key: "Espresso",     label: "Espresso",     hex: "#2C1A0E", img: "/sweats-espresso-mockup.jpg", gd: true },
+    ],
+    sizes: SIZES_GD,
+    tag: "New",
+    dynamicSizes: true,
+  },
+  {
+    id: "hat",
+    name: "Foam Trucker Hat",
+    subtitle: "Otto Cap 39-165 · One size",
+    price: 3800,
+    colors: [
+      { key: "Black/White/Black", label: "Classic",       hex: "#222222", img: "/hat-bwb-mockup.jpg" },
+      { key: "All Black",         label: "All Black",     hex: "#0A0A0A", img: "/hat-black-mockup.jpg" },
+      { key: "Red/White/Blue",    label: "Red/White/Blue",hex: "#B22234", img: "/hat-rwb-mockup.jpg" },
+    ],
+    sizes: [],
+    tag: "",
+  },
+  {
+    id: "socks",
+    name: "Issued With Honor Socks",
+    subtitle: "Sublimation crew · Logo on each side",
+    price: 2000,
+    colors: [
+      { key: "Navy", label: "Navy/Red", hex: "#0D1B3E", img: "/socks-mockup.jpg" },
+    ],
+    sizes: SIZES_SOCKS,
+    tag: "New",
+  },
+  {
+    id: "sticker",
+    name: "Die-Cut Vinyl Sticker",
+    subtitle: "3\"×3\" premium vinyl · Weather resistant",
+    price: 700,
+    colors: [
+      { key: "Logo",    label: "Logo",    hex: "#0D1B3E", img: "/sticker-logo.png" },
+      { key: "QR Code", label: "QR Code", hex: "#B22234", img: "/sticker-qr.png" },
+    ],
+    sizes: [],
+    tag: "",
+  },
+] as const;
 
-  useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    NAV_ITEMS.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) setActiveSection(id); },
-        { rootMargin: "-40% 0px -50% 0px", threshold: 0 }
-      );
-      obs.observe(el);
-      observers.push(obs);
-    });
-    return () => observers.forEach((o) => o.disconnect());
-  }, []);
+type Product = typeof PRODUCTS[number];
+type Color = Product["colors"][number];
 
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const navH = navRef.current?.offsetHeight || 60;
-    const top = el.getBoundingClientRect().top + window.scrollY - navH - 16;
-    window.scrollTo({ top, behavior: "smooth" });
-  };
+const PROMO_CODES: Record<string, Record<string, number>> = {
+  TEAM: { tee: 2999, hoodie: 5500, crew: 4444, sweatpants: 4444, hat: 2800, socks: 1500, sticker: 500 },
+};
 
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+// ─── Product Card ─────────────────────────────────────────────────────────────
+
+function ProductCard({ product, appliedCode }: { product: Product; appliedCode: string | null }) {
+  const [activeColor, setActiveColor] = useState<string>(product.colors[0].key);
+  const [activeSize, setActiveSize] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [promoCode, setPromoCode] = useState("");
-  const [promoApplied, setPromoApplied] = useState(false);
-  const [promoError, setPromoError] = useState("");
+  const [flipped, setFlipped] = useState(false);
 
-  const VALID_CODES: Record<string, { shirt: number; sweats: number; hat: number; socks: number; sticker: number; richardson: number; hoodie: number; crew: number }> = {
-    TEAM: { shirt: 2999, sweats: 4444, hat: 2800, socks: 1500, sticker: 500, richardson: 2800, hoodie: 5500, crew: 4444 }, // richardson kept for API compat
-  };
+  const discount = appliedCode ? PROMO_CODES[appliedCode]?.[product.id] : null;
+  const finalPrice = discount ?? product.price;
+  const displayPrice = `$${(finalPrice / 100).toFixed(2)}`;
+  const originalPrice = discount ? `$${(product.price / 100).toFixed(2)}` : null;
 
-  const handleApplyPromo = () => {
-    const code = promoCode.toUpperCase().trim();
-    if (VALID_CODES[code]) {
-      setPromoApplied(true);
-      setPromoError("");
-    } else {
-      setPromoApplied(false);
-      setPromoError("Invalid code. Try again.");
+  const colorObj = (product.colors as readonly Color[]).find(c => c.key === activeColor) ?? product.colors[0];
+
+  // Dynamic sizes for items that vary by color
+  const getSizes = () => {
+    if ("dynamicSizes" in product && product.dynamicSizes) {
+      const isGD = (colorObj as { gd?: boolean }).gd;
+      return isGD ? SIZES_SWEATS_GD : SIZES_GD;
     }
+    return [...product.sizes];
   };
 
-  const appliedCode = promoApplied ? promoCode.toUpperCase().trim() : null;
-  const shirtPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].shirt : 5500;
-  const sweatsPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].sweats : 5500;
-  const displayPrice = (shirtPrice / 100).toFixed(2);
-  const sweatsDisplayPrice = (sweatsPrice / 100).toFixed(2);
+  const hasBack = "backImg" in colorObj && (colorObj as { backImg?: string }).backImg;
 
-  const [sweatsSize, setSweatsSize] = useState<string | null>(null);
-  const [sweatsColor, setSweatsColor] = useState<string>("Black");
-  const [sweatsLoading, setSweatsLoading] = useState(false);
-  const [sweatsError, setSweatsError] = useState<string | null>(null);
-  const [hatColor, setHatColor] = useState<string>("Black/White/Black");
-  const [hatLoading, setHatLoading] = useState(false);
-  const [hatError, setHatError] = useState<string | null>(null);
-
-  const socksPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].socks : 2000;
-  const socksDisplayPrice = (socksPrice / 100).toFixed(2);
-  const [socksSize, setSocksSize] = useState<string | null>(null);
-  const [socksLoading, setSocksLoading] = useState(false);
-  const [socksError, setSocksError] = useState<string | null>(null);
-
-  const handleSocksCheckout = async () => {
-    if (!socksSize || socksLoading) return;
-    setSocksLoading(true);
-    setSocksError(null);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product: "socks", size: socksSize, promoCode: appliedCode || undefined }),
-      });
-      const data = await res.json();
-      if (data.url) { window.location.href = data.url; }
-      else { setSocksError(data.error || "Something went wrong."); setSocksLoading(false); }
-    } catch {
-      setSocksError("Network error. Please try again.");
-      setSocksLoading(false);
-    }
-  };
-
-  const stickerPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].sticker : 700;
-  const stickerDisplayPrice = (stickerPrice / 100).toFixed(2);
-  const richardsonPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].richardson : 3500;
-  const richardsonDisplayPrice = (richardsonPrice / 100).toFixed(2);
-  const [stickerType, setStickerType] = useState<string>("Logo");
-  const [stickerLoading, setStickerLoading] = useState(false);
-  const [stickerError, setStickerError] = useState<string | null>(null);
-  const [richardsonLoading, setRichardsonLoading] = useState(false);
-  const [richardsonError, setRichardsonError] = useState<string | null>(null);
-
-  const handleStickerCheckout = async () => {
-    setStickerLoading(true); setStickerError(null);
-    try {
-      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product: "sticker", color: stickerType, promoCode: appliedCode || undefined }) });
-      const data = await res.json();
-      if (data.url) { window.location.href = data.url; } else { setStickerError(data.error || "Error"); setStickerLoading(false); }
-    } catch { setStickerError("Network error."); setStickerLoading(false); }
-  };
-
-  const handleRichardsonCheckout = async () => {
-    setRichardsonLoading(true); setRichardsonError(null);
-    try {
-      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product: "richardson", promoCode: appliedCode || undefined }) });
-      const data = await res.json();
-      if (data.url) { window.location.href = data.url; } else { setRichardsonError(data.error || "Error"); setRichardsonLoading(false); }
-    } catch { setRichardsonError("Network error."); setRichardsonLoading(false); }
-  };
-
-  const hatPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].hat : 3800;
-  const hatDisplayPrice = (hatPrice / 100).toFixed(2);
-
-  // Hoodie
-  const hoodiePrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].hoodie : 6500;
-  const hoodieDisplayPrice = (hoodiePrice / 100).toFixed(2);
-  const [hoodieColor, setHoodieColor] = useState("Pepper");
-  const [hoodieSize, setHoodieSize] = useState<string | null>(null);
-  const [hoodieLoading, setHoodieLoading] = useState(false);
-  const [hoodieError, setHoodieError] = useState<string | null>(null);
-  const HOODIE_COLORS = [
-    { key: "Pepper",     label: "Pepper",     img: "/hoodie-pepper-mockup.jpg" },
-    { key: "Grey",       label: "Grey",       img: "/hoodie-grey-mockup.jpg" },
-    { key: "True Navy",  label: "True Navy",  img: "/hoodie-navy-mockup.jpg" },
-  ];
-  const handleHoodieCheckout = async () => {
-    if (!hoodieSize || hoodieLoading) return;
-    setHoodieLoading(true); setHoodieError(null);
-    try {
-      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product: "hoodie", size: hoodieSize, color: hoodieColor, promoCode: appliedCode || undefined }) });
-      const data = await res.json();
-      if (data.url) { window.location.href = data.url; } else { setHoodieError(data.error || "Error"); setHoodieLoading(false); }
-    } catch { setHoodieError("Network error."); setHoodieLoading(false); }
-  };
-
-  // Crewneck
-  const crewPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].crew : 5500;
-  const crewDisplayPrice = (crewPrice / 100).toFixed(2);
-  const [crewColor, setCrewColor] = useState("Pepper");
-  const [crewSize, setCrewSize] = useState<string | null>(null);
-  const [crewLoading, setCrewLoading] = useState(false);
-  const [crewError, setCrewError] = useState<string | null>(null);
-  const CREW_COLORS = [
-    { key: "Pepper",   label: "Pepper",   img: "/crew-pepper-mockup.jpg" },
-    { key: "Espresso", label: "Espresso", img: "/crew-espresso-mockup.jpg" },
-    { key: "Black",    label: "Black",    img: "/crew-black-mockup.jpg" },
-  ];
-  const GD_SIZES = ["S", "M", "L", "XL", "2XL", "3XL"];
-  const handleCrewCheckout = async () => {
-    if (!crewSize || crewLoading) return;
-    setCrewLoading(true); setCrewError(null);
-    try {
-      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product: "crew", size: crewSize, color: crewColor, promoCode: appliedCode || undefined }) });
-      const data = await res.json();
-      if (data.url) { window.location.href = data.url; } else { setCrewError(data.error || "Error"); setCrewLoading(false); }
-    } catch { setCrewError("Network error."); setCrewLoading(false); }
-  };
-
-  const handleHatCheckout = async () => {
-    if (hatLoading) return;
-    setHatLoading(true);
-    setHatError(null);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product: "hat", color: hatColor, promoCode: appliedCode || undefined }),
-      });
-      const data = await res.json();
-      if (data.url) { window.location.href = data.url; }
-      else { setHatError(data.error || "Something went wrong."); setHatLoading(false); }
-    } catch {
-      setHatError("Network error. Please try again.");
-      setHatLoading(false);
-    }
-  };
-
-  const handleSweatsCheckout = async () => {
-    if (!sweatsSize || sweatsLoading) return;
-    setSweatsLoading(true);
-    setSweatsError(null);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product: "sweatpants", size: sweatsSize, color: sweatsColor, promoCode: appliedCode || undefined }),
-      });
-      const data = await res.json();
-      if (data.url) { window.location.href = data.url; }
-      else { setSweatsError(data.error || "Something went wrong."); setSweatsLoading(false); }
-    } catch {
-      setSweatsError("Network error. Please try again.");
-      setSweatsLoading(false);
-    }
-  };
-
-  const handleCheckout = async () => {
-    if (!selectedSize || loading) return;
+  const handleBuy = async () => {
+    if (product.sizes.length > 0 && !activeSize) return;
     setLoading(true);
     setError(null);
     try {
+      const body: Record<string, string | undefined> = {
+        product: product.id,
+        color: activeColor,
+        size: activeSize ?? undefined,
+        promoCode: appliedCode ?? undefined,
+      };
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product: "shirt", size: selectedSize, promoCode: appliedCode || undefined }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setError(data.error || "Something went wrong. Try again.");
-        setLoading(false);
-      }
-    } catch {
-      setError("Network error. Please try again.");
-      setLoading(false);
-    }
+      if (data.url) { window.location.href = data.url; }
+      else { setError(data.error || "Something went wrong."); setLoading(false); }
+    } catch { setError("Network error."); setLoading(false); }
+  };
+
+  const needsSize = product.sizes.length > 0 && !activeSize;
+
+  return (
+    <div className="group bg-[#111111] rounded-2xl overflow-hidden border border-white/5 hover:border-white/15 transition-all duration-300 flex flex-col">
+
+      {/* Image */}
+      <div className="relative aspect-square bg-[#0a0a0a] overflow-hidden">
+        {product.tag && (
+          <span className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-[#b22234] text-white text-xs font-bold uppercase tracking-wide">
+            {product.tag}
+          </span>
+        )}
+        {discount && (
+          <span className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full bg-green-600 text-white text-xs font-bold">
+            TEAM ✓
+          </span>
+        )}
+        <img
+          src={flipped && hasBack ? (colorObj as { backImg?: string }).backImg! : colorObj.img}
+          alt={`${product.name} — ${colorObj.label}`}
+          className="w-full h-full object-contain p-4 transition-all duration-500 group-hover:scale-105"
+        />
+        {hasBack && (
+          <button
+            onClick={() => setFlipped(f => !f)}
+            className="absolute bottom-3 right-3 bg-black/60 hover:bg-black/80 text-white text-xs px-2.5 py-1 rounded-lg border border-white/20 backdrop-blur-sm transition-all"
+          >
+            {flipped ? "Front" : "Back"}
+          </button>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="p-5 flex flex-col gap-4 flex-1">
+        <div>
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-extrabold text-white text-base leading-tight">{product.name}</h3>
+            <div className="text-right shrink-0">
+              <span className="font-extrabold text-[#b22234] text-lg">{displayPrice}</span>
+              {originalPrice && <p className="text-white/30 text-xs line-through">{originalPrice}</p>}
+            </div>
+          </div>
+          <p className="text-white/40 text-xs mt-0.5">{product.subtitle}</p>
+        </div>
+
+        {/* Color swatches */}
+        {product.colors.length > 1 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {(product.colors as readonly Color[]).map(c => (
+              <button
+                key={c.key}
+                onClick={() => { setActiveColor(c.key); setActiveSize(null); setFlipped(false); }}
+                title={c.label}
+                className={`w-6 h-6 rounded-full border-2 transition-all ${
+                  activeColor === c.key ? "border-white scale-110" : "border-transparent hover:border-white/50"
+                }`}
+                style={{ backgroundColor: c.hex }}
+              />
+            ))}
+            <span className="text-white/40 text-xs ml-1">{colorObj.label}</span>
+          </div>
+        )}
+
+        {/* Size picker */}
+        {getSizes().length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {getSizes().map(s => (
+              <button
+                key={s}
+                onClick={() => setActiveSize(s)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                  activeSize === s
+                    ? "bg-white text-black border-white"
+                    : "border-white/15 text-white/60 hover:border-white/50 hover:text-white"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {error && <p className="text-red-400 text-xs">{error}</p>}
+
+        {/* Buy button */}
+        <button
+          onClick={handleBuy}
+          disabled={loading || (getSizes().length > 0 && !activeSize)}
+          className={`mt-auto w-full py-3 rounded-xl text-sm font-extrabold uppercase tracking-wide transition-all ${
+            loading || needsSize
+              ? "bg-white/5 text-white/30 cursor-not-allowed"
+              : "bg-[#b22234] hover:bg-[#8b0000] text-white"
+          }`}
+        >
+          {loading ? "..." : needsSize ? "Select a Size" : `Add to Cart — ${displayPrice}`}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
+
+export default function ShopPage() {
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
+  const [promoError, setPromoError] = useState("");
+
+  const handlePromo = () => {
+    const code = promoCode.toUpperCase().trim();
+    if (PROMO_CODES[code]) { setAppliedCode(code); setPromoError(""); }
+    else { setPromoError("Invalid code."); }
   };
 
   return (
-    <main className="min-h-screen bg-black text-white font-sans">
-      {/* NAV */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <main className="min-h-screen bg-[#0a0a0a] text-white font-sans">
+
+      {/* ── NAV ── */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <a href="/" className="text-white font-extrabold text-lg tracking-tight">
             One Leg B4 the Other
           </a>
@@ -268,571 +285,110 @@ export default function ShopPage() {
         </div>
       </nav>
 
-      {/* SHOP NAV */}
-      <div ref={navRef} className="sticky top-[65px] z-40 bg-black/95 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex overflow-x-auto scrollbar-hide">
-            {NAV_ITEMS.map(({ id, label }) => (
-              <button
-                key={id}
-                onClick={() => scrollTo(id)}
-                className={`flex-shrink-0 px-5 py-4 text-sm font-bold tracking-wide uppercase transition-all border-b-2 ${
-                  activeSection === id
-                    ? "text-[#b22234] border-[#b22234]"
-                    : "text-white/40 border-transparent hover:text-white/80 hover:border-white/20"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+      {/* ── HERO ── */}
+      <div className="pt-16">
+        <div className="relative overflow-hidden bg-[#0d0d0d] border-b border-white/5">
+          <div className="max-w-7xl mx-auto px-6 py-20 md:py-28 flex flex-col md:flex-row items-center gap-12">
+            <div className="flex-1 text-center md:text-left">
+              <p className="text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">Issued With Honor</p>
+              <h1 className="text-5xl md:text-7xl font-black text-white leading-none tracking-tight mb-6">
+                Wear<br className="hidden md:block" /> the<br className="hidden md:block" /> Mission.
+              </h1>
+              <p className="text-white/50 text-lg max-w-md mb-8">
+                Every purchase funds a pair of adaptive pants for a veteran in need. No overhead. Full impact.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+                <a
+                  href="#shop-grid"
+                  className="px-8 py-4 rounded-2xl bg-[#b22234] text-white font-extrabold text-base hover:bg-[#8b0000] transition-colors"
+                >
+                  Shop Now
+                </a>
+                <a
+                  href="/#donate"
+                  className="px-8 py-4 rounded-2xl border border-white/20 text-white font-extrabold text-base hover:bg-white/5 transition-colors"
+                >
+                  Just Donate →
+                </a>
+              </div>
+            </div>
+            {/* Hero product stack */}
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-72 h-72 md:w-96 md:h-96">
+                <img src="/hoodie-pepper-mockup.jpg" alt="Garment-Dyed Hoodie" className="absolute inset-0 w-full h-full object-contain drop-shadow-2xl" />
+              </div>
+            </div>
           </div>
+          {/* Subtle gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#b22234]/5 via-transparent to-transparent pointer-events-none" />
         </div>
       </div>
 
-      {promoApplied && (
-        <div className="sticky top-[113px] z-30 bg-green-900/90 backdrop-blur-sm border-b border-green-700/50 text-center py-2 text-green-300 text-sm font-bold">
+      {/* ── PROMO BANNER ── */}
+      {appliedCode && (
+        <div className="bg-green-900/80 border-b border-green-700/50 text-center py-2.5 text-green-300 text-sm font-bold">
           ✓ TEAM code active — discounted prices applied on all items
         </div>
       )}
 
-      <div className="pt-12 pb-20 px-6 max-w-5xl mx-auto">
-        <BlurFade delay={0.1}>
-          <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">
-              Issued With Honor
-            </span>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4">Wear the Mission</h1>
-            <p className="text-white/60 text-lg max-w-xl mx-auto">
-              Every shirt sold funds a pair of adaptive pants for a veteran in need. $55 — no markup, full impact.
-            </p>
-          </div>
-        </BlurFade>
-
-        <div id="tee" className="grid md:grid-cols-2 gap-12 items-start">
-          {/* Product Images */}
-          <BlurFade delay={0.2}>
-            <div className="space-y-3">
-              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-6">
-                <img
-                  src="https://files.cdn.printful.com/files/844/844011d92c81ab651408cb0aa7b88076_preview.png"
-                  alt="Issued With Honor Tee — Front"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex flex-col items-center justify-center p-2 relative">
-                  <img src="/shirt-front-mockup.jpg" alt="Front" className="w-full h-full object-contain" />
-                  <span className="absolute bottom-2 left-0 right-0 text-center text-white/60 text-xs">Front</span>
-                </div>
-                <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex flex-col items-center justify-center p-2 relative">
-                  <img src="/shirt-back-mockup.jpg" alt="Back" className="w-full h-full object-contain" />
-                  <span className="absolute bottom-2 left-0 right-0 text-center text-white/60 text-xs">Back</span>
-                </div>
-              </div>
+      {/* ── PROMO CODE BAR ── */}
+      <div className="bg-[#111111] border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-end gap-3">
+          {!appliedCode ? (
+            <>
+              <input
+                value={promoCode}
+                onChange={e => { setPromoCode(e.target.value); setPromoError(""); }}
+                onKeyDown={e => e.key === "Enter" && handlePromo()}
+                placeholder="Promo code"
+                className="h-9 w-40 rounded-lg bg-white/5 border border-white/10 text-white text-sm px-3 focus:outline-none focus:border-white/30 uppercase placeholder:normal-case placeholder:text-white/30"
+              />
+              <button onClick={handlePromo} className="h-9 px-4 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-bold transition-colors">
+                Apply
+              </button>
+              {promoError && <span className="text-red-400 text-xs">{promoError}</span>}
+            </>
+          ) : (
+            <div className="flex items-center gap-3">
+              <span className="text-green-400 text-sm font-bold">✓ {appliedCode} applied</span>
+              <button onClick={() => { setAppliedCode(null); setPromoCode(""); }} className="text-white/30 hover:text-white text-xs transition-colors">
+                Remove
+              </button>
             </div>
-          </BlurFade>
-
-          {/* Purchase Panel */}
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-2xl font-extrabold text-white mb-1">Issued With Honor Tee</h2>
-              <div className="flex items-baseline gap-3">
-                <p className="text-3xl font-bold text-[#b22234]">${displayPrice}</p>
-                {promoApplied && <span className="text-lg line-through text-white/30">$55.00</span>}
-                {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
-              </div>
-              <p className="text-white/50 text-sm mt-1">Free shipping · Printful fulfilled · Ships in 3–5 days</p>
-            </div>
-
-            {/* Size Selector */}
-            <div>
-              <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Select Size</p>
-              <div className="flex flex-wrap gap-3">
-                {SHIRT_SIZES.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                      selectedSize === size
-                        ? "bg-[#b22234] border-[#b22234] text-white"
-                        : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400 hover:text-white"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Promo Code */}
-            <div>
-              <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Promo Code</p>
-              {!promoApplied ? (
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={promoCode}
-                    onChange={(e) => { setPromoCode(e.target.value); setPromoError(""); }}
-                    onKeyDown={(e) => e.key === "Enter" && handleApplyPromo()}
-                    placeholder="Enter code..."
-                    className="flex-1 h-11 rounded-xl bg-gray-800 border border-gray-600 text-white text-sm px-4 focus:outline-none focus:border-[#b22234] uppercase placeholder:normal-case placeholder:text-white/30"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleApplyPromo}
-                    className="h-11 px-5 rounded-xl bg-gray-700 hover:bg-gray-600 text-white text-sm font-bold transition-colors"
-                  >
-                    Apply
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between h-11 px-4 rounded-xl bg-green-900/30 border border-green-700/50">
-                  <span className="text-green-400 text-sm font-bold">✓ Code TEAM applied — $29.99</span>
-                  <button
-                    type="button"
-                    onClick={() => { setPromoApplied(false); setPromoCode(""); }}
-                    className="text-white/40 hover:text-white text-xs transition-colors"
-                  >
-                    Remove
-                  </button>
-                </div>
-              )}
-              {promoError && <p className="text-red-400 text-xs mt-1.5">{promoError}</p>}
-            </div>
-
-            {/* Impact callout */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-              <p className="text-white/80 text-sm">
-                {promoApplied
-                  ? <><span className="text-white font-bold">Team price applied.</span> Thank you for being part of the mission. 🎖️</>
-                  : <><span className="text-white font-bold">Your $55</span> directly funds a pair of adaptive pants for a veteran on our waitlist. That&apos;s it. No overhead theater.</>
-                }
-              </p>
-            </div>
-
-            {!selectedSize && (
-              <p className="text-yellow-400 text-sm font-semibold">👆 Select a size above to continue</p>
-            )}
-            {error && <p className="text-red-400 text-sm">{error}</p>}
-
-            <button
-              onClick={handleCheckout}
-              disabled={!selectedSize || loading}
-              className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
-              style={{
-                background: selectedSize && !loading ? "rgb(178,34,52)" : "rgb(80,80,80)",
-                cursor: selectedSize && !loading ? "pointer" : "not-allowed",
-              }}
-            >
-              {loading ? "Redirecting to checkout..." : selectedSize ? `Buy Now — ${selectedSize} / $${displayPrice}` : "Select a Size to Continue"}
-            </button>
-
-            <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
-          </div>
-        </div>
-
-        {/* HOODIE */}
-        <div id="hoodie" className="mt-20 border-t border-white/10 pt-16">
-          <BlurFade delay={0.1}>
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Garment-Dyed Hoodie</h2>
-              <p className="text-white/60 text-lg max-w-xl mx-auto">Comfort Colors 1567. Heavyweight garment-dyed fleece. Vintage washed look. Logo on the chest.</p>
-            </div>
-          </BlurFade>
-          <div className="grid md:grid-cols-2 gap-12 items-start">
-            <BlurFade delay={0.2}>
-              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-0">
-                <img src={HOODIE_COLORS.find(c=>c.key===hoodieColor)?.img || "/hoodie-pepper-mockup.jpg"} alt={`Hoodie — ${hoodieColor}`} className="w-full h-full object-contain transition-opacity duration-300" />
-              </div>
-            </BlurFade>
-            <BlurFade delay={0.3}>
-              <div className="space-y-8">
-                <div>
-                  <h3 className="text-2xl font-extrabold text-white mb-1">Garment-Dyed Hoodie</h3>
-                  <div className="flex items-baseline gap-3">
-                    <p className="text-3xl font-bold text-[#b22234]">${hoodieDisplayPrice}</p>
-                    {promoApplied && <span className="text-lg line-through text-white/30">$65.00</span>}
-                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
-                  </div>
-                  <p className="text-white/50 text-sm mt-1">Free shipping · Comfort Colors 1567 ✦ Garment-Dyed · Ships in 3–5 days</p>
-                </div>
-                <div>
-                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Color</p>
-                  <div className="flex flex-wrap gap-3">
-                    {HOODIE_COLORS.map(c => (
-                      <button key={c.key} onClick={() => { setHoodieColor(c.key); setHoodieSize(null); }}
-                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                          hoodieColor===c.key ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
-                        }`}>{c.label}</button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Size</p>
-                  <div className="flex flex-wrap gap-3">
-                    {GD_SIZES.map(s => (
-                      <button key={s} onClick={() => setHoodieSize(s)}
-                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                          hoodieSize===s ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
-                        }`}>{s}</button>
-                    ))}
-                  </div>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $65</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
-                </div>
-                {!hoodieSize && <p className="text-yellow-400 text-sm font-semibold">👆 Select a size to continue</p>}
-                {hoodieError && <p className="text-red-400 text-sm">{hoodieError}</p>}
-                <button onClick={handleHoodieCheckout} disabled={!hoodieSize || hoodieLoading}
-                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
-                  style={{ background: hoodieSize && !hoodieLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: hoodieSize && !hoodieLoading ? "pointer" : "not-allowed" }}>
-                  {hoodieLoading ? "Redirecting..." : hoodieSize ? `Buy Now — ${hoodieColor} / ${hoodieSize} / $${hoodieDisplayPrice}` : "Select a Size to Continue"}
-                </button>
-                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
-              </div>
-            </BlurFade>
-          </div>
-        </div>
-
-        {/* CREWNECK */}
-        <div id="crewneck" className="mt-20 border-t border-white/10 pt-16">
-          <BlurFade delay={0.1}>
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Garment-Dyed Crewneck</h2>
-              <p className="text-white/60 text-lg max-w-xl mx-auto">Comfort Colors 1466. Lightweight garment-dyed fleece. Clean vintage feel. Logo on the chest.</p>
-            </div>
-          </BlurFade>
-          <div className="grid md:grid-cols-2 gap-12 items-start">
-            <BlurFade delay={0.2}>
-              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-0">
-                <img src={CREW_COLORS.find(c=>c.key===crewColor)?.img || "/crew-pepper-mockup.jpg"} alt={`Crewneck — ${crewColor}`} className="w-full h-full object-contain transition-opacity duration-300" />
-              </div>
-            </BlurFade>
-            <BlurFade delay={0.3}>
-              <div className="space-y-8">
-                <div>
-                  <h3 className="text-2xl font-extrabold text-white mb-1">Garment-Dyed Crewneck</h3>
-                  <div className="flex items-baseline gap-3">
-                    <p className="text-3xl font-bold text-[#b22234]">${crewDisplayPrice}</p>
-                    {promoApplied && <span className="text-lg line-through text-white/30">$55.00</span>}
-                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
-                  </div>
-                  <p className="text-white/50 text-sm mt-1">Free shipping · Comfort Colors 1466 ✦ Garment-Dyed · Ships in 3–5 days</p>
-                </div>
-                <div>
-                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Color</p>
-                  <div className="flex flex-wrap gap-3">
-                    {CREW_COLORS.map(c => (
-                      <button key={c.key} onClick={() => { setCrewColor(c.key); setCrewSize(null); }}
-                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                          crewColor===c.key ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
-                        }`}>{c.label}</button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Size</p>
-                  <div className="flex flex-wrap gap-3">
-                    {GD_SIZES.map(s => (
-                      <button key={s} onClick={() => setCrewSize(s)}
-                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                          crewSize===s ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
-                        }`}>{s}</button>
-                    ))}
-                  </div>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $55</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
-                </div>
-                {!crewSize && <p className="text-yellow-400 text-sm font-semibold">👆 Select a size to continue</p>}
-                {crewError && <p className="text-red-400 text-sm">{crewError}</p>}
-                <button onClick={handleCrewCheckout} disabled={!crewSize || crewLoading}
-                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
-                  style={{ background: crewSize && !crewLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: crewSize && !crewLoading ? "pointer" : "not-allowed" }}>
-                  {crewLoading ? "Redirecting..." : crewSize ? `Buy Now — ${crewColor} / ${crewSize} / $${crewDisplayPrice}` : "Select a Size to Continue"}
-                </button>
-                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
-              </div>
-            </BlurFade>
-          </div>
-        </div>
-
-        {/* SWEATPANTS */}
-        <div id="sweatpants" className="mt-20 border-t border-white/10 pt-16">
-          <BlurFade delay={0.1}>
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Issued With Honor Sweatpants</h2>
-              <p className="text-white/60 text-lg max-w-xl mx-auto">Bella + Canvas heavyweight fleece. Primary emblem on the left leg. Black or grey.</p>
-            </div>
-          </BlurFade>
-
-          <div className="grid md:grid-cols-2 gap-12 items-start">
-            <BlurFade delay={0.2}>
-              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-0">
-                <img
-                  src={SWEATS_COLORS.find(c => c.key === sweatsColor)?.img || "/sweats-black-mockup.jpg"}
-                  alt={`Issued With Honor Sweatpants — ${sweatsColor}`}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-            </BlurFade>
-
-            <BlurFade delay={0.3}>
-              <div className="space-y-8">
-                <div>
-                  <h3 className="text-2xl font-extrabold text-white mb-1">Issued With Honor Sweatpants</h3>
-                  <div className="flex items-baseline gap-3">
-                    <p className="text-3xl font-bold text-[#b22234]">${sweatsDisplayPrice}</p>
-                    {promoApplied && <span className="text-lg line-through text-white/30">$55.00</span>}
-                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
-                  </div>
-                  <p className="text-white/50 text-sm mt-1">
-                    Free shipping · {sweatsColor === "Pepper" || sweatsColor === "Espresso" ? "Comfort Colors 1469 ✦ Garment-Dyed" : "Bella + Canvas 4737"} · Ships in 3–5 days
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Color</p>
-                  <div className="flex gap-3">
-                    {SWEATS_COLORS.map((c) => (
-                      <button key={c.key} onClick={() => { setSweatsColor(c.key); setSweatsSize(null); }}
-                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                          sweatsColor === c.key ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
-                        }`}>
-                        {c.label}
-                        {c.tag && <span className="ml-1 text-xs opacity-70">✦</span>}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Size</p>
-                  <div className="flex flex-wrap gap-3">
-                    {(sweatsColor === "Pepper" || sweatsColor === "Espresso" ? SWEATS_SIZES_GD : SWEATS_SIZES_FULL).map((size) => (
-                      <button key={size} onClick={() => setSweatsSize(size)}
-                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                          sweatsSize === size ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400 hover:text-white"
-                        }`}>
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-white/30 text-xs mt-2">Need 4XL? <a href="/#contact" className="underline hover:text-white">Contact us</a> — we’ll handle it.</p>
-                </div>
-
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $44</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
-                </div>
-
-                {!sweatsSize && <p className="text-yellow-400 text-sm font-semibold">👆 Select a size above to continue</p>}
-                {sweatsError && <p className="text-red-400 text-sm">{sweatsError}</p>}
-
-                <button onClick={handleSweatsCheckout} disabled={!sweatsSize || sweatsLoading}
-                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
-                  style={{ background: sweatsSize && !sweatsLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: sweatsSize && !sweatsLoading ? "pointer" : "not-allowed" }}>
-                  {sweatsLoading ? "Redirecting..." : sweatsSize ? `Buy Now — ${sweatsColor} / ${sweatsSize} / $${sweatsDisplayPrice}` : "Select a Size to Continue"}
-                </button>
-
-                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
-              </div>
-            </BlurFade>
-          </div>
-        </div>
-
-        {/* HATS */}
-        <div id="hats" className="mt-20 border-t border-white/10 pt-16">
-          <BlurFade delay={0.1}>
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Issued With Honor Trucker Hat</h2>
-              <p className="text-white/60 text-lg max-w-xl mx-auto">Otto Cap foam front trucker. Three colorways. One size fits all.</p>
-            </div>
-          </BlurFade>
-
-          <div className="grid md:grid-cols-2 gap-12 items-start">
-            <BlurFade delay={0.2}>
-              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-6">
-                <img
-                  src={
-                    hatColor === "All Black" ? "/hat-black-mockup.jpg"
-                    : hatColor === "Red/White/Blue" ? "/hat-rwb-mockup.jpg"
-                    : "/hat-bwb-mockup.jpg"
-                  }
-                  alt={`Foam Trucker Hat — ${hatColor}`}
-                  className="w-full h-full object-contain transition-opacity duration-300"
-                />
-              </div>
-            </BlurFade>
-
-            <BlurFade delay={0.3}>
-              <div className="space-y-8">
-                <div>
-                  <h3 className="text-2xl font-extrabold text-white mb-1">Issued With Honor Trucker Hat</h3>
-                  <div className="flex items-baseline gap-3">
-                    <p className="text-3xl font-bold text-[#b22234]">${hatDisplayPrice}</p>
-                    {promoApplied && <span className="text-lg line-through text-white/30">$38.00</span>}
-                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
-                  </div>
-                  <p className="text-white/50 text-sm mt-1">Free shipping · Otto Cap 39-165 · One size fits all</p>
-                </div>
-
-                <div>
-                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Color</p>
-                  <div className="flex flex-wrap gap-3">
-                    {HAT_COLORS.map((c) => (
-                      <button key={c} onClick={() => setHatColor(c)}
-                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                          hatColor === c ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
-                        }`}>
-                        {c}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $38</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
-                </div>
-
-                {hatError && <p className="text-red-400 text-sm">{hatError}</p>}
-
-                <button onClick={handleHatCheckout} disabled={hatLoading}
-                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
-                  style={{ background: !hatLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: !hatLoading ? "pointer" : "not-allowed" }}>
-                  {hatLoading ? "Redirecting..." : `Buy Now — ${hatColor === "Black/White/Black" ? "Classic" : hatColor === "All Black" ? "All Black" : "Red/White/Blue"} / $${hatDisplayPrice}`}
-                </button>
-
-                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
-              </div>
-            </BlurFade>
-          </div>
-        </div>
-
-        {/* SOCKS */}
-        <div id="socks" className="mt-20 border-t border-white/10 pt-16">
-          <BlurFade delay={0.1}>
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Issued With Honor Socks</h2>
-              <p className="text-white/60 text-lg max-w-xl mx-auto">Sublimation crew socks. Navy base, red stripes, logo on each side.</p>
-            </div>
-          </BlurFade>
-
-          <div className="grid md:grid-cols-2 gap-12 items-start">
-            <BlurFade delay={0.2}>
-              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-6">
-                <img src="/socks-mockup.jpg" alt="Issued With Honor Socks" className="w-full h-full object-contain" />
-              </div>
-            </BlurFade>
-
-            <BlurFade delay={0.3}>
-              <div className="space-y-8">
-                <div>
-                  <h3 className="text-2xl font-extrabold text-white mb-1">Issued With Honor Socks</h3>
-                  <div className="flex items-baseline gap-3">
-                    <p className="text-3xl font-bold text-[#b22234]">${socksDisplayPrice}</p>
-                    {promoApplied && <span className="text-lg line-through text-white/30">$20.00</span>}
-                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
-                  </div>
-                  <p className="text-white/50 text-sm mt-1">Free shipping · One pair · Ships in 3–5 days</p>
-                </div>
-
-                <div>
-                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Size</p>
-                  <div className="flex gap-3">
-                    {SOCK_SIZES.map((s) => (
-                      <button key={s} onClick={() => setSocksSize(s)}
-                        className={`px-6 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                          socksSize === s ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
-                        }`}>
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-white/30 text-xs mt-2">S = Wmn 4–10 / Mn 4–8 · M = Wmn 10–13 / Mn 8–11 · L = Mn 11–14</p>
-                </div>
-
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $20</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
-                </div>
-
-                {!socksSize && <p className="text-yellow-400 text-sm font-semibold">👆 Select a size above to continue</p>}
-                {socksError && <p className="text-red-400 text-sm">{socksError}</p>}
-
-                <button onClick={handleSocksCheckout} disabled={!socksSize || socksLoading}
-                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
-                  style={{ background: socksSize && !socksLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: socksSize && !socksLoading ? "pointer" : "not-allowed" }}>
-                  {socksLoading ? "Redirecting..." : socksSize ? `Buy Now — Size ${socksSize} / $${socksDisplayPrice}` : "Select a Size to Continue"}
-                </button>
-
-                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
-              </div>
-            </BlurFade>
-          </div>
-        </div>
-
-        {/* STICKERS */}
-        <div id="stickers" className="mt-20 border-t border-white/10 pt-16">
-          <BlurFade delay={0.1}>
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Die-Cut Vinyl Stickers</h2>
-              <p className="text-white/60 text-lg max-w-xl mx-auto">Thick premium vinyl. Weather resistant. 3∃3. Logo or QR code that links straight to the site.</p>
-            </div>
-          </BlurFade>
-          <div className="grid md:grid-cols-2 gap-12 items-start">
-            <BlurFade delay={0.2}>
-              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-8">
-                <img
-                  src={stickerType === "QR Code" ? "/sticker-qr.png" : "/sticker-logo.png"}
-                  alt={`${stickerType} Sticker`}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-            </BlurFade>
-            <BlurFade delay={0.3}>
-              <div className="space-y-8">
-                <div>
-                  <h3 className="text-2xl font-extrabold text-white mb-1">Die-Cut Vinyl Stickers</h3>
-                  <div className="flex items-baseline gap-3">
-                    <p className="text-3xl font-bold text-[#b22234]">${stickerDisplayPrice}</p>
-                    {promoApplied && <span className="text-lg line-through text-white/30">$7.00</span>}
-                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
-                  </div>
-                  <p className="text-white/50 text-sm mt-1">Free shipping · 3″×3″ premium vinyl · Weather resistant</p>
-                </div>
-                <div>
-                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Design</p>
-                  <div className="flex gap-3">
-                    {["Logo", "QR Code"].map((t) => (
-                      <button key={t} onClick={() => setStickerType(t)}
-                        className={`px-5 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                          stickerType === t ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
-                        }`}>
-                        {t === "QR Code" ? "QR Code → Site" : "Logo"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $7</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
-                </div>
-                {stickerError && <p className="text-red-400 text-sm">{stickerError}</p>}
-                <button onClick={handleStickerCheckout} disabled={stickerLoading}
-                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
-                  style={{ background: !stickerLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: !stickerLoading ? "pointer" : "not-allowed" }}>
-                  {stickerLoading ? "Redirecting..." : `Buy Now — ${stickerType} / $${stickerDisplayPrice}`}
-                </button>
-                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
-              </div>
-            </BlurFade>
-          </div>
+          )}
         </div>
       </div>
+
+      {/* ── PRODUCT GRID ── */}
+      <div id="shop-grid" className="max-w-7xl mx-auto px-6 py-16">
+
+        {/* Mission stat strip */}
+        <div className="grid grid-cols-3 gap-4 mb-16">
+          {[
+            { n: "100%", label: "Goes to veterans" },
+            { n: "$0",   label: "Cost to the vet" },
+            { n: "∞",    label: "Pairs per veteran" },
+          ].map(s => (
+            <div key={s.n} className="text-center border border-white/5 rounded-2xl py-6 bg-[#111111]">
+              <p className="text-3xl font-black text-[#b22234]">{s.n}</p>
+              <p className="text-white/40 text-xs mt-1 uppercase tracking-wide">{s.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {PRODUCTS.map(p => (
+            <ProductCard key={p.id} product={p as unknown as Product} appliedCode={appliedCode} />
+          ))}
+        </div>
+
+        {/* Footer note */}
+        <p className="text-center text-white/20 text-sm mt-16">
+          Secure checkout via Stripe · Fulfilled by Printful · Ships in 3–5 days · Free shipping on all orders
+        </p>
+      </div>
+
     </main>
   );
 }
