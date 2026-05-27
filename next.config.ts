@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       {
         // QR code sticker redirect — update destination anytime without reprinting
         source: "/qr",
-        destination: "/",
+        destination: "/shop",
         permanent: false, // keep false so we can change destination freely
       },
     ];
