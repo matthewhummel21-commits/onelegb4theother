@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { id: "sweatpants", label: "Sweatpants" },
   { id: "hats",       label: "Hats" },
   { id: "socks",      label: "Socks" },
-  { id: "snapback",   label: "Snapback" },
+
   { id: "stickers",   label: "Stickers" },
 ];
 
@@ -53,7 +53,7 @@ export default function ShopPage() {
   const [promoError, setPromoError] = useState("");
 
   const VALID_CODES: Record<string, { shirt: number; sweats: number; hat: number; socks: number; sticker: number; richardson: number }> = {
-    TEAM: { shirt: 2999, sweats: 4444, hat: 2800, socks: 1500, sticker: 500, richardson: 2800 },
+    TEAM: { shirt: 2999, sweats: 4444, hat: 2800, socks: 1500, sticker: 500, richardson: 2800 }, // richardson kept for API compat
   };
 
   const handleApplyPromo = () => {
@@ -584,47 +584,6 @@ export default function ShopPage() {
                   {socksLoading ? "Redirecting..." : socksSize ? `Buy Now — Size ${socksSize} / $${socksDisplayPrice}` : "Select a Size to Continue"}
                 </button>
 
-                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
-              </div>
-            </BlurFade>
-          </div>
-        </div>
-
-        {/* RICHARDSON 112 */}
-        <div id="snapback" className="mt-20 border-t border-white/10 pt-16">
-          <BlurFade delay={0.1}>
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Richardson 112 Snapback</h2>
-              <p className="text-white/60 text-lg max-w-xl mx-auto">All black. Embroidered logo. The hat veterans actually wear.</p>
-            </div>
-          </BlurFade>
-          <div className="grid md:grid-cols-2 gap-12 items-start">
-            <BlurFade delay={0.2}>
-              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-4">
-                <img src="/richardson-mockup.jpg" alt="Richardson 112 Snapback" className="w-full h-full object-contain" />
-              </div>
-            </BlurFade>
-            <BlurFade delay={0.3}>
-              <div className="space-y-8">
-                <div>
-                  <h3 className="text-2xl font-extrabold text-white mb-1">Richardson 112 Snapback</h3>
-                  <div className="flex items-baseline gap-3">
-                    <p className="text-3xl font-bold text-[#b22234]">${richardsonDisplayPrice}</p>
-                    {promoApplied && <span className="text-lg line-through text-white/30">$35.00</span>}
-                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
-                  </div>
-                  <p className="text-white/50 text-sm mt-1">Free shipping · All black · Embroidered · One size fits all</p>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $35</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
-                </div>
-                {richardsonError && <p className="text-red-400 text-sm">{richardsonError}</p>}
-                <button onClick={handleRichardsonCheckout} disabled={richardsonLoading}
-                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
-                  style={{ background: !richardsonLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: !richardsonLoading ? "pointer" : "not-allowed" }}>
-                  {richardsonLoading ? "Redirecting..." : `Buy Now — Black / $${richardsonDisplayPrice}`}
-                </button>
                 <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
               </div>
             </BlurFade>
