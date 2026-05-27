@@ -578,7 +578,7 @@ export default function DonationPage() {
                 <div className="flex gap-3 w-full justify-center">
                   <div className="flex-1 text-center">
                     <img
-                      src="https://files.cdn.printful.com/files/844/844011d92c81ab651408cb0aa7b88076_preview.png"
+                      src="https://files.cdn.printful.com/files/ddf/ddf2a7cb5e629596c28f07090b1b6267_preview.png"
                       alt="Issued With Honor T-Shirt Front"
                       className="w-full object-contain rounded-xl"
                     />
