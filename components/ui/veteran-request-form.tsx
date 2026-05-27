@@ -32,6 +32,20 @@ interface FormData {
 
 const BRANCHES = ["Army", "Navy", "Marine Corps", "Air Force", "Space Force", "Coast Guard", "National Guard", "Reserves"];
 
+const US_STATES = [
+  ["AL","Alabama"],["AK","Alaska"],["AZ","Arizona"],["AR","Arkansas"],["CA","California"],
+  ["CO","Colorado"],["CT","Connecticut"],["DE","Delaware"],["FL","Florida"],["GA","Georgia"],
+  ["HI","Hawaii"],["ID","Idaho"],["IL","Illinois"],["IN","Indiana"],["IA","Iowa"],
+  ["KS","Kansas"],["KY","Kentucky"],["LA","Louisiana"],["ME","Maine"],["MD","Maryland"],
+  ["MA","Massachusetts"],["MI","Michigan"],["MN","Minnesota"],["MS","Mississippi"],["MO","Missouri"],
+  ["MT","Montana"],["NE","Nebraska"],["NV","Nevada"],["NH","New Hampshire"],["NJ","New Jersey"],
+  ["NM","New Mexico"],["NY","New York"],["NC","North Carolina"],["ND","North Dakota"],["OH","Ohio"],
+  ["OK","Oklahoma"],["OR","Oregon"],["PA","Pennsylvania"],["RI","Rhode Island"],["SC","South Carolina"],
+  ["SD","South Dakota"],["TN","Tennessee"],["TX","Texas"],["UT","Utah"],["VT","Vermont"],
+  ["VA","Virginia"],["WA","Washington"],["WV","West Virginia"],["WI","Wisconsin"],["WY","Wyoming"],
+  ["DC","Washington D.C."],
+] as const;
+
 const INITIAL: FormData = {
   firstName: "", lastName: "", email: "", phone: "",
   address: "", city: "", state: "", zip: "",
@@ -48,6 +62,30 @@ export function VeteranRequestForm() {
 
   const set = (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
+
+  const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const zip = e.target.value.replace(/\D/g, "").slice(0, 5);
+    setForm((prev) => ({ ...prev, zip }));
+    if (zip.length === 5) {
+      try {
+        const res = await fetch(`https://api.zippopotam.us/us/${zip}`);
+        if (res.ok) {
+          const data = await res.json();
+          const place = data.places?.[0];
+          if (place) {
+            setForm((prev) => ({
+              ...prev,
+              zip,
+              city: prev.city || place["place name"] || prev.city,
+              state: prev.state || place["state abbreviation"] || prev.state,
+            }));
+          }
+        }
+      } catch {
+        // silently fail — user can fill in manually
+      }
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -152,11 +190,21 @@ export function VeteranRequestForm() {
             </div>
             <div>
               <label className={labelClass}>State *</label>
-              <Input required value={form.state} onChange={set("state")} className={inputClass} placeholder="SD" maxLength={2} />
+              <select
+                required
+                value={form.state}
+                onChange={set("state")}
+                className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
+              >
+                <option value="">State...</option>
+                {US_STATES.map(([abbr, name]) => (
+                  <option key={abbr} value={abbr}>{abbr} — {name}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className={labelClass}>ZIP *</label>
-              <Input required value={form.zip} onChange={set("zip")} className={inputClass} placeholder="57104" />
+              <Input required value={form.zip} onChange={handleZipChange} className={inputClass} placeholder="57104" maxLength={5} inputMode="numeric" />
             </div>
           </div>
         </div>
