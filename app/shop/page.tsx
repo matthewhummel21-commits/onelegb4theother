@@ -13,13 +13,24 @@ const PRODUCTS = [
   {
     id: "tee",
     name: "Issued With Honor Tee",
-    subtitle: "Next Level 3600 · Fitted crew",
+    subtitle: "Next Level 3600 · Small logo front · Full back print",
     price: 5500,
     colors: [
       { key: "White", label: "White", hex: "#FFFFFF", img: "/shirt-front-mockup.jpg", backImg: "/shirt-back-mockup.jpg" },
     ],
     sizes: SIZES_FULL,
     tag: "Bestseller",
+  },
+  {
+    id: "largetee",
+    name: "Issued With Honor Tee — Large Logo",
+    subtitle: "Next Level 3600 · Large center logo · Left sleeve flag",
+    price: 5500,
+    colors: [
+      { key: "White", label: "White", hex: "#FFFFFF", img: "/shirt-large-logo-mockup.jpg" },
+    ],
+    sizes: SIZES_FULL,
+    tag: "New",
   },
   {
     id: "hoodie",
@@ -34,19 +45,7 @@ const PRODUCTS = [
     sizes: SIZES_GD,
     tag: "🔥 Trending",
   },
-  {
-    id: "crew",
-    name: "Garment-Dyed Crewneck",
-    subtitle: "Comfort Colors 1466 · Lightweight",
-    price: 5500,
-    colors: [
-      { key: "Pepper",   label: "Pepper",   hex: "#3D3635", img: "/crew-pepper-mockup.jpg" },
-      { key: "Espresso", label: "Espresso", hex: "#2C1A0E", img: "/crew-espresso-mockup.jpg" },
-      { key: "Black",    label: "Black",    hex: "#1A1A1A", img: "/crew-black-mockup.jpg" },
-    ],
-    sizes: SIZES_GD,
-    tag: "New",
-  },
+
   {
     id: "sweatpants",
     name: "Sweatpants",
@@ -92,8 +91,7 @@ const PRODUCTS = [
     subtitle: "3\"×3\" premium vinyl · Weather resistant",
     price: 700,
     colors: [
-      { key: "Logo",    label: "Logo",    hex: "#0D1B3E", img: "/sticker-logo.png" },
-      { key: "QR Code", label: "QR Code", hex: "#B22234", img: "/sticker-qr.png" },
+      { key: "Logo", label: "Logo", hex: "#0D1B3E", img: "/sticker-logo.png" },
     ],
     sizes: [],
     tag: "",
@@ -104,7 +102,7 @@ type Product = typeof PRODUCTS[number];
 type Color = Product["colors"][number];
 
 const PROMO_CODES: Record<string, Record<string, number>> = {
-  TEAM: { tee: 2999, hoodie: 5500, crew: 4444, sweatpants: 4444, hat: 2800, socks: 1500, sticker: 500 },
+  TEAM: { tee: 2999, largetee: 2999, hoodie: 5500, sweatpants: 4444, hat: 2800, socks: 1500, sticker: 500 },
 };
 
 // ─── Product Card ─────────────────────────────────────────────────────────────
