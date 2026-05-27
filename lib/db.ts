@@ -25,6 +25,8 @@ export type RequestRow = {
   annual_income: string | null;
   pant_type: string | null;
   pant_fit: string | null;
+  pant_color: string | null;
+  pant_brand: string | null;
   pant_size: string | null;
   waist: string | null;
   inseam: string | null;
@@ -61,6 +63,8 @@ export async function initDb(): Promise<void> {
         annual_income TEXT,
         pant_type TEXT,
         pant_fit TEXT,
+        pant_color TEXT,
+        pant_brand TEXT,
         pant_size TEXT,
         waist TEXT,
         inseam TEXT,
@@ -77,6 +81,8 @@ export async function initDb(): Promise<void> {
     `;
     // Migrations — add columns that may not exist on older tables
     await sql`ALTER TABLE requests ADD COLUMN IF NOT EXISTS pant_fit TEXT`;
+    await sql`ALTER TABLE requests ADD COLUMN IF NOT EXISTS pant_color TEXT`;
+    await sql`ALTER TABLE requests ADD COLUMN IF NOT EXISTS pant_brand TEXT`;
     await sql`ALTER TABLE requests ADD COLUMN IF NOT EXISTS wants_follow_up_call BOOLEAN DEFAULT FALSE`;
   } catch (err) {
     console.error("initDb error:", err);
@@ -100,6 +106,8 @@ export async function insertRequest(data: {
   annualIncome?: string | null;
   pantType?: string | null;
   pantFit?: string | null;
+  pantColor?: string | null;
+  pantBrand?: string | null;
   pantSize?: string | null;
   waist?: string | null;
   inseam?: string | null;
@@ -117,7 +125,7 @@ export async function insertRequest(data: {
       address, city, state, zip,
       branch, years_served,
       household_size, annual_income,
-      pant_type, pant_fit, pant_size, waist, inseam,
+      pant_type, pant_fit, pant_color, pant_brand, pant_size, waist, inseam,
       referred_by, notes,
       wants_follow_up_call, id_uploaded, id_file_path, verified_by
     ) VALUES (
@@ -136,6 +144,8 @@ export async function insertRequest(data: {
       ${data.annualIncome ?? null},
       ${data.pantType ?? null},
       ${data.pantFit ?? null},
+      ${data.pantColor ?? null},
+      ${data.pantBrand ?? null},
       ${data.pantSize ?? null},
       ${data.waist ?? null},
       ${data.inseam ?? null},

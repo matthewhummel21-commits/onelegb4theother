@@ -80,7 +80,7 @@ function RequestCard({
         <InfoRow label="Phone" value={req.phone} />
         <InfoRow label="Email" value={req.email} />
         <InfoRow label="Branch" value={[req.branch, req.years_served].filter(Boolean).join(" · ")} />
-        <InfoRow label="Pants" value={`${type} · ${size}${req.pant_fit ? ` · ${req.pant_fit}` : ""}`} />
+        <InfoRow label="Pants" value={[type, size, req.pant_fit, req.pant_color, req.pant_brand].filter(Boolean).join(" · ")} />
         <InfoRow label="Address" value={fullAddress} className="col-span-2" />
         {req.household_size && <InfoRow label="Household" value={`${req.household_size} people · ${req.annual_income}/yr`} className="col-span-2" />}
         {req.referred_by && <InfoRow label="Referred by" value={req.referred_by} className="col-span-2" />}
@@ -248,7 +248,7 @@ function ManualAddModal({ onClose, onAdded }: { onClose: () => void; onAdded: (r
     firstName: "", lastName: "", phone: "", email: "",
     address: "", city: "", state: "", zip: "",
     branch: "", yearsServed: "",
-    pantType: "jeans", pantSize: "", waist: "", inseam: "", pantFit: "",
+    pantType: "jeans", pantSize: "", waist: "", inseam: "", pantFit: "", pantColor: "", pantBrand: "",
     householdSize: "", annualIncome: "", notes: "",
   });
   const [saving, setSaving] = useState(false);
@@ -289,6 +289,8 @@ function ManualAddModal({ onClose, onAdded }: { onClose: () => void; onAdded: (r
         annual_income: form.annualIncome,
         pant_type: form.pantType,
         pant_fit: form.pantFit,
+        pant_color: form.pantColor,
+        pant_brand: form.pantBrand,
         pant_size: size,
         waist: form.waist,
         inseam: form.inseam,
@@ -386,20 +388,45 @@ function ManualAddModal({ onClose, onAdded }: { onClose: () => void; onAdded: (r
                 </>
               ) : (
                 <>
-                  <option value="Regular / Classic">Regular / Classic</option>
-                  <option value="Relaxed">Relaxed</option>
-                  <option value="Straight">Straight</option>
-                  <option value="Slim">Slim</option>
-                  <option value="Athletic">Athletic</option>
+                  <option value="Relaxed / Loose">Relaxed / Loose</option>
+                  <option value="Regular / Straight">Regular / Straight</option>
+                  <option value="Slim / Fitted">Slim / Fitted</option>
                   <option value="Bootcut">Bootcut</option>
-                  <option value="Tapered">Tapered</option>
-                  <option value="Skinny">Skinny</option>
-                  <option value="Loose / Baggy">Loose / Baggy</option>
-                  <option value="Wide Leg">Wide Leg</option>
                   <option value="No preference">No preference</option>
                 </>
               )}
             </select>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={lbl}>Color Preference</label>
+              <select className={inp} value={form.pantColor} onChange={set("pantColor")}>
+                <option value="">Select color...</option>
+                <option value="Dark (Black / Dark Wash / Navy)">Dark — Black, Dark Wash, Navy</option>
+                <option value="Medium (Medium Wash / Khaki / Grey)">Medium — Wash, Khaki, Grey</option>
+                <option value="Light (Light Wash / Tan)">Light — Light Wash, Tan</option>
+                <option value="No preference">No preference</option>
+              </select>
+            </div>
+            <div>
+              <label className={lbl}>Brand Preference</label>
+              <select className={inp} value={form.pantBrand} onChange={set("pantBrand")}>
+                <option value="">Select brand...</option>
+                {form.pantType === "sweatpants" ? (
+                  <>
+                    <option value="Hanes">Hanes</option>
+                    <option value="Fruit of the Loom">Fruit of the Loom</option>
+                    <option value="No preference">No preference</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="Lee">Lee</option>
+                    <option value="Wrangler">Wrangler</option>
+                    <option value="No preference">No preference</option>
+                  </>
+                )}
+              </select>
+            </div>
           </div>
           <div><label className={lbl}>Notes</label><textarea className={`${inp} h-20 py-2 resize-none`} value={form.notes} onChange={set("notes")} placeholder="Any context about this vet..." /></div>
           <div className="flex gap-3 pt-2">

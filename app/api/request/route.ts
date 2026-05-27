@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
       address, city, state, zip,
       branch, yearsServed,
       householdSize, annualIncome,
-      waist, inseam, pantSize, pantType, pantFit, wantsFollowUpCall,
+      waist, inseam, pantSize, pantType, pantFit, pantColor, pantBrand, wantsFollowUpCall,
       referredBy, notes,
     } = fields;
 
@@ -195,6 +195,8 @@ export async function POST(req: NextRequest) {
       annualIncome: annualIncome || null,
       pantType: pantType || null,
       pantFit: pantFit || null,
+      pantColor: pantColor || null,
+      pantBrand: pantBrand || null,
       wantsFollowUpCall: wantsFollowUpCall === 'true' || wantsFollowUpCall === 'on' || wantsFollowUpCall === '1',
       pantSize: pantSize || null,
       waist: waist || null,

@@ -20,6 +20,8 @@ interface FormData {
   annualIncome: string;
   pantType: string;
   pantFit: string;
+  pantColor: string;
+  pantBrand: string;
   pantSize: string;
   waist: string;
   inseam: string;
@@ -34,7 +36,7 @@ const INITIAL: FormData = {
   firstName: "", lastName: "", email: "", phone: "",
   address: "", city: "", state: "", zip: "",
   branch: "", yearsServed: "", householdSize: "", annualIncome: "",
-  pantType: "", pantFit: "", pantSize: "", waist: "", inseam: "", referredBy: "", notes: "", wantsFollowUpCall: false,
+  pantType: "", pantFit: "", pantColor: "", pantBrand: "", pantSize: "", waist: "", inseam: "", referredBy: "", notes: "", wantsFollowUpCall: false,
 };
 
 export function VeteranRequestForm() {
@@ -270,10 +272,9 @@ export function VeteranRequestForm() {
                 className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
               >
                 <option value="">Select fit...</option>
-                <option value="Regular">Regular — standard, not too baggy or tight</option>
-                <option value="Relaxed / Baggy">Relaxed / Baggy — extra room throughout</option>
-                <option value="Slim / Tapered">Slim / Tapered — fitted, narrow at ankle</option>
-                <option value="Athletic">Athletic — wider thigh, tapered cuff</option>
+                <option value="Regular">Regular — standard fit</option>
+                <option value="Relaxed / Baggy">Relaxed / Baggy — extra room</option>
+                <option value="Slim / Tapered">Slim / Tapered — fitted through the leg</option>
                 <option value="No preference">No preference — whatever fits best</option>
               </select>
             </div>
@@ -302,25 +303,59 @@ export function VeteranRequestForm() {
                 className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
               >
                 <option value="">Select fit...</option>
-                <optgroup label="Common Fits">
-                  <option value="Regular / Classic">Regular / Classic — straight from hip to ankle</option>
-                  <option value="Relaxed">Relaxed — extra room in seat &amp; thigh</option>
-                  <option value="Straight">Straight — consistent width hip to hem</option>
-                  <option value="Slim">Slim — fitted through thigh, narrow at ankle</option>
-                </optgroup>
-                <optgroup label="More Fits">
-                  <option value="Athletic">Athletic — wider thigh, tapered ankle</option>
-                  <option value="Bootcut">Bootcut — slight flare below knee</option>
-                  <option value="Tapered">Tapered — wider at top, narrow at cuff</option>
-                  <option value="Skinny">Skinny — tight throughout</option>
-                  <option value="Loose / Baggy">Loose / Baggy — very roomy overall</option>
-                  <option value="Wide Leg">Wide Leg — wide all the way down</option>
-                </optgroup>
+                <option value="Relaxed / Loose">Relaxed / Loose — extra room throughout</option>
+                <option value="Regular / Straight">Regular / Straight — classic straight leg</option>
+                <option value="Slim / Fitted">Slim / Fitted — closer to the leg</option>
+                <option value="Bootcut">Bootcut — slight flare at the ankle</option>
                 <option value="No preference">No preference — whatever fits best</option>
               </select>
             </div>
           </div>
         )}
+      </div>
+
+      {/* Color & Brand */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>Color Preference</label>
+          <select
+            value={form.pantColor}
+            onChange={set("pantColor")}
+            className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
+          >
+            <option value="">Select color...</option>
+            <option value="Dark (Black / Dark Wash / Navy)">Dark — Black, Dark Wash, or Navy</option>
+            <option value="Medium (Medium Wash / Khaki / Grey)">Medium — Medium Wash, Khaki, or Grey</option>
+            <option value="Light (Light Wash / Tan)">Light — Light Wash or Tan</option>
+            <option value="No preference">No preference</option>
+          </select>
+          <p className="text-xs text-muted-foreground mt-1">We default to darker colors when unsure.</p>
+        </div>
+        <div>
+          <label className={labelClass}>
+            {form.pantType === "sweatpants" ? "Brand Preference" : "Brand Preference"}
+          </label>
+          <select
+            value={form.pantBrand}
+            onChange={set("pantBrand")}
+            className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
+          >
+            <option value="">Select brand...</option>
+            {form.pantType === "sweatpants" ? (
+              <>
+                <option value="Hanes">Hanes — USA brand, great quality</option>
+                <option value="Fruit of the Loom">Fruit of the Loom — USA brand, comfortable</option>
+                <option value="No preference">No preference</option>
+              </>
+            ) : (
+              <>
+                <option value="Lee">Lee — American-made, classic fit</option>
+                <option value="Wrangler">Wrangler — American-made, durable</option>
+                <option value="No preference">No preference</option>
+              </>
+            )}
+          </select>
+        </div>
       </div>
 
       {/* Step 7 — Verify Service (Optional) */}
