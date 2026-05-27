@@ -262,6 +262,21 @@ export function VeteranRequestForm() {
             {!form.pantSize && form.pantType === "sweatpants" && (
               <p className="text-xs text-amber-500 mt-2">Please select a size</p>
             )}
+            <div className="mt-4">
+              <label className={labelClass}>Fit Style</label>
+              <select
+                value={form.pantFit}
+                onChange={set("pantFit")}
+                className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
+              >
+                <option value="">Select fit...</option>
+                <option value="Regular">Regular — standard, not too baggy or tight</option>
+                <option value="Relaxed / Baggy">Relaxed / Baggy — extra room throughout</option>
+                <option value="Slim / Tapered">Slim / Tapered — fitted, narrow at ankle</option>
+                <option value="Athletic">Athletic — wider thigh, tapered cuff</option>
+                <option value="No preference">No preference — whatever fits best</option>
+              </select>
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
@@ -281,22 +296,28 @@ export function VeteranRequestForm() {
             </div>
             <div>
               <label className={labelClass}>Fit Style</label>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {["Relaxed", "Boot Cut", "Straight", "Slim", "Athletic"].map((fit) => (
-                  <button
-                    key={fit}
-                    type="button"
-                    onClick={() => setForm((prev) => ({ ...prev, pantFit: fit }))}
-                    className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                      form.pantFit === fit
-                        ? "bg-primary border-primary text-white"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    {fit}
-                  </button>
-                ))}
-              </div>
+              <select
+                value={form.pantFit}
+                onChange={set("pantFit")}
+                className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
+              >
+                <option value="">Select fit...</option>
+                <optgroup label="Common Fits">
+                  <option value="Regular / Classic">Regular / Classic — straight from hip to ankle</option>
+                  <option value="Relaxed">Relaxed — extra room in seat &amp; thigh</option>
+                  <option value="Straight">Straight — consistent width hip to hem</option>
+                  <option value="Slim">Slim — fitted through thigh, narrow at ankle</option>
+                </optgroup>
+                <optgroup label="More Fits">
+                  <option value="Athletic">Athletic — wider thigh, tapered ankle</option>
+                  <option value="Bootcut">Bootcut — slight flare below knee</option>
+                  <option value="Tapered">Tapered — wider at top, narrow at cuff</option>
+                  <option value="Skinny">Skinny — tight throughout</option>
+                  <option value="Loose / Baggy">Loose / Baggy — very roomy overall</option>
+                  <option value="Wide Leg">Wide Leg — wide all the way down</option>
+                </optgroup>
+                <option value="No preference">No preference — whatever fits best</option>
+              </select>
             </div>
           </div>
         )}

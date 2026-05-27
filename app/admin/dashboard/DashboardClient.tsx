@@ -372,6 +372,35 @@ function ManualAddModal({ onClose, onAdded }: { onClose: () => void; onAdded: (r
               <div><label className={lbl}>Inseam</label><input className={inp} value={form.inseam} onChange={set("inseam")} placeholder="30" /></div>
             </div>
           )}
+          <div>
+            <label className={lbl}>Fit Style</label>
+            <select className={inp} value={form.pantFit} onChange={set("pantFit")}>
+              <option value="">Select fit...</option>
+              {form.pantType === "sweatpants" ? (
+                <>
+                  <option value="Regular">Regular</option>
+                  <option value="Relaxed / Baggy">Relaxed / Baggy</option>
+                  <option value="Slim / Tapered">Slim / Tapered</option>
+                  <option value="Athletic">Athletic</option>
+                  <option value="No preference">No preference</option>
+                </>
+              ) : (
+                <>
+                  <option value="Regular / Classic">Regular / Classic</option>
+                  <option value="Relaxed">Relaxed</option>
+                  <option value="Straight">Straight</option>
+                  <option value="Slim">Slim</option>
+                  <option value="Athletic">Athletic</option>
+                  <option value="Bootcut">Bootcut</option>
+                  <option value="Tapered">Tapered</option>
+                  <option value="Skinny">Skinny</option>
+                  <option value="Loose / Baggy">Loose / Baggy</option>
+                  <option value="Wide Leg">Wide Leg</option>
+                  <option value="No preference">No preference</option>
+                </>
+              )}
+            </select>
+          </div>
           <div><label className={lbl}>Notes</label><textarea className={`${inp} h-20 py-2 resize-none`} value={form.notes} onChange={set("notes")} placeholder="Any context about this vet..." /></div>
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="flex-1 h-11 rounded-xl border border-[#2a3d52] text-slate-400 hover:text-white text-sm font-bold transition-colors">Cancel</button>
