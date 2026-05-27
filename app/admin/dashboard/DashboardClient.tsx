@@ -14,7 +14,11 @@ interface Props {
 }
 
 function formatDate(d: string) {
-  return new Date(d + "Z").toLocaleString("en-US", {
+  // Only append Z if no timezone info present already
+  const normalized = /[Zz]$|[+-]\d{2}:?\d{2}$/.test(d) ? d : d + "Z";
+  const date = new Date(normalized);
+  if (isNaN(date.getTime())) return d; // fallback to raw string
+  return date.toLocaleString("en-US", {
     month: "short", day: "numeric", year: "numeric",
     hour: "numeric", minute: "2-digit",
   });
