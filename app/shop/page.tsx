@@ -245,11 +245,12 @@ export default function ShopPage() {
 
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <BlurFade delay={0.2}>
-              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-10">
-                <div className="text-center">
-                  <img src="https://files.cdn.printful.com/files/2f7/2f711ba9243f8c05399977fd7d8e9f32_preview.png" alt="Logo" className="w-32 h-32 object-contain mx-auto mb-4 opacity-60" />
-                  <p className="text-white/40 text-sm">Mockup generating — check Printful dashboard</p>
-                </div>
+              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-0">
+                <img
+                  src={sweatsColor === "Vintage Heather Grey" ? "/sweats-grey-mockup.jpg" : "/sweats-black-mockup.jpg"}
+                  alt={`Issued With Honor Sweatpants — ${sweatsColor}`}
+                  className="w-full h-full object-contain"
+                />
               </div>
             </BlurFade>
 
