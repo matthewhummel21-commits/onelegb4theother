@@ -162,7 +162,7 @@ export default function DonationPage() {
               transition={{ delay: 0.5, duration: 0.6 }}
               className="text-lg md:text-xl text-gray-300 max-w-xl mb-4 leading-relaxed"
             >
-              We provide new clothing to veterans in need — when they need it most.
+              We provide custom branded adaptive wear to veterans who’ve earned every stitch.
             </motion.p>
 
             <motion.p
