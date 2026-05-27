@@ -14,7 +14,7 @@ const PRODUCTS = [
     id: "tee",
     name: "Issued With Honor Tee",
     subtitle: "Next Level 3600 · Small logo front · Full back print",
-    price: 5500,
+    price: 4500,
     colors: [
       { key: "White", label: "White", hex: "#FFFFFF", img: "/shirt-front-mockup.jpg", backImg: "/shirt-back-mockup.jpg" },
     ],
@@ -72,7 +72,7 @@ type Product = typeof PRODUCTS[number];
 type Color = Product["colors"][number];
 
 const PROMO_CODES: Record<string, Record<string, number>> = {
-  TEAM: { tee: 2999, hoodie: 5500, sweatpants: 4444, hat: 2800 },
+  TEAM: { tee: 3000, hoodie: 5000, sweatpants: 4000, hat: 2000 },
 };
 
 // ─── Product Card ─────────────────────────────────────────────────────────────

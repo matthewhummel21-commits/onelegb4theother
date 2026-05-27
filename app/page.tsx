@@ -604,7 +604,7 @@ export default function DonationPage() {
                 </p>
 
                 <div className="flex items-baseline gap-2 mb-5">
-                  <span className="text-3xl font-extrabold">$55</span>
+                  <span className="text-3xl font-extrabold">$45</span>
                   <span className="text-sm text-muted-foreground line-through"></span>
                 </div>
 
@@ -642,7 +642,7 @@ export default function DonationPage() {
                     cursor: merchSize && !merchLoading ? "pointer" : "not-allowed",
                   }}
                 >
-                  {merchLoading ? "Redirecting..." : merchSize ? `Buy Now — ${merchSize} / $55` : "Select a Size"}
+                  {merchLoading ? "Redirecting..." : merchSize ? `Buy Now — ${merchSize} / $45` : "Select a Size"}
                 </button>
 
                 <p className="text-xs text-muted-foreground text-center mt-3">

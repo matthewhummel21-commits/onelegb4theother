@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
 
     // Validate promo code
     const PROMO_CODES: Record<string, { label: string; shirtPrice: number; sweatsPrice: number; hatPrice: number; socksPrice: number; stickerPrice: number; hoodiePrice: number }> = {
-      TEAM: { label: "Team / Nonprofit Discount", shirtPrice: 2999, sweatsPrice: 4444, hatPrice: 2800, socksPrice: 1500, stickerPrice: 500, hoodiePrice: 5500 },
+      TEAM: { label: "Team / Nonprofit Discount", shirtPrice: 3000, sweatsPrice: 4000, hatPrice: 2000, socksPrice: 1500, stickerPrice: 500, hoodiePrice: 5000 },
     };
     const promo = promoCode ? PROMO_CODES[promoCode.toUpperCase().trim()] : null;
     if (promoCode && !promo) {
@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
             unit_amount: isHoodie
                 ? (promo ? promo.hoodiePrice : 6500)
                 : isLargeTee
-                ? (promo ? promo.shirtPrice : 5500)
+                ? (promo ? promo.shirtPrice : 4500)
                 : isSticker
                 ? (promo ? promo.stickerPrice : 700)
                 : isSocks
@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
                 ? (promo ? promo.hatPrice : 3800)
                 : isSweatpants
                 ? (promo ? promo.sweatsPrice : 5500)
-                : (promo ? promo.shirtPrice : 5500),
+                : (promo ? promo.shirtPrice : 4500),
           },
           quantity: 1,
         },
