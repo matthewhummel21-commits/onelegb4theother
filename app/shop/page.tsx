@@ -74,17 +74,7 @@ const PRODUCTS = [
     sizes: [],
     tag: "",
   },
-  {
-    id: "socks",
-    name: "Issued With Honor Socks",
-    subtitle: "Sublimation crew · Logo on each side",
-    price: 2000,
-    colors: [
-      { key: "Navy", label: "Navy/Red", hex: "#0D1B3E", img: "/socks-mockup.jpg" },
-    ],
-    sizes: SIZES_SOCKS,
-    tag: "New",
-  },
+
   {
     id: "sticker",
     name: "Die-Cut Vinyl Sticker",
@@ -102,7 +92,7 @@ type Product = typeof PRODUCTS[number];
 type Color = Product["colors"][number];
 
 const PROMO_CODES: Record<string, Record<string, number>> = {
-  TEAM: { tee: 2999, largetee: 2999, hoodie: 5500, sweatpants: 4444, hat: 2800, socks: 1500, sticker: 500 },
+  TEAM: { tee: 2999, largetee: 2999, hoodie: 5500, sweatpants: 4444, hat: 2800, sticker: 500 },
 };
 
 // ─── Product Card ─────────────────────────────────────────────────────────────
