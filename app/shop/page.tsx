@@ -7,6 +7,7 @@ const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
 const SWEATS_SIZES = ["S", "M", "L", "XL", "2XL", "3XL"];
 const SWEATS_COLORS = ["Black", "Vintage Heather Grey"];
 const HAT_COLORS = ["Black/White/Black", "All Black", "Red/White/Blue"];
+const SOCK_SIZES = ["S", "M", "L"];
 
 export default function ShopPage() {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -16,8 +17,8 @@ export default function ShopPage() {
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState("");
 
-  const VALID_CODES: Record<string, { shirt: number; sweats: number; hat: number }> = {
-    TEAM: { shirt: 2999, sweats: 4444, hat: 2800 },
+  const VALID_CODES: Record<string, { shirt: number; sweats: number; hat: number; socks: number }> = {
+    TEAM: { shirt: 2999, sweats: 4444, hat: 2800, socks: 1500 },
   };
 
   const handleApplyPromo = () => {
@@ -44,6 +45,31 @@ export default function ShopPage() {
   const [hatColor, setHatColor] = useState<string>("Black/White/Black");
   const [hatLoading, setHatLoading] = useState(false);
   const [hatError, setHatError] = useState<string | null>(null);
+
+  const socksPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].socks : 2000;
+  const socksDisplayPrice = (socksPrice / 100).toFixed(2);
+  const [socksSize, setSocksSize] = useState<string | null>(null);
+  const [socksLoading, setSocksLoading] = useState(false);
+  const [socksError, setSocksError] = useState<string | null>(null);
+
+  const handleSocksCheckout = async () => {
+    if (!socksSize || socksLoading) return;
+    setSocksLoading(true);
+    setSocksError(null);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product: "socks", size: socksSize, promoCode: appliedCode || undefined }),
+      });
+      const data = await res.json();
+      if (data.url) { window.location.href = data.url; }
+      else { setSocksError(data.error || "Something went wrong."); setSocksLoading(false); }
+    } catch {
+      setSocksError("Network error. Please try again.");
+      setSocksLoading(false);
+    }
+  };
 
   const hatPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].hat : 3800;
   const hatDisplayPrice = (hatPrice / 100).toFixed(2);
@@ -393,6 +419,69 @@ export default function ShopPage() {
                   className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
                   style={{ background: !hatLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: !hatLoading ? "pointer" : "not-allowed" }}>
                   {hatLoading ? "Redirecting..." : `Buy Now — ${hatColor} / $${hatDisplayPrice}`}
+                </button>
+
+                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
+              </div>
+            </BlurFade>
+          </div>
+        </div>
+
+        {/* SOCKS */}
+        <div className="mt-20 border-t border-white/10 pt-16">
+          <BlurFade delay={0.1}>
+            <div className="text-center mb-12">
+              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Issued With Honor Socks</h2>
+              <p className="text-white/60 text-lg max-w-xl mx-auto">Sublimation crew socks. Navy base, red stripes, logo on each side.</p>
+            </div>
+          </BlurFade>
+
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            <BlurFade delay={0.2}>
+              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-6">
+                <img src="/socks-mockup.jpg" alt="Issued With Honor Socks" className="w-full h-full object-contain" />
+              </div>
+            </BlurFade>
+
+            <BlurFade delay={0.3}>
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-2xl font-extrabold text-white mb-1">Issued With Honor Socks</h3>
+                  <div className="flex items-baseline gap-3">
+                    <p className="text-3xl font-bold text-[#b22234]">${socksDisplayPrice}</p>
+                    {promoApplied && <span className="text-lg line-through text-white/30">$20.00</span>}
+                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
+                  </div>
+                  <p className="text-white/50 text-sm mt-1">Free shipping · One pair · Ships in 3–5 days</p>
+                </div>
+
+                <div>
+                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Size</p>
+                  <div className="flex gap-3">
+                    {SOCK_SIZES.map((s) => (
+                      <button key={s} onClick={() => setSocksSize(s)}
+                        className={`px-6 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                          socksSize === s ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
+                        }`}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-white/30 text-xs mt-2">S = Wmn 4–10 / Mn 4–8 · M = Wmn 10–13 / Mn 8–11 · L = Mn 11–14</p>
+                </div>
+
+                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $20</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
+                </div>
+
+                {!socksSize && <p className="text-yellow-400 text-sm font-semibold">👆 Select a size above to continue</p>}
+                {socksError && <p className="text-red-400 text-sm">{socksError}</p>}
+
+                <button onClick={handleSocksCheckout} disabled={!socksSize || socksLoading}
+                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
+                  style={{ background: socksSize && !socksLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: socksSize && !socksLoading ? "pointer" : "not-allowed" }}>
+                  {socksLoading ? "Redirecting..." : socksSize ? `Buy Now — Size ${socksSize} / $${socksDisplayPrice}` : "Select a Size to Continue"}
                 </button>
 
                 <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
