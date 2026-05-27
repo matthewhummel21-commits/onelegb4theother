@@ -30,6 +30,20 @@ const HAT_VARIANTS: Record<string, number> = {
   "Red/White/Blue": 5327644163,
 };
 
+// Hoodie variants — CC 1567 garment-dyed, Pepper/Grey/True Navy, S-3XL
+const HOODIE_VARIANTS: Record<string, Record<string, number>> = {
+  Pepper:     { S: 5327674379, M: 5327674380, L: 5327674381, XL: 5327674382, "2XL": 5327674383, "3XL": 5327674384 },
+  Grey:       { S: 5327674385, M: 5327674386, L: 5327674387, XL: 5327674388, "2XL": 5327674389, "3XL": 5327674390 },
+  "True Navy": { S: 5327674391, M: 5327674392, L: 5327674393, XL: 5327674394, "2XL": 5327674395, "3XL": 5327674396 },
+};
+
+// Crewneck variants — CC 1466 garment-dyed, Pepper/Espresso/Black, S-3XL
+const CREW_VARIANTS: Record<string, Record<string, number>> = {
+  Pepper:   { S: 5327674453, M: 5327674454, L: 5327674455, XL: 5327674456, "2XL": 5327674457, "3XL": 5327674458 },
+  Espresso: { S: 5327674459, M: 5327674460, L: 5327674461, XL: 5327674462, "2XL": 5327674463, "3XL": 5327674464 },
+  Black:    { S: 5327674465, M: 5327674466, L: 5327674467, XL: 5327674468, "2XL": 5327674469, "3XL": 5327674470 },
+};
+
 // Sweatpants variants
 const SWEATS_VARIANTS: Record<string, Record<string, number>> = {
   // Bella+Canvas 4737 heavyweight
@@ -48,10 +62,20 @@ export async function POST(req: NextRequest) {
     const isSocks = product === "socks";
     const isSticker = product === "sticker";
     const isRichardson = product === "richardson";
+    const isHoodie = product === "hoodie";
+    const isCrew = product === "crew";
 
     // Validate variant
     let syncVariantId: number;
-    if (isHat) {
+    if (isHoodie) {
+      const colorMap = HOODIE_VARIANTS[color];
+      if (!colorMap || !colorMap[size]) return NextResponse.json({ error: "Invalid hoodie color or size" }, { status: 400 });
+      syncVariantId = colorMap[size];
+    } else if (isCrew) {
+      const colorMap = CREW_VARIANTS[color];
+      if (!colorMap || !colorMap[size]) return NextResponse.json({ error: "Invalid crewneck color or size" }, { status: 400 });
+      syncVariantId = colorMap[size];
+    } else if (isHat) {
       if (!color || !HAT_VARIANTS[color]) {
         return NextResponse.json({ error: "Invalid hat color" }, { status: 400 });
       }
@@ -82,8 +106,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate promo code
-    const PROMO_CODES: Record<string, { label: string; shirtPrice: number; sweatsPrice: number; hatPrice: number; socksPrice: number; stickerPrice: number; richardsonPrice: number }> = {
-      TEAM: { label: "Team / Nonprofit Discount", shirtPrice: 2999, sweatsPrice: 4444, hatPrice: 2800, socksPrice: 1500, stickerPrice: 500, richardsonPrice: 2800 },
+    const PROMO_CODES: Record<string, { label: string; shirtPrice: number; sweatsPrice: number; hatPrice: number; socksPrice: number; stickerPrice: number; richardsonPrice: number; hoodiePrice: number; crewPrice: number }> = {
+      TEAM: { label: "Team / Nonprofit Discount", shirtPrice: 2999, sweatsPrice: 4444, hatPrice: 2800, socksPrice: 1500, stickerPrice: 500, richardsonPrice: 2800, hoodiePrice: 5500, crewPrice: 4444 },
     };
     const promo = promoCode ? PROMO_CODES[promoCode.toUpperCase().trim()] : null;
     if (promoCode && !promo) {
@@ -99,10 +123,12 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: isSticker
+              name: isHoodie
+                ? `One Leg B4 the Other — Garment-Dyed Hoodie (${color} / ${size})`
+                : isCrew
+                ? `One Leg B4 the Other — Garment-Dyed Crewneck (${color} / ${size})`
+                : isSticker
                 ? `One Leg B4 the Other — ${color} Sticker (3"×3")`
-                : isRichardson
-                ? `One Leg B4 the Other — Richardson 112 Snapback (Black)`
                 : isSocks
                 ? `One Leg B4 the Other — Issued With Honor Socks (${size})`
                 : isHat
@@ -110,16 +136,18 @@ export async function POST(req: NextRequest) {
                 : isSweatpants
                 ? `One Leg B4 the Other — Issued With Honor Sweatpants (${color} / ${size})`
                 : `One Leg B4 the Other — Issued With Honor Tee (${size})`,
-              description: isSticker
+              description: isHoodie
+                ? "CC 1567 garment-dyed hoodie. Your purchase helps fund adaptive pants for veterans in need."
+                : isCrew
+                ? "CC 1466 garment-dyed crewneck. Your purchase helps fund adaptive pants for veterans in need."
+                : isSticker
                 ? "Premium die-cut vinyl sticker. Your purchase helps fund adaptive pants for veterans in need."
-                : isRichardson
-                ? "Embroidered Richardson 112 snapback. Your purchase helps fund adaptive pants for veterans in need."
                 : isSocks
                 ? "Sublimation crew socks. Your purchase helps fund adaptive pants for veterans in need."
                 : isHat
                 ? "Otto Cap foam trucker hat. Your purchase helps fund adaptive pants for veterans in need."
                 : isSweatpants
-                ? "Bella + Canvas heavyweight fleece. Your purchase helps fund adaptive pants for veterans in need."
+                ? "Comfort Colors garment-dyed or Bella+Canvas heavyweight sweatpants. Your purchase helps fund adaptive pants for veterans in need."
                 : promo
                   ? "Team / nonprofit price — thank you for your support!"
                   : "Your purchase funds a pair of adaptive pants for a veteran in need.",
@@ -127,10 +155,12 @@ export async function POST(req: NextRequest) {
                 "https://files.cdn.printful.com/files/844/844011d92c81ab651408cb0aa7b88076_preview.png",
               ],
             },
-            unit_amount: isSticker
+            unit_amount: isHoodie
+                ? (promo ? promo.hoodiePrice : 6500)
+                : isCrew
+                ? (promo ? promo.crewPrice : 5500)
+                : isSticker
                 ? (promo ? promo.stickerPrice : 700)
-                : isRichardson
-                ? (promo ? promo.richardsonPrice : 3500)
                 : isSocks
                 ? (promo ? promo.socksPrice : 2000)
                 : isHat
@@ -150,7 +180,7 @@ export async function POST(req: NextRequest) {
         color: color || "",
         product: product || "shirt",
         printful_variant_id: String(syncVariantId),
-        printful_product_id: isSticker ? (color === "Logo" ? "435179893" : "435179896") : isRichardson ? "435179939" : isSocks ? "435179141" : isHat ? "435178002" : isSweatpants ? "435175071" : "432664066",
+        printful_product_id: isHoodie ? "435182091" : isCrew ? "435182102" : isSticker ? (color === "Logo" ? "435179893" : "435179896") : isSocks ? "435179141" : isHat ? "435178002" : isSweatpants ? (color === "Pepper" || color === "Espresso" ? "435181837" : "435175071") : "432664066",
       },
       shipping_address_collection: {
         allowed_countries: ["US"],

@@ -5,10 +5,11 @@ import { BlurFade } from "@/components/ui/blur-fade";
 
 const NAV_ITEMS = [
   { id: "tee",        label: "Tee" },
+  { id: "hoodie",     label: "Hoodie" },
+  { id: "crewneck",   label: "Crewneck" },
   { id: "sweatpants", label: "Sweatpants" },
   { id: "hats",       label: "Hats" },
   { id: "socks",      label: "Socks" },
-
   { id: "stickers",   label: "Stickers" },
 ];
 
@@ -58,8 +59,8 @@ export default function ShopPage() {
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState("");
 
-  const VALID_CODES: Record<string, { shirt: number; sweats: number; hat: number; socks: number; sticker: number; richardson: number }> = {
-    TEAM: { shirt: 2999, sweats: 4444, hat: 2800, socks: 1500, sticker: 500, richardson: 2800 }, // richardson kept for API compat
+  const VALID_CODES: Record<string, { shirt: number; sweats: number; hat: number; socks: number; sticker: number; richardson: number; hoodie: number; crew: number }> = {
+    TEAM: { shirt: 2999, sweats: 4444, hat: 2800, socks: 1500, sticker: 500, richardson: 2800, hoodie: 5500, crew: 4444 }, // richardson kept for API compat
   };
 
   const handleApplyPromo = () => {
@@ -144,6 +145,53 @@ export default function ShopPage() {
 
   const hatPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].hat : 3800;
   const hatDisplayPrice = (hatPrice / 100).toFixed(2);
+
+  // Hoodie
+  const hoodiePrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].hoodie : 6500;
+  const hoodieDisplayPrice = (hoodiePrice / 100).toFixed(2);
+  const [hoodieColor, setHoodieColor] = useState("Pepper");
+  const [hoodieSize, setHoodieSize] = useState<string | null>(null);
+  const [hoodieLoading, setHoodieLoading] = useState(false);
+  const [hoodieError, setHoodieError] = useState<string | null>(null);
+  const HOODIE_COLORS = [
+    { key: "Pepper",     label: "Pepper",     img: "/hoodie-pepper-mockup.jpg" },
+    { key: "Grey",       label: "Grey",       img: "/hoodie-grey-mockup.jpg" },
+    { key: "True Navy",  label: "True Navy",  img: "/hoodie-navy-mockup.jpg" },
+  ];
+  const handleHoodieCheckout = async () => {
+    if (!hoodieSize || hoodieLoading) return;
+    setHoodieLoading(true); setHoodieError(null);
+    try {
+      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product: "hoodie", size: hoodieSize, color: hoodieColor, promoCode: appliedCode || undefined }) });
+      const data = await res.json();
+      if (data.url) { window.location.href = data.url; } else { setHoodieError(data.error || "Error"); setHoodieLoading(false); }
+    } catch { setHoodieError("Network error."); setHoodieLoading(false); }
+  };
+
+  // Crewneck
+  const crewPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].crew : 5500;
+  const crewDisplayPrice = (crewPrice / 100).toFixed(2);
+  const [crewColor, setCrewColor] = useState("Pepper");
+  const [crewSize, setCrewSize] = useState<string | null>(null);
+  const [crewLoading, setCrewLoading] = useState(false);
+  const [crewError, setCrewError] = useState<string | null>(null);
+  const CREW_COLORS = [
+    { key: "Pepper",   label: "Pepper",   img: "/crew-pepper-mockup.jpg" },
+    { key: "Espresso", label: "Espresso", img: "/crew-espresso-mockup.jpg" },
+    { key: "Black",    label: "Black",    img: "/crew-black-mockup.jpg" },
+  ];
+  const GD_SIZES = ["S", "M", "L", "XL", "2XL", "3XL"];
+  const handleCrewCheckout = async () => {
+    if (!crewSize || crewLoading) return;
+    setCrewLoading(true); setCrewError(null);
+    try {
+      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product: "crew", size: crewSize, color: crewColor, promoCode: appliedCode || undefined }) });
+      const data = await res.json();
+      if (data.url) { window.location.href = data.url; } else { setCrewError(data.error || "Error"); setCrewLoading(false); }
+    } catch { setCrewError("Network error."); setCrewLoading(false); }
+  };
 
   const handleHatCheckout = async () => {
     if (hatLoading) return;
@@ -380,6 +428,134 @@ export default function ShopPage() {
             </button>
 
             <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
+          </div>
+        </div>
+
+        {/* HOODIE */}
+        <div id="hoodie" className="mt-20 border-t border-white/10 pt-16">
+          <BlurFade delay={0.1}>
+            <div className="text-center mb-12">
+              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Garment-Dyed Hoodie</h2>
+              <p className="text-white/60 text-lg max-w-xl mx-auto">Comfort Colors 1567. Heavyweight garment-dyed fleece. Vintage washed look. Logo on the chest.</p>
+            </div>
+          </BlurFade>
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            <BlurFade delay={0.2}>
+              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-0">
+                <img src={HOODIE_COLORS.find(c=>c.key===hoodieColor)?.img || "/hoodie-pepper-mockup.jpg"} alt={`Hoodie — ${hoodieColor}`} className="w-full h-full object-contain transition-opacity duration-300" />
+              </div>
+            </BlurFade>
+            <BlurFade delay={0.3}>
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-2xl font-extrabold text-white mb-1">Garment-Dyed Hoodie</h3>
+                  <div className="flex items-baseline gap-3">
+                    <p className="text-3xl font-bold text-[#b22234]">${hoodieDisplayPrice}</p>
+                    {promoApplied && <span className="text-lg line-through text-white/30">$65.00</span>}
+                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
+                  </div>
+                  <p className="text-white/50 text-sm mt-1">Free shipping · Comfort Colors 1567 ✦ Garment-Dyed · Ships in 3–5 days</p>
+                </div>
+                <div>
+                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Color</p>
+                  <div className="flex flex-wrap gap-3">
+                    {HOODIE_COLORS.map(c => (
+                      <button key={c.key} onClick={() => { setHoodieColor(c.key); setHoodieSize(null); }}
+                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                          hoodieColor===c.key ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
+                        }`}>{c.label}</button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Size</p>
+                  <div className="flex flex-wrap gap-3">
+                    {GD_SIZES.map(s => (
+                      <button key={s} onClick={() => setHoodieSize(s)}
+                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                          hoodieSize===s ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
+                        }`}>{s}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $65</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
+                </div>
+                {!hoodieSize && <p className="text-yellow-400 text-sm font-semibold">👆 Select a size to continue</p>}
+                {hoodieError && <p className="text-red-400 text-sm">{hoodieError}</p>}
+                <button onClick={handleHoodieCheckout} disabled={!hoodieSize || hoodieLoading}
+                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
+                  style={{ background: hoodieSize && !hoodieLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: hoodieSize && !hoodieLoading ? "pointer" : "not-allowed" }}>
+                  {hoodieLoading ? "Redirecting..." : hoodieSize ? `Buy Now — ${hoodieColor} / ${hoodieSize} / $${hoodieDisplayPrice}` : "Select a Size to Continue"}
+                </button>
+                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
+              </div>
+            </BlurFade>
+          </div>
+        </div>
+
+        {/* CREWNECK */}
+        <div id="crewneck" className="mt-20 border-t border-white/10 pt-16">
+          <BlurFade delay={0.1}>
+            <div className="text-center mb-12">
+              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Garment-Dyed Crewneck</h2>
+              <p className="text-white/60 text-lg max-w-xl mx-auto">Comfort Colors 1466. Lightweight garment-dyed fleece. Clean vintage feel. Logo on the chest.</p>
+            </div>
+          </BlurFade>
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            <BlurFade delay={0.2}>
+              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-0">
+                <img src={CREW_COLORS.find(c=>c.key===crewColor)?.img || "/crew-pepper-mockup.jpg"} alt={`Crewneck — ${crewColor}`} className="w-full h-full object-contain transition-opacity duration-300" />
+              </div>
+            </BlurFade>
+            <BlurFade delay={0.3}>
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-2xl font-extrabold text-white mb-1">Garment-Dyed Crewneck</h3>
+                  <div className="flex items-baseline gap-3">
+                    <p className="text-3xl font-bold text-[#b22234]">${crewDisplayPrice}</p>
+                    {promoApplied && <span className="text-lg line-through text-white/30">$55.00</span>}
+                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
+                  </div>
+                  <p className="text-white/50 text-sm mt-1">Free shipping · Comfort Colors 1466 ✦ Garment-Dyed · Ships in 3–5 days</p>
+                </div>
+                <div>
+                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Color</p>
+                  <div className="flex flex-wrap gap-3">
+                    {CREW_COLORS.map(c => (
+                      <button key={c.key} onClick={() => { setCrewColor(c.key); setCrewSize(null); }}
+                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                          crewColor===c.key ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
+                        }`}>{c.label}</button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Size</p>
+                  <div className="flex flex-wrap gap-3">
+                    {GD_SIZES.map(s => (
+                      <button key={s} onClick={() => setCrewSize(s)}
+                        className={`px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                          crewSize===s ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
+                        }`}>{s}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $55</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
+                </div>
+                {!crewSize && <p className="text-yellow-400 text-sm font-semibold">👆 Select a size to continue</p>}
+                {crewError && <p className="text-red-400 text-sm">{crewError}</p>}
+                <button onClick={handleCrewCheckout} disabled={!crewSize || crewLoading}
+                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
+                  style={{ background: crewSize && !crewLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: crewSize && !crewLoading ? "pointer" : "not-allowed" }}>
+                  {crewLoading ? "Redirecting..." : crewSize ? `Buy Now — ${crewColor} / ${crewSize} / $${crewDisplayPrice}` : "Select a Size to Continue"}
+                </button>
+                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
+              </div>
+            </BlurFade>
           </div>
         </div>
 
