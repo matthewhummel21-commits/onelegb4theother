@@ -314,19 +314,28 @@ export function VeteranRequestForm() {
             )}
             <div className="mt-4">
               <label className={labelClass}>Color</label>
-              <div className="flex gap-3">
-                {["Black", "Grey"].map((c) => (
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { key: "Black",    hex: "#1A1A1A" },
+                  { key: "Grey",     hex: "#9B9B9B" },
+                  { key: "Pepper",   hex: "#3D3635" },
+                  { key: "Espresso", hex: "#2C1A0E" },
+                ].map((c) => (
                   <button
-                    key={c}
+                    key={c.key}
                     type="button"
-                    onClick={() => setForm((prev) => ({ ...prev, pantColor: c }))}
-                    className={`flex-1 py-2.5 rounded-xl border-2 text-sm font-bold transition-all ${
-                      form.pantColor === c
-                        ? "bg-primary border-primary text-white"
+                    onClick={() => setForm((prev) => ({ ...prev, pantColor: c.key }))}
+                    className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 text-sm font-bold transition-all ${
+                      form.pantColor === c.key
+                        ? "border-primary bg-primary/10"
                         : "border-border hover:border-primary/50"
                     }`}
                   >
-                    {c}
+                    <span
+                      className="w-5 h-5 rounded-full border border-white/20 shrink-0"
+                      style={{ backgroundColor: c.hex }}
+                    />
+                    {c.key}
                   </button>
                 ))}
               </div>

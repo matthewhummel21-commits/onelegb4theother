@@ -49,16 +49,21 @@ export async function POST(req: NextRequest) {
     const size = row.pant_size || (row.waist && row.inseam ? `${row.waist}x${row.inseam}` : "?");
     const fullAddress = [row.address, row.city, row.state, row.zip].filter(Boolean).join(", ");
 
-    // Printful variant map — BC sweatpants 435175062
-    const SWEATS_VARIANTS: Record<string, Record<string, number>> = {
+    // Printful variant maps
+    const SWEATS_BC: Record<string, Record<string, number>> = {
       Black:  { S: 5327615052, M: 5327615053, L: 5327615054, XL: 5327615055, "2XL": 5327615056, "3XL": 5327615057 },
       Grey:   { S: 5327615058, M: 5327615059, L: 5327615060, XL: 5327615061, "2XL": 5327615062, "3XL": 5327615063 },
+    };
+    const SWEATS_GD: Record<string, Record<string, number>> = {
+      Pepper:   { S: 5327672970, M: 5327672977, L: 5327672978, XL: 5327672979, "2XL": 5327672980 },
+      Espresso: { S: 5327672975, M: 5327672971, L: 5327672972, XL: 5327672973, "2XL": 5327672974 },
     };
 
     const safeRow = row!;
     async function placePrintfulOrder(): Promise<string | null> {
-      const color = safeRow.pant_color === "Grey" ? "Grey" : "Black";
-      const colorMap = SWEATS_VARIANTS[color];
+      const color = safeRow.pant_color || "Black";
+      const isGD = color === "Pepper" || color === "Espresso";
+      const colorMap = isGD ? SWEATS_GD[color] : SWEATS_BC[color] ?? SWEATS_BC["Black"];
       const variantId = colorMap?.[size];
       if (!variantId) return null;
 
