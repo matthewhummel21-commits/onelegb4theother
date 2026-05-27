@@ -17,8 +17,8 @@ export default function ShopPage() {
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState("");
 
-  const VALID_CODES: Record<string, { shirt: number; sweats: number; hat: number; socks: number }> = {
-    TEAM: { shirt: 2999, sweats: 4444, hat: 2800, socks: 1500 },
+  const VALID_CODES: Record<string, { shirt: number; sweats: number; hat: number; socks: number; sticker: number; richardson: number }> = {
+    TEAM: { shirt: 2999, sweats: 4444, hat: 2800, socks: 1500, sticker: 500, richardson: 2800 },
   };
 
   const handleApplyPromo = () => {
@@ -69,6 +69,36 @@ export default function ShopPage() {
       setSocksError("Network error. Please try again.");
       setSocksLoading(false);
     }
+  };
+
+  const stickerPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].sticker : 700;
+  const stickerDisplayPrice = (stickerPrice / 100).toFixed(2);
+  const richardsonPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].richardson : 3500;
+  const richardsonDisplayPrice = (richardsonPrice / 100).toFixed(2);
+  const [stickerType, setStickerType] = useState<string>("Logo");
+  const [stickerLoading, setStickerLoading] = useState(false);
+  const [stickerError, setStickerError] = useState<string | null>(null);
+  const [richardsonLoading, setRichardsonLoading] = useState(false);
+  const [richardsonError, setRichardsonError] = useState<string | null>(null);
+
+  const handleStickerCheckout = async () => {
+    setStickerLoading(true); setStickerError(null);
+    try {
+      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product: "sticker", color: stickerType, promoCode: appliedCode || undefined }) });
+      const data = await res.json();
+      if (data.url) { window.location.href = data.url; } else { setStickerError(data.error || "Error"); setStickerLoading(false); }
+    } catch { setStickerError("Network error."); setStickerLoading(false); }
+  };
+
+  const handleRichardsonCheckout = async () => {
+    setRichardsonLoading(true); setRichardsonError(null);
+    try {
+      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product: "richardson", promoCode: appliedCode || undefined }) });
+      const data = await res.json();
+      if (data.url) { window.location.href = data.url; } else { setRichardsonError(data.error || "Error"); setRichardsonLoading(false); }
+    } catch { setRichardsonError("Network error."); setRichardsonLoading(false); }
   };
 
   const hatPrice = appliedCode && VALID_CODES[appliedCode] ? VALID_CODES[appliedCode].hat : 3800;
@@ -484,6 +514,108 @@ export default function ShopPage() {
                   {socksLoading ? "Redirecting..." : socksSize ? `Buy Now — Size ${socksSize} / $${socksDisplayPrice}` : "Select a Size to Continue"}
                 </button>
 
+                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
+              </div>
+            </BlurFade>
+          </div>
+        </div>
+
+        {/* RICHARDSON 112 */}
+        <div className="mt-20 border-t border-white/10 pt-16">
+          <BlurFade delay={0.1}>
+            <div className="text-center mb-12">
+              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Richardson 112 Snapback</h2>
+              <p className="text-white/60 text-lg max-w-xl mx-auto">All black. Embroidered logo. The hat veterans actually wear.</p>
+            </div>
+          </BlurFade>
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            <BlurFade delay={0.2}>
+              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-10">
+                <div className="text-center text-white/40">
+                  <div className="text-7xl mb-4">🧢</div>
+                  <p className="text-sm">Mockup generating — check Printful dashboard</p>
+                </div>
+              </div>
+            </BlurFade>
+            <BlurFade delay={0.3}>
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-2xl font-extrabold text-white mb-1">Richardson 112 Snapback</h3>
+                  <div className="flex items-baseline gap-3">
+                    <p className="text-3xl font-bold text-[#b22234]">${richardsonDisplayPrice}</p>
+                    {promoApplied && <span className="text-lg line-through text-white/30">$35.00</span>}
+                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
+                  </div>
+                  <p className="text-white/50 text-sm mt-1">Free shipping · All black · Embroidered · One size fits all</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $35</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
+                </div>
+                {richardsonError && <p className="text-red-400 text-sm">{richardsonError}</p>}
+                <button onClick={handleRichardsonCheckout} disabled={richardsonLoading}
+                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
+                  style={{ background: !richardsonLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: !richardsonLoading ? "pointer" : "not-allowed" }}>
+                  {richardsonLoading ? "Redirecting..." : `Buy Now — Black / $${richardsonDisplayPrice}`}
+                </button>
+                <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
+              </div>
+            </BlurFade>
+          </div>
+        </div>
+
+        {/* STICKERS */}
+        <div className="mt-20 border-t border-white/10 pt-16">
+          <BlurFade delay={0.1}>
+            <div className="text-center mb-12">
+              <span className="inline-block px-4 py-1 rounded-full bg-[#b22234]/20 text-[#b22234] text-sm font-bold uppercase tracking-widest mb-4">New</span>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Die-Cut Vinyl Stickers</h2>
+              <p className="text-white/60 text-lg max-w-xl mx-auto">Thick premium vinyl. Weather resistant. 3∃3. Logo or QR code that links straight to the site.</p>
+            </div>
+          </BlurFade>
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            <BlurFade delay={0.2}>
+              <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10 aspect-square flex items-center justify-center p-8">
+                <img
+                  src={stickerType === "QR Code" ? "/sticker-qr.png" : "/sticker-logo.png"}
+                  alt={`${stickerType} Sticker`}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </BlurFade>
+            <BlurFade delay={0.3}>
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-2xl font-extrabold text-white mb-1">Die-Cut Vinyl Stickers</h3>
+                  <div className="flex items-baseline gap-3">
+                    <p className="text-3xl font-bold text-[#b22234]">${stickerDisplayPrice}</p>
+                    {promoApplied && <span className="text-lg line-through text-white/30">$7.00</span>}
+                    {promoApplied && <span className="text-sm font-bold text-green-400">TEAM price ✓</span>}
+                  </div>
+                  <p className="text-white/50 text-sm mt-1">Free shipping · 3″×3″ premium vinyl · Weather resistant</p>
+                </div>
+                <div>
+                  <p className="text-white/70 text-sm font-semibold uppercase tracking-widest mb-3">Design</p>
+                  <div className="flex gap-3">
+                    {["Logo", "QR Code"].map((t) => (
+                      <button key={t} onClick={() => setStickerType(t)}
+                        className={`px-5 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                          stickerType === t ? "bg-[#b22234] border-[#b22234] text-white" : "border-gray-600 bg-gray-800 text-gray-100 hover:border-gray-400"
+                        }`}>
+                        {t === "QR Code" ? "QR Code → Site" : "Logo"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-white/80 text-sm"><span className="text-white font-bold">Your $7</span> helps fund a pair of adaptive pants for a veteran on our waitlist.</p>
+                </div>
+                {stickerError && <p className="text-red-400 text-sm">{stickerError}</p>}
+                <button onClick={handleStickerCheckout} disabled={stickerLoading}
+                  className="w-full py-4 rounded-2xl text-base font-extrabold text-white transition-all"
+                  style={{ background: !stickerLoading ? "rgb(178,34,52)" : "rgb(80,80,80)", cursor: !stickerLoading ? "pointer" : "not-allowed" }}>
+                  {stickerLoading ? "Redirecting..." : `Buy Now — ${stickerType} / $${stickerDisplayPrice}`}
+                </button>
                 <p className="text-white/30 text-xs text-center">Secure checkout via Stripe · Sales tax may apply</p>
               </div>
             </BlurFade>
