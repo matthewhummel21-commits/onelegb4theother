@@ -50,7 +50,7 @@ const INITIAL: FormData = {
   firstName: "", lastName: "", email: "", phone: "",
   address: "", city: "", state: "", zip: "",
   branch: "", yearsServed: "", householdSize: "", annualIncome: "",
-  pantType: "", pantFit: "", pantColor: "", pantBrand: "", pantSize: "", waist: "", inseam: "", referredBy: "", notes: "", wantsFollowUpCall: false,
+  pantType: "sweatpants", pantFit: "", pantColor: "", pantBrand: "", pantSize: "", waist: "", inseam: "", referredBy: "", notes: "", wantsFollowUpCall: false,
 };
 
 export function VeteranRequestForm() {
@@ -263,8 +263,8 @@ export function VeteranRequestForm() {
         </p>
         <div className="grid grid-cols-2 gap-4">
           {[
-            { value: "jeans", label: "👖 Jeans", desc: "Lee jeans, denim" },
             { value: "sweatpants", label: "🩳 Sweatpants", desc: "Athletic, comfortable" },
+            { value: "jeans", label: "👖 Jeans", desc: "Lee jeans, denim" },
           ].map((opt) => (
             <button
               key={opt.value}
