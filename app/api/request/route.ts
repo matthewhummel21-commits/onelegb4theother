@@ -173,7 +173,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const status = idUploaded ? "pending" : "needs_call";
+    // Referral bypass — if Matt referred them personally, skip verification
+    const mattReferral = /\bmatt(hew)?\b/i.test(referredBy || "");
+    const status = (idUploaded || mattReferral) ? "pending" : "needs_call";
+    const verifiedBy = mattReferral ? "referral" : idUploaded ? undefined : undefined;
 
     // ── Save to Neon Postgres ────────────────────────────────────────────────
     const requestId = await insertRequest({
@@ -200,6 +203,7 @@ export async function POST(req: NextRequest) {
       notes: notes || null,
       idUploaded,
       idFilePath,
+      verifiedBy: verifiedBy || null,
     });
 
     // ── Send email notification ──────────────────────────────────────────────
@@ -225,13 +229,20 @@ export async function POST(req: NextRequest) {
       await transporter.sendMail({
         from: `"One Leg B4 the Other" <${process.env.GMAIL_USER}>`,
         to: recipients.join(", "),
-        subject: `🎖️ New Pants Request — ${fullName} (${type}, ${size})${idUploaded ? " ✅ ID Uploaded" : " 📞 Needs Call"}`,
+        subject: `🎖️ New Pants Request — ${fullName} (${type}, ${size})${mattReferral ? " 🤝 Matt Referral" : idUploaded ? " ✅ ID Uploaded" : " 📞 Needs Call"}`,
         html,
       });
     }
 
     // ── Send Telegram notification ───────────────────────────────────────────
-    const telegramMsg = idUploaded
+    const telegramMsg = mattReferral
+      ? `🎖️ <b>New Pants Request</b> [#${requestId}]\n` +
+        `👤 ${fullName} · ${branch || "?"}\n` +
+        `📍 ${fullAddress}\n` +
+        `👖 ${type} · ${size}\n` +
+        `🤝 Referred by Matt — pre-verified, ready to approve\n` +
+        `🔗 <a href="${process.env.NEXT_PUBLIC_SITE_URL || ""}/admin/dashboard">Open Admin</a>`
+      : idUploaded
       ? `🎖️ <b>New Pants Request</b> [#${requestId}]\n` +
         `👤 ${fullName} · ${branch || "?"}\n` +
         `📍 ${fullAddress}\n` +

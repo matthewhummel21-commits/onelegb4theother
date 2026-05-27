@@ -108,6 +108,7 @@ export async function insertRequest(data: {
   wantsFollowUpCall?: boolean;
   idUploaded?: boolean;
   idFilePath?: string | null;
+  verifiedBy?: string | null;
 }): Promise<number> {
   const sql = getSql();
   const rows = await sql`
@@ -118,7 +119,7 @@ export async function insertRequest(data: {
       household_size, annual_income,
       pant_type, pant_fit, pant_size, waist, inseam,
       referred_by, notes,
-      wants_follow_up_call, id_uploaded, id_file_path
+      wants_follow_up_call, id_uploaded, id_file_path, verified_by
     ) VALUES (
       ${data.status},
       ${data.firstName ?? null},
@@ -142,7 +143,8 @@ export async function insertRequest(data: {
       ${data.notes ?? null},
       ${data.wantsFollowUpCall ?? false},
       ${data.idUploaded ?? false},
-      ${data.idFilePath ?? null}
+      ${data.idFilePath ?? null},
+      ${data.verifiedBy ?? null}
     )
     RETURNING id
   `;

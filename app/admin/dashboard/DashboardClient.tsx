@@ -242,12 +242,156 @@ const TAB_CONFIG: { id: Tab; label: string; emoji: string; color: string }[] = [
   { id: "denied", label: "Denied", emoji: "✗", color: "text-red-400 border-red-500" },
 ];
 
+// ─── Manual Add Modal ────────────────────────────────────────────────────────
+function ManualAddModal({ onClose, onAdded }: { onClose: () => void; onAdded: (row: RequestRow) => void }) {
+  const [form, setForm] = useState({
+    firstName: "", lastName: "", phone: "", email: "",
+    address: "", city: "", state: "", zip: "",
+    branch: "", yearsServed: "",
+    pantType: "jeans", pantSize: "", waist: "", inseam: "", pantFit: "",
+    householdSize: "", annualIncome: "", notes: "",
+  });
+  const [saving, setSaving] = useState(false);
+  const set = (f: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+    setForm((p) => ({ ...p, [f]: e.target.value }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const res = await fetch("/api/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          referredBy: "Matt",  // triggers pre-verified bypass
+          wantsFollowUpCall: false,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      const { requestId } = await res.json();
+      // Build a local row to insert optimistically
+      const size = form.pantSize || (form.waist && form.inseam ? `${form.waist}x${form.inseam}` : "?");
+      const newRow: RequestRow = {
+        id: requestId,
+        status: "pending",
+        first_name: form.firstName,
+        last_name: form.lastName,
+        email: form.email,
+        phone: form.phone,
+        address: form.address,
+        city: form.city,
+        state: form.state,
+        zip: form.zip,
+        branch: form.branch,
+        years_served: form.yearsServed,
+        household_size: form.householdSize,
+        annual_income: form.annualIncome,
+        pant_type: form.pantType,
+        pant_fit: form.pantFit,
+        pant_size: size,
+        waist: form.waist,
+        inseam: form.inseam,
+        referred_by: "Matt",
+        notes: form.notes,
+        wants_follow_up_call: false,
+        id_uploaded: false,
+        id_file_path: null,
+        verified_by: "referral",
+        call_notes: null,
+        amazon_link: null,
+        shipped_at: null,
+        created_at: new Date().toISOString(),
+      };
+      onAdded(newRow);
+      onClose();
+    } catch {
+      alert("Failed to add. Try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inp = "w-full h-10 rounded-lg border border-[#2a3d52] bg-[#0d1b2a] text-white text-sm px-3 focus:outline-none focus:border-blue-500";
+  const lbl = "block text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+      <div className="bg-[#1a2d42] border border-[#2a3d52] rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-[#2a3d52] flex items-center justify-between">
+          <h2 className="font-bold text-white text-lg">➕ Add Vet Manually</h2>
+          <p className="text-xs text-green-400 font-semibold">🤝 Pre-verified — no ID required</p>
+          <button onClick={onClose} className="text-slate-400 hover:text-white text-xl leading-none">✕</button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className={lbl}>First Name *</label><input required className={inp} value={form.firstName} onChange={set("firstName")} placeholder="John" /></div>
+            <div><label className={lbl}>Last Name *</label><input required className={inp} value={form.lastName} onChange={set("lastName")} placeholder="Smith" /></div>
+            <div><label className={lbl}>Phone *</label><input required className={inp} value={form.phone} onChange={set("phone")} placeholder="(605) 555-0000" /></div>
+            <div><label className={lbl}>Email</label><input className={inp} value={form.email} onChange={set("email")} placeholder="optional" /></div>
+          </div>
+          <div><label className={lbl}>Street Address *</label><input required className={inp} value={form.address} onChange={set("address")} placeholder="123 Main St" /></div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="col-span-1"><label className={lbl}>City *</label><input required className={inp} value={form.city} onChange={set("city")} /></div>
+            <div><label className={lbl}>State *</label><input required className={inp} value={form.state} onChange={set("state")} maxLength={2} placeholder="SD" /></div>
+            <div><label className={lbl}>ZIP *</label><input required className={inp} value={form.zip} onChange={set("zip")} placeholder="57104" /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={lbl}>Branch</label>
+              <select className={inp} value={form.branch} onChange={set("branch")}>
+                <option value="">Select...</option>
+                {["Army","Navy","Marine Corps","Air Force","Space Force","Coast Guard","National Guard","Reserves"].map(b => <option key={b} value={b}>{b}</option>)}
+              </select>
+            </div>
+            <div><label className={lbl}>Years Served</label><input className={inp} value={form.yearsServed} onChange={set("yearsServed")} placeholder="2005–2013" /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={lbl}>Pants Type *</label>
+              <select required className={inp} value={form.pantType} onChange={set("pantType")}>
+                <option value="jeans">👖 Jeans</option>
+                <option value="sweatpants">🩳 Sweatpants</option>
+              </select>
+            </div>
+            {form.pantType === "sweatpants" ? (
+              <div>
+                <label className={lbl}>Size *</label>
+                <select required className={inp} value={form.pantSize} onChange={set("pantSize")}>
+                  <option value="">Select...</option>
+                  {["S","M","L","XL","2XL","3XL"].map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+            ) : (
+              <div><label className={lbl}>Size (e.g. 32x30)</label><input className={inp} value={form.pantSize} onChange={set("pantSize")} placeholder="32x30" /></div>
+            )}
+          </div>
+          {form.pantType === "jeans" && (
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className={lbl}>Waist</label><input className={inp} value={form.waist} onChange={set("waist")} placeholder="32" /></div>
+              <div><label className={lbl}>Inseam</label><input className={inp} value={form.inseam} onChange={set("inseam")} placeholder="30" /></div>
+            </div>
+          )}
+          <div><label className={lbl}>Notes</label><textarea className={`${inp} h-20 py-2 resize-none`} value={form.notes} onChange={set("notes")} placeholder="Any context about this vet..." /></div>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 h-11 rounded-xl border border-[#2a3d52] text-slate-400 hover:text-white text-sm font-bold transition-colors">Cancel</button>
+            <button type="submit" disabled={saving} className="flex-1 h-11 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-colors disabled:opacity-60">
+              {saving ? "Adding..." : "Add Vet →"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardClient({ needsCall, pending, approved, denied }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>("needs_call");
   const [localNeedsCall, setLocalNeedsCall] = useState(needsCall);
   const [localPending, setLocalPending] = useState(pending);
   const [localApproved, setLocalApproved] = useState(approved);
   const [localDenied, setLocalDenied] = useState(denied);
+  const [showManualAdd, setShowManualAdd] = useState(false);
   const router = useRouter();
 
   const getList = (tab: Tab) => {
@@ -345,6 +489,12 @@ export default function DashboardClient({ needsCall, pending, approved, denied }
               {counts.needs_call + counts.pending} active · {counts.approved} approved
             </span>
             <button
+              onClick={() => setShowManualAdd(true)}
+              className="text-xs text-white font-bold bg-blue-600 hover:bg-blue-500 transition-colors px-3 py-1.5 rounded-lg"
+            >
+              + Add Vet
+            </button>
+            <button
               onClick={() => router.refresh()}
               className="text-xs text-slate-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg border border-[#2a3d52] hover:border-slate-500"
             >
@@ -353,6 +503,16 @@ export default function DashboardClient({ needsCall, pending, approved, denied }
           </div>
         </div>
       </header>
+
+      {showManualAdd && (
+        <ManualAddModal
+          onClose={() => setShowManualAdd(false)}
+          onAdded={(row) => {
+            setLocalPending((p) => [row, ...p]);
+            setActiveTab("pending");
+          }}
+        />
+      )}
 
       <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Tabs */}
