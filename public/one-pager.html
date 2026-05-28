@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>One Leg B4 the Other — One Pager</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #fff;
+    color: #111;
+    width: 8.5in;
+    min-height: 11in;
+    margin: 0 auto;
+    padding: 0.5in 0.6in;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 4px solid #b22234;
+    padding-bottom: 16px;
+    margin-bottom: 22px;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .logo { width: 72px; height: 72px; object-fit: contain; }
+  .org-name { font-size: 22px; font-weight: 900; color: #0D1B3E; line-height: 1.15; }
+  .org-tagline { font-size: 12px; color: #b22234; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+  .header-badge {
+    background: #0D1B3E;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  /* HERO STATEMENT */
+  .hero {
+    background: #0D1B3E;
+    color: #fff;
+    border-radius: 14px;
+    padding: 22px 28px;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .hero-text h2 {
+    font-size: 22px;
+    font-weight: 900;
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+  .hero-text h2 span { color: #b22234; }
+  .hero-text p { font-size: 13px; color: #c8d0e0; line-height: 1.6; }
+
+  /* TWO COLUMN */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px; }
+
+  /* PHOTO BOXES */
+  .photo-section { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .photo-box {
+    border: 2px dashed #c8d0e0;
+    border-radius: 12px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #9aa5b8;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    gap: 8px;
+    background: #f7f9fc;
+  }
+  .photo-box .icon { font-size: 32px; }
+  .photo-box .hint { font-size: 11px; color: #b0bac8; max-width: 120px; }
+
+  /* INFO CARD */
+  .info-card {
+    background: #f7f9fc;
+    border: 1px solid #e0e5ee;
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .info-card h3 {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #0D1B3E;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .info-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .info-card ul li {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.4;
+    display: flex;
+    gap: 8px;
+  }
+  .info-card ul li .dot {
+    width: 6px;
+    height: 6px;
+    background: #b22234;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  /* HOW IT WORKS */
+  .steps { display: flex; flex-direction: column; gap: 10px; }
+  .step { display: flex; align-items: flex-start; gap: 12px; }
+  .step-num {
+    width: 26px;
+    height: 26px;
+    background: #b22234;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-text { font-size: 13px; color: #333; line-height: 1.5; padding-top: 3px; }
+  .step-text strong { color: #0D1B3E; }
+
+  /* QR SECTION */
+  .qr-section {
+    border-top: 3px solid #b22234;
+    padding-top: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 4px;
+  }
+  .qr-left { flex: 1; }
+  .qr-left h3 { font-size: 18px; font-weight: 900; color: #0D1B3E; margin-bottom: 6px; }
+  .qr-left p { font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 10px; }
+  .qr-url {
+    font-size: 13px;
+    font-weight: 700;
+    color: #b22234;
+    background: #fff0f2;
+    border: 1px solid #f5c0c8;
+    padding: 6px 14px;
+    border-radius: 8px;
+    display: inline-block;
+  }
+  .qr-img { width: 130px; height: 130px; object-fit: contain; }
+
+  /* CONTACT ROW */
+  .contact-row {
+    display: flex;
+    gap: 24px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .contact-item { font-size: 12px; color: #555; display: flex; align-items: center; gap: 5px; }
+  .contact-item strong { color: #0D1B3E; }
+
+  /* EIN */
+  .ein { font-size: 11px; color: #aaa; margin-top: 10px; }
+
+  @media print {
+    body { margin: 0; padding: 0.45in 0.55in; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <img src="logo.png" class="logo" alt="One Leg B4 the Other Logo" />
+      <div>
+        <div class="org-name">One Leg B4<br>the Other</div>
+        <div class="org-tagline">Beyond the Uniform · Est. 2024</div>
+      </div>
+    </div>
+    <div class="header-badge">501(c)(3) Nonprofit · EIN 99-3332965</div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-text">
+      <h2>We provide custom branded adaptive wear<br>to veterans who've <span>earned every stitch.</span></h2>
+      <p>No cost to the veteran. No red tape. Just real support for the people who gave everything — delivered with dignity, straight to their door.</p>
+    </div>
+  </div>
+
+  <!-- PHOTO PLACEHOLDERS -->
+  <div class="photo-section">
+    <div class="photo-box">
+      <div class="icon">📷</div>
+      <div>Add Photo Here</div>
+      <div class="hint">Delivery day, veterans, community event</div>
+    </div>
+    <div class="photo-box">
+      <div class="icon">📷</div>
+      <div>Add Photo Here</div>
+      <div class="hint">Team, recipients, behind the scenes</div>
+    </div>
+  </div>
+
+  <!-- TWO COLUMN INFO -->
+  <div class="two-col">
+    <div class="info-card">
+      <h3>🎖️ Who Qualifies</h3>
+      <ul>
+        <li><div class="dot"></div>Any U.S. military veteran in need</li>
+        <li><div class="dot"></div>Active duty transitioning out</li>
+        <li><div class="dot"></div>Veterans experiencing hardship</li>
+        <li><div class="dot"></div>Referred by a VSO, social worker, or community member</li>
+        <li><div class="dot"></div>No income threshold required — we review each request personally</li>
+      </ul>
+    </div>
+    <div class="info-card">
+      <h3>⚙️ How It Works</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text"><strong>Scan or visit</strong> onelegb4theother.com and fill out a short request form</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text"><strong>We review</strong> every request personally — usually within 48 hours</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text"><strong>Approved gear ships</strong> directly to the veteran at no cost</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text"><strong>We follow up</strong> — because this is a relationship, not a transaction</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR + DONATE -->
+  <div class="qr-section">
+    <div class="qr-left">
+      <h3>Support the Mission</h3>
+      <p>Every donation goes directly to putting quality gear on the backs of veterans in need. Scan the code to donate, shop our mission-driven merch, or submit a request on behalf of a veteran you know.</p>
+      <div class="qr-url">onelegb4theother.com</div>
+      <div class="contact-row">
+        <div class="contact-item">📍 <strong>230 S Phillips Ave Suite 203, Sioux Falls, SD 57104</strong></div>
+        <div class="contact-item">📞 <strong>(605) 277-2721</strong></div>
+      </div>
+      <div class="ein">501(c)(3) tax-exempt · EIN 99-3332965 · Donations are tax-deductible</div>
+    </div>
+    <img src="sticker-qr.png" class="qr-img" alt="Donation QR Code" />
+  </div>
+
+</body>
+</html>
