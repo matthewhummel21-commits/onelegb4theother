@@ -80,6 +80,14 @@ const PROMO_CODES: Record<string, Record<string, number>> = {
 function ProductCard({ product, appliedCode }: { product: Product; appliedCode: string | null }) {
   const [activeColor, setActiveColor] = useState<string>(product.colors[0].key);
   const [activeSize, setActiveSize] = useState<string | null>(null);
+
+  // Reset selected size if it's not available in the newly selected color
+  useEffect(() => {
+    if (activeSize && !getSizes().includes(activeSize)) {
+      setActiveSize(null);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeColor]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [flipped, setFlipped] = useState(false);
@@ -187,22 +195,29 @@ function ProductCard({ product, appliedCode }: { product: Product; appliedCode: 
           </div>
         )}
 
-        {/* Size picker */}
-        {getSizes().length > 0 && (
+        {/* Size picker — show all product sizes; disable ones unavailable for the selected color */}
+        {product.sizes.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
-            {getSizes().map(s => (
-              <button
-                key={s}
-                onClick={() => setActiveSize(s)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
-                  activeSize === s
-                    ? "bg-white text-black border-white"
-                    : "border-white/15 text-white/60 hover:border-white/50 hover:text-white"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
+            {[...product.sizes].map(s => {
+              const available = getSizes().includes(s);
+              return (
+                <button
+                  key={s}
+                  onClick={() => available && setActiveSize(s)}
+                  disabled={!available}
+                  title={!available ? `Not available in ${colorObj.label}` : undefined}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                    !available
+                      ? "border-white/5 text-white/20 line-through cursor-not-allowed"
+                      : activeSize === s
+                        ? "bg-white text-black border-white"
+                        : "border-white/15 text-white/60 hover:border-white/50 hover:text-white"
+                  }`}
+                >
+                  {s}
+                </button>
+              );
+            })}
           </div>
         )}
 
