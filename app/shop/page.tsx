@@ -70,8 +70,8 @@ const PRODUCTS = [
     subtitle: "Independent Trading Co. · Left leg logo",
     price: 4500,
     colors: [
-      { key: "Black",        label: "Black",        hex: "#1A1A1A", img: "/shorts-fleece-mockup.jpg" },
-      { key: "Heather Grey", label: "Heather Grey", hex: "#9B9B9B", img: "/shorts-fleece-mockup.jpg" },
+      { key: "Black",        label: "Black",        hex: "#1A1A1A", img: "/shorts-fleece-black-mockup.jpg" },
+      { key: "Heather Grey", label: "Heather Grey", hex: "#9B9B9B", img: "/shorts-fleece-grey-mockup.jpg" },
     ],
     sizes: ["S","M","L","XL","2XL"],
     tag: "New",
