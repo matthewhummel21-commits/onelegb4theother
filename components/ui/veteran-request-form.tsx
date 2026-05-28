@@ -123,7 +123,7 @@ export function VeteranRequestForm() {
     }
   };
 
-  const inputClass = "h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm";
+  const inputClass = "h-12 rounded-xl border-2 border-border focus:border-primary bg-white text-gray-900 text-sm placeholder:text-gray-400";
   const labelClass = "block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5";
 
   if (submitted) {
@@ -194,7 +194,7 @@ export function VeteranRequestForm() {
                 required
                 value={form.state}
                 onChange={set("state")}
-                className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
+                className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-white text-gray-900 text-sm px-3 focus:outline-none"
               >
                 <option value="">State...</option>
                 {US_STATES.map(([abbr, name]) => (
@@ -223,7 +223,7 @@ export function VeteranRequestForm() {
               required
               value={form.branch}
               onChange={set("branch")}
-              className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
+              className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-white text-gray-900 text-sm px-3 focus:outline-none"
             >
               <option value="">Select branch...</option>
               {BRANCHES.map((b) => <option key={b} value={b}>{b}</option>)}
@@ -362,7 +362,7 @@ export function VeteranRequestForm() {
               <select
                 value={form.pantFit}
                 onChange={set("pantFit")}
-                className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
+                className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-white text-gray-900 text-sm px-3 focus:outline-none"
               >
                 <option value="">Select fit...</option>
                 <option value="Relaxed / Loose">Relaxed / Loose — extra room throughout</option>
@@ -384,7 +384,7 @@ export function VeteranRequestForm() {
             <select
               value={form.pantColor}
               onChange={set("pantColor")}
-              className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
+              className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-white text-gray-900 text-sm px-3 focus:outline-none"
             >
               <option value="">Select color...</option>
               <option value="Dark">Dark</option>
@@ -398,7 +398,7 @@ export function VeteranRequestForm() {
             <select
               value={form.pantBrand}
               onChange={set("pantBrand")}
-              className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-background text-sm px-3 focus:outline-none"
+              className="w-full h-12 rounded-xl border-2 border-border focus:border-primary bg-white text-gray-900 text-sm px-3 focus:outline-none"
             >
               <option value="">Select brand...</option>
               <option value="Lee">Lee — American-made, classic fit</option>
