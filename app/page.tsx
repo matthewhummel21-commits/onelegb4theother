@@ -31,6 +31,26 @@ export default function DonationPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [merchSize, setMerchSize] = useState<string | null>(null);
   const [merchLoading, setMerchLoading] = useState(false);
+  const [donating, setDonating] = useState(false);
+
+  const handleDonate = async () => {
+    if (!finalAmount || isNaN(Number(finalAmount)) || donating) return;
+    setDonating(true);
+    try {
+      const res = await fetch("/api/donate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: finalAmount, mode }),
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+      else alert("Something went wrong. Please try again.");
+    } catch {
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setDonating(false);
+    }
+  };
 
   const handleMerchCheckout = async () => {
     if (!merchSize || merchLoading) return;
@@ -481,9 +501,12 @@ export default function DonationPage() {
               shimmerColor="#ffffff"
               borderRadius="16px"
               className="w-full h-16 text-xl font-extrabold"
-              disabled={!finalAmount || isNaN(Number(finalAmount))}
+              disabled={!finalAmount || isNaN(Number(finalAmount)) || donating}
+              onClick={handleDonate}
             >
-              {finalAmount
+              {donating
+                ? "Redirecting..."
+                : finalAmount
                 ? `Donate $${finalAmount}${mode === "monthly" ? "/mo" : ""} →`
                 : "Choose an Amount"}
             </ShimmerButton>
