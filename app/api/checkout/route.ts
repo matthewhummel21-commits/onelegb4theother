@@ -31,9 +31,10 @@ const FLEECE_VARIANTS: Record<string, Record<string, number>> = {
   "Heather Grey": { S: 5328923102, M: 5328923103, L: 5328923105, XL: 5328923111, "2XL": 5328923115 },
 };
 
-// Women's PJ Shorts variants — 435293738
-const PJ_VARIANTS: Record<string, number> = {
-  XS: 5328923158, S: 5328923163, M: 5328923164, L: 5328923165, XL: 5328923166, "2XL": 5328923167,
+// Women's Lounge Shorts variants — 435299379 (Black + White)
+const PJ_VARIANTS: Record<string, Record<string, number>> = {
+  Black: { XS: 5328975196, S: 5328975197, M: 5328975198, L: 5328975199, XL: 5328975200, "2XL": 5328975201 },
+  White: { XS: 5328975202, S: 5328975203, M: 5328975204, L: 5328975205, XL: 5328975206, "2XL": 5328975207 },
 };
 
 // Hat variants
@@ -96,8 +97,9 @@ export async function POST(req: NextRequest) {
       if (!colorMap || !colorMap[size]) return NextResponse.json({ error: "Invalid fleece color or size" }, { status: 400 });
       syncVariantId = colorMap[size];
     } else if (isPJ) {
-      if (!size || !PJ_VARIANTS[size]) return NextResponse.json({ error: "Invalid size" }, { status: 400 });
-      syncVariantId = PJ_VARIANTS[size];
+      const pjColorMap = PJ_VARIANTS[color] ?? PJ_VARIANTS["Black"];
+      if (!pjColorMap || !pjColorMap[size]) return NextResponse.json({ error: "Invalid size" }, { status: 400 });
+      syncVariantId = pjColorMap[size];
     } else if (isSocks) {
       if (!size || !SOCK_VARIANTS[size]) {
         return NextResponse.json({ error: "Invalid sock size" }, { status: 400 });
@@ -195,7 +197,7 @@ export async function POST(req: NextRequest) {
         color: color || "",
         product: product || "shirt",
         printful_variant_id: String(syncVariantId),
-        printful_product_id: isHoodie ? "435182091" : isLargeTee ? "435183890" : isFleece ? "435293736" : isPJ ? "435293738" : isSticker ? "435179893" : isSocks ? "435179129" : isHat ? "435178002" : isSweatpants ? (color === "Pepper" || color === "Espresso" ? "435181837" : "435175062") : "432664066",
+        printful_product_id: isHoodie ? "435182091" : isLargeTee ? "435183890" : isFleece ? "435293736" : isPJ ? "435299379" : isSticker ? "435179893" : isSocks ? "435179129" : isHat ? "435178002" : isSweatpants ? (color === "Pepper" || color === "Espresso" ? "435181837" : "435175062") : "432664066",
       },
       shipping_address_collection: {
         allowed_countries: ["US"],
