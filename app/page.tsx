@@ -110,7 +110,7 @@ export default function DonationPage() {
         <div className="fixed top-[65px] left-0 right-0 z-40 bg-black/95 backdrop-blur-md border-b border-white/10 sm:hidden">
           <div className="flex flex-col p-4 gap-3">
             <a href="/shop" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
-              🛍️ Shop — Issued With Honor Tee
+              🛍️ Shop - Issued With Honor Tee
             </a>
             <a href="#request" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
               👖 Request Pants
@@ -160,9 +160,9 @@ export default function DonationPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.6 }}
-              className="text-lg md:text-xl text-gray-300 max-w-xl mb-4 leading-relaxed"
+              className="text-lg md:text-xl text-gray-300 max-w-xl mb-4 leading-relaxed font-semibold"
             >
-              We provide custom branded adaptive wear to veterans who’ve earned every stitch.
+              We provide the pants. Veterans put their best foot forward.
             </motion.p>
 
             <motion.p
@@ -223,7 +223,7 @@ export default function DonationPage() {
             </motion.div>
           </div>
 
-          {/* Logo — right side of hero */}
+          {/* Logo - right side of hero */}
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -297,7 +297,7 @@ export default function DonationPage() {
               <div className="absolute -top-4 -left-4 text-8xl text-primary/20 font-serif leading-none">&ldquo;</div>
               <div className="bg-card border border-border rounded-3xl p-8 relative z-10">
                 <p className="text-lg leading-relaxed text-foreground mb-6 italic">
-                  "I don't know what you want me to do with my life, but if you want me to do something impactful, you need to tell me — because I'm ready to make that move."
+                  "I don't know what you want me to do with my life, but if you want me to do something impactful, you need to tell me - because I'm ready to make that move."
                 </p>
                 <Separator className="mb-6" />
                 <div className="flex items-center gap-4">
@@ -467,7 +467,7 @@ export default function DonationPage() {
                 className="mb-6 p-5 rounded-2xl bg-primary/8 border border-primary/20 text-sm"
               >
                 {isJeansPair ? (
-                  <p className="text-foreground">⚡ <strong>$35</strong> is roughly the cost of one pair of jeans — that&rsquo;s exactly what goes to a veteran on our waitlist.</p>
+                  <p className="text-foreground">⚡ <strong>$35</strong> is roughly the cost of one pair of jeans - that&rsquo;s exactly what goes to a veteran on our waitlist.</p>
                 ) : (
                   <p className="text-foreground">⚡ Your <strong>${finalAmount}</strong> goes directly to putting veterans on their feet. Thank you.</p>
                 )}
@@ -534,7 +534,7 @@ export default function DonationPage() {
           <BlurFade inView delay={0}>
             <div className="text-center mb-10">
               <Badge className="mb-3 bg-secondary/10 text-secondary border border-secondary/20">Are You a Veteran in Need?</Badge>
-              <h2 className="text-4xl font-extrabold tracking-tight mb-3">Request Pants — No Cost to You</h2>
+              <h2 className="text-4xl font-extrabold tracking-tight mb-3">Request Pants - No Cost to You</h2>
               <p className="text-muted-foreground leading-relaxed max-w-lg mx-auto">
                 If you&rsquo;re a veteran facing hardship, we&rsquo;ll ship pants directly to your door at no charge.
                 Know a vet who needs help? Fill this out on their behalf.
@@ -573,7 +573,7 @@ export default function DonationPage() {
               whileHover={{ y: -2 }}
               className="bg-card border-2 border-border rounded-3xl overflow-hidden md:flex max-w-3xl mx-auto shadow-md"
             >
-              {/* Shirt Images — Front & Back */}
+              {/* Shirt Images - Front & Back */}
               <div className="md:w-1/2 bg-gray-50 flex flex-col items-center justify-center p-6 gap-3">
                 <div className="flex gap-3 w-full justify-center">
                   <div className="flex-1 text-center">
@@ -642,7 +642,7 @@ export default function DonationPage() {
                     cursor: merchSize && !merchLoading ? "pointer" : "not-allowed",
                   }}
                 >
-                  {merchLoading ? "Redirecting..." : merchSize ? `Buy Now — ${merchSize} / $45` : "Select a Size"}
+                  {merchLoading ? "Redirecting..." : merchSize ? `Buy Now - ${merchSize} / $45` : "Select a Size"}
                 </button>
 
                 <p className="text-xs text-muted-foreground text-center mt-3">
