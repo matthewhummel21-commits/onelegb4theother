@@ -25,6 +25,17 @@ const SOCK_VARIANTS: Record<string, number> = {
   S: 5327650831, M: 5327650832, L: 5327650833,
 };
 
+// Men's Fleece Shorts variants — 435293736
+const FLEECE_VARIANTS: Record<string, Record<string, number>> = {
+  Black:        { S: 5328923097, M: 5328923098, L: 5328923099, XL: 5328923100, "2XL": 5328923101 },
+  "Heather Grey": { S: 5328923102, M: 5328923103, L: 5328923105, XL: 5328923111, "2XL": 5328923115 },
+};
+
+// Women's PJ Shorts variants — 435293738
+const PJ_VARIANTS: Record<string, number> = {
+  XS: 5328923158, S: 5328923163, M: 5328923164, L: 5328923165, XL: 5328923166, "2XL": 5328923167,
+};
+
 // Hat variants
 const HAT_VARIANTS: Record<string, number> = {
   "Black/White/Black": 5327641776,
@@ -58,6 +69,8 @@ export async function POST(req: NextRequest) {
     const isSticker = product === "sticker";
     const isHoodie = product === "hoodie";
     const isLargeTee = product === "largetee";
+    const isFleece = product === "fleece";
+    const isPJ = product === "pj";
 
     // Validate variant
     let syncVariantId: number;
@@ -78,6 +91,13 @@ export async function POST(req: NextRequest) {
     } else if (isLargeTee) {
       if (!size || !LARGE_TEE_VARIANTS[size]) return NextResponse.json({ error: "Invalid size" }, { status: 400 });
       syncVariantId = LARGE_TEE_VARIANTS[size];
+    } else if (isFleece) {
+      const colorMap = FLEECE_VARIANTS[color];
+      if (!colorMap || !colorMap[size]) return NextResponse.json({ error: "Invalid fleece color or size" }, { status: 400 });
+      syncVariantId = colorMap[size];
+    } else if (isPJ) {
+      if (!size || !PJ_VARIANTS[size]) return NextResponse.json({ error: "Invalid size" }, { status: 400 });
+      syncVariantId = PJ_VARIANTS[size];
     } else if (isSocks) {
       if (!size || !SOCK_VARIANTS[size]) {
         return NextResponse.json({ error: "Invalid sock size" }, { status: 400 });
@@ -150,6 +170,10 @@ export async function POST(req: NextRequest) {
                 ? (promo ? promo.hoodiePrice : 6500)
                 : isLargeTee
                 ? (promo ? promo.shirtPrice : 4500)
+                : isFleece
+                ? (promo ? (promo as unknown as Record<string,number>).fleece ?? 4500 : 4500)
+                : isPJ
+                ? (promo ? (promo as unknown as Record<string,number>).pj ?? 4000 : 4000)
                 : isSticker
                 ? (promo ? promo.stickerPrice : 700)
                 : isSocks
@@ -171,7 +195,7 @@ export async function POST(req: NextRequest) {
         color: color || "",
         product: product || "shirt",
         printful_variant_id: String(syncVariantId),
-        printful_product_id: isHoodie ? "435182091" : isLargeTee ? "435183890" : isSticker ? "435179893" : isSocks ? "435179129" : isHat ? "435178002" : isSweatpants ? (color === "Pepper" || color === "Espresso" ? "435181837" : "435175062") : "432664066",
+        printful_product_id: isHoodie ? "435182091" : isLargeTee ? "435183890" : isFleece ? "435293736" : isPJ ? "435293738" : isSticker ? "435179893" : isSocks ? "435179129" : isHat ? "435178002" : isSweatpants ? (color === "Pepper" || color === "Espresso" ? "435181837" : "435175062") : "432664066",
       },
       shipping_address_collection: {
         allowed_countries: ["US"],
