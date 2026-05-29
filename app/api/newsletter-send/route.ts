@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { buildNewsletterHtml, NewsletterData } from '@/lib/newsletter-template'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-const audienceId = process.env.RESEND_AUDIENCE_ID!
 const SECRET = process.env.NEWSLETTER_STATS_SECRET
 
 export async function POST(req: NextRequest) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
+  const audienceId = process.env.RESEND_AUDIENCE_ID!
+
   const secret = req.headers.get('x-secret')
   if (SECRET && secret !== SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
