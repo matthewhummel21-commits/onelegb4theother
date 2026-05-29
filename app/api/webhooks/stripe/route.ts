@@ -2,9 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-const audienceId = process.env.RESEND_AUDIENCE_ID!
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY!;
 const PRINTFUL_STORE_ID = process.env.PRINTFUL_STORE_ID!;
@@ -45,6 +42,8 @@ export async function POST(req: NextRequest) {
     const firstName = name.split(' ')[0] || undefined
     if (email) {
       try {
+        const resend = new Resend(process.env.RESEND_API_KEY)
+        const audienceId = process.env.RESEND_AUDIENCE_ID!
         await resend.contacts.create({ email, firstName, unsubscribed: false, audienceId })
         console.log(`📬 Subscribed buyer to newsletter: ${email}`)
       } catch (err) {
