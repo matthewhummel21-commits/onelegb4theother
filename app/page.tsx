@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
+import NewsletterSignup from "@/components/NewsletterSignup";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -742,6 +743,12 @@ export default function DonationPage() {
       </BlurFade>
 
       {/* FOOTER */}
+      <section className="py-16 px-6 bg-gray-950 border-t border-white/10">
+        <div className="max-w-2xl mx-auto text-center">
+          <NewsletterSignup />
+        </div>
+      </section>
+
       <footer className="py-10 px-6 bg-black border-t border-white/10 text-center text-xs text-gray-500">
         <p className="font-bold text-white mb-1">One Leg B4 the Other</p>
         <p className="mb-1">230 S Phillips Ave, Suite 203 · Sioux Falls, SD 57104</p>

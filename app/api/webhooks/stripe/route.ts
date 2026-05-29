@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY)
+const audienceId = process.env.RESEND_AUDIENCE_ID!
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY!;
@@ -33,6 +37,19 @@ export async function POST(req: NextRequest) {
     } catch (err) {
       console.error("Printful fulfillment error:", err);
       // Return 200 so Stripe doesn't retry — log manually
+    }
+
+    // Auto-subscribe buyer to newsletter
+    const email = session.customer_details?.email
+    const name = session.customer_details?.name || ''
+    const firstName = name.split(' ')[0] || undefined
+    if (email) {
+      try {
+        await resend.contacts.create({ email, firstName, unsubscribed: false, audienceId })
+        console.log(`📬 Subscribed buyer to newsletter: ${email}`)
+      } catch (err) {
+        console.error('Newsletter subscribe error:', err)
+      }
     }
   }
 
