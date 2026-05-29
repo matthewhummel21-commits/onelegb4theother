@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid promo code" }, { status: 400 });
     }
 
-    const origin = req.headers.get("origin") || "https://onelegb4theother.org";
+    const origin = req.headers.get("origin") || "https://onelegb4theother.com";
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
