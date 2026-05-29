@@ -17,7 +17,7 @@ export interface NewsletterData {
 }
 
 export function buildNewsletterHtml(d: NewsletterData): string {
-  const logoUrl = 'https://onelegb4theother.com/brand-final-transparent.png'
+  const logoUrl = 'https://onelegb4theother.com/logo.png'
   const siteUrl = d.ctaUrl ?? 'https://onelegb4theother.com'
   const shopUrl = 'https://onelegb4theother.com/shop'
   const donateUrl = 'https://onelegb4theother.com/#donate'
