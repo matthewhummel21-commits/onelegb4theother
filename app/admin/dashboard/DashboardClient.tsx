@@ -285,7 +285,6 @@ function NewsletterTab() {
   const [storyAngle, setStoryAngle] = useState('')
   const [tweetImageUrl, setTweetImageUrl] = useState('')
   const [tweetLink, setTweetLink] = useState('')
-  const [uploadingTweet, setUploadingTweet] = useState(false)
   const [sending, setSending] = useState(false)
   const [sentMsg, setSentMsg] = useState('')
 
@@ -445,29 +444,10 @@ function NewsletterTab() {
       {/* Featured X Post */}
       <div className="space-y-4">
         <h2 className="font-bold text-white text-base">🐦 Featured X Post</h2>
+        <p className="text-xs text-slate-500">Upload your screenshot to imgur.com (free) then paste the image URL below.</p>
         <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Upload Screenshot</label>
-          <input
-            type="file"
-            accept="image/*"
-            className="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-700 file:text-white file:font-bold hover:file:bg-purple-600 cursor-pointer"
-            onChange={async (e) => {
-              const file = e.target.files?.[0]
-              if (!file) return
-              setUploadingTweet(true)
-              try {
-                const form = new FormData()
-                form.append('file', file)
-                const res = await fetch('/api/upload-tweet', { method: 'POST', body: form })
-                const data = await res.json()
-                if (data.url) setTweetImageUrl(data.url)
-                else alert('Upload failed')
-              } finally {
-                setUploadingTweet(false)
-              }
-            }}
-          />
-          {uploadingTweet && <p className="text-xs text-purple-400 mt-1">Uploading...</p>}
+          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Screenshot Image URL</label>
+          <input className={inp} value={tweetImageUrl} onChange={e => setTweetImageUrl(e.target.value)} placeholder="https://i.imgur.com/..." />
           {tweetImageUrl && (
             <div className="mt-2">
               <img src={tweetImageUrl} alt="Tweet preview" className="rounded-lg max-w-sm border border-[#2a3d52]" />
