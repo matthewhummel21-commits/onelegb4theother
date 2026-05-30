@@ -9,48 +9,110 @@ interface Article {
   summary: string
 }
 
+const SKIP_DOMAINS = ['blogger.com', 'globenewswire.com', 'yardbarker.com', 'theadvocate.com']
+const SKIP_KEYWORDS = ['world cup', 'nfl', 'nba', 'nhl', 'mlb', 'saints', 'soccer', 'football team', 'sports']
+
+function isRelevant(title: string, url: string): boolean {
+  const lower = title.toLowerCase()
+  if (SKIP_DOMAINS.some(d => url.includes(d))) return false
+  if (SKIP_KEYWORDS.some(k => lower.includes(k))) return false
+  return true
+}
+
+async function fetchNewsApi(apiKey: string): Promise<Article[]> {
+  const queries = [
+    '"military veterans" homelessness OR housing OR clothing OR benefits',
+    '"veteran nonprofit" OR "veteran support" OR "veteran assistance" clothing OR housing',
+  ]
+  const articles: Article[] = []
+
+  for (const q of queries) {
+    if (articles.length >= 3) break
+    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&language=en&sortBy=publishedAt&pageSize=5&apiKey=${apiKey}`
+    const res = await fetch(url)
+    const data = await res.json()
+
+    for (const a of data.articles ?? []) {
+      if (!a.url || a.title === '[Removed]') continue
+      if (!a.description || a.description.length < 50) continue
+      if (!isRelevant(a.title, a.url)) continue
+      if (articles.find(x => x.url === a.url)) continue
+
+      articles.push({
+        title: a.title,
+        source: a.source?.name ?? 'Unknown',
+        url: a.url,
+        summary: a.description,
+      })
+      if (articles.length >= 3) break
+    }
+  }
+
+  return articles
+}
+
+async function fetchGNews(apiKey: string): Promise<Article[]> {
+  const queries = [
+    '"military veteran" homeless OR clothing OR benefits OR nonprofit',
+    '"veteran housing" OR "veteran assistance" OR "VA benefits"',
+  ]
+  const articles: Article[] = []
+
+  for (const q of queries) {
+    if (articles.length >= 3) break
+    const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(q)}&lang=en&max=5&apikey=${apiKey}`
+    const res = await fetch(url)
+    const data = await res.json()
+
+    for (const a of data.articles ?? []) {
+      if (!a.url || !a.description || a.description.length < 50) continue
+      if (!isRelevant(a.title, a.url)) continue
+      if (articles.find(x => x.url === a.url)) continue
+
+      articles.push({
+        title: a.title,
+        source: a.source?.name ?? 'Unknown',
+        url: a.url,
+        summary: a.description,
+      })
+      if (articles.length >= 3) break
+    }
+  }
+
+  return articles
+}
+
 export async function GET(req: NextRequest) {
   const secret = req.headers.get('x-secret')
   if (SECRET && secret !== SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const apiKey = process.env.NEWS_API_KEY
-  if (!apiKey) {
-    return NextResponse.json({ error: 'NEWS_API_KEY not set' }, { status: 500 })
+  const newsApiKey = process.env.NEWS_API_KEY
+  const gNewsKey = process.env.GNEWS_API_KEY
+
+  if (!newsApiKey && !gNewsKey) {
+    return NextResponse.json({ error: 'No news API keys configured' }, { status: 500 })
   }
 
-  const queries = [
-    'veteran homelessness OR "veteran housing" OR "veteran benefits"',
-    'military veteran nonprofit OR "veteran support" OR "veteran assistance"',
-    'veteran legislation OR "VA benefits" OR "veteran healthcare"',
-  ]
+  // Fetch from both in parallel
+  const [newsApiArticles, gNewsArticles] = await Promise.all([
+    newsApiKey ? fetchNewsApi(newsApiKey) : Promise.resolve([]),
+    gNewsKey ? fetchGNews(gNewsKey) : Promise.resolve([]),
+  ])
 
-  const articles: Article[] = []
+  // Interleave results for variety, dedupe by URL
+  const seen = new Set<string>()
+  const merged: Article[] = []
 
-  for (const q of queries) {
-    if (articles.length >= 3) break
-
-    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&language=en&sortBy=publishedAt&pageSize=5&apiKey=${apiKey}`
-    const res = await fetch(url)
-    const data = await res.json()
-
-    for (const a of data.articles ?? []) {
-      const skipDomains = ['blogger.com', 'harvard.edu/gazette', 'globenewswire.com']
-      if (!a.url || a.title === '[Removed]' || articles.find(x => x.url === a.url)) continue
-      if (skipDomains.some(d => a.url.includes(d))) continue
-      if (!a.description || a.description.length < 50) continue
-
-      articles.push({
-        title: a.title,
-        source: a.source?.name ?? 'Unknown',
-        url: a.url,
-        summary: a.description ?? a.content?.slice(0, 200) ?? '',
-      })
-
-      if (articles.length >= 3) break
+  const max = Math.max(newsApiArticles.length, gNewsArticles.length)
+  for (let i = 0; i < max; i++) {
+    for (const a of [newsApiArticles[i], gNewsArticles[i]]) {
+      if (!a || seen.has(a.url)) continue
+      seen.add(a.url)
+      merged.push(a)
     }
   }
 
-  return NextResponse.json({ articles })
+  return NextResponse.json({ articles: merged.slice(0, 4) })
 }
