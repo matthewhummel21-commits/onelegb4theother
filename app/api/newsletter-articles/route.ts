@@ -21,9 +21,9 @@ export async function GET(req: NextRequest) {
   }
 
   const queries = [
-    'veterans support nonprofit',
-    'military veterans homeless clothing',
-    'veteran benefits legislation',
+    'veteran homelessness OR "veteran housing" OR "veteran benefits"',
+    'military veteran nonprofit OR "veteran support" OR "veteran assistance"',
+    'veteran legislation OR "VA benefits" OR "veteran healthcare"',
   ]
 
   const articles: Article[] = []
@@ -36,7 +36,10 @@ export async function GET(req: NextRequest) {
     const data = await res.json()
 
     for (const a of data.articles ?? []) {
+      const skipDomains = ['blogger.com', 'harvard.edu/gazette', 'globenewswire.com']
       if (!a.url || a.title === '[Removed]' || articles.find(x => x.url === a.url)) continue
+      if (skipDomains.some(d => a.url.includes(d))) continue
+      if (!a.description || a.description.length < 50) continue
 
       articles.push({
         title: a.title,
