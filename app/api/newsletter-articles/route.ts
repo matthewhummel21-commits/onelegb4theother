@@ -22,24 +22,31 @@ const REQUIRE_TITLE_KEYWORDS = [
   'veteran', 'veterans', 'military', 'va benefit', 'service member', 'armed forces',
 ]
 
-function isRelevant(title: string, url: string): boolean {
+function isRelevant(title: string, url: string, requireVeteranTitle = false): boolean {
   const lower = title.toLowerCase()
   if (SKIP_DOMAINS.some(d => url.includes(d))) return false
   if (SKIP_TITLE_KEYWORDS.some(k => lower.includes(k))) return false
-  if (!REQUIRE_TITLE_KEYWORDS.some(k => lower.includes(k))) return false
+  if (requireVeteranTitle && !REQUIRE_TITLE_KEYWORDS.some(k => lower.includes(k))) return false
   return true
 }
 
+const REPUTABLE_DOMAINS = [
+  'militarytimes.com', 'stripes.com', 'military.com', 'navytimes.com',
+  'airforcetimes.com', 'armytimes.com', 'marinecorpstimes.com', 'defensenews.com',
+  'npr.org', 'apnews.com', 'reuters.com', 'usatoday.com',
+  'propublica.org', 'govexec.com',
+].join(',')
+
 async function fetchNewsApi(apiKey: string): Promise<Article[]> {
   const queries = [
-    '"military veterans" homelessness OR housing OR clothing OR benefits',
-    '"veteran nonprofit" OR "veteran support" OR "veteran assistance" clothing OR housing',
+    'veteran homelessness OR housing OR clothing OR benefits',
+    'veteran nonprofit OR assistance OR support',
   ]
   const articles: Article[] = []
 
   for (const q of queries) {
     if (articles.length >= 3) break
-    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&language=en&sortBy=publishedAt&pageSize=5&apiKey=${apiKey}`
+    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&domains=${REPUTABLE_DOMAINS}&language=en&sortBy=publishedAt&pageSize=5&apiKey=${apiKey}`
     const res = await fetch(url)
     const data = await res.json()
 
@@ -77,7 +84,7 @@ async function fetchGNews(apiKey: string): Promise<Article[]> {
 
     for (const a of data.articles ?? []) {
       if (!a.url || !a.description || a.description.length < 50) continue
-      if (!isRelevant(a.title, a.url)) continue
+      if (!isRelevant(a.title, a.url, true)) continue
       if (articles.find(x => x.url === a.url)) continue
 
       articles.push({
