@@ -102,6 +102,9 @@ export default function DonationPage() {
             <a href="#request" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
               Request Pants
             </a>
+            <a href="#newsletter" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
+              Newsletter
+            </a>
             {/* Mobile hamburger */}
             <button
               className="sm:hidden flex flex-col gap-1.5 p-2"
@@ -135,6 +138,9 @@ export default function DonationPage() {
             </a>
             <a href="#request" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
               👖 Request Pants
+            </a>
+            <a href="#newsletter" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
+              📬 Newsletter
             </a>
             <a href="#donate" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-[#b22234] text-white font-bold hover:bg-[#8b0000] transition-colors">
               ❤️ Donate Now
@@ -743,7 +749,7 @@ export default function DonationPage() {
       </BlurFade>
 
       {/* FOOTER */}
-      <section className="py-16 px-6 bg-gray-950 border-t border-white/10">
+      <section id="newsletter" className="py-16 px-6 bg-gray-950 border-t border-white/10">
         <div className="max-w-2xl mx-auto text-center">
           <NewsletterSignup />
         </div>
