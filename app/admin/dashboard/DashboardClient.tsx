@@ -283,6 +283,9 @@ function NewsletterTab() {
   const [month, setMonth] = useState('')
   const [fromMateo, setFromMateo] = useState('')
   const [storyAngle, setStoryAngle] = useState('')
+  const [tweetImageUrl, setTweetImageUrl] = useState('')
+  const [tweetLink, setTweetLink] = useState('')
+  const [uploadingTweet, setUploadingTweet] = useState(false)
   const [sending, setSending] = useState(false)
   const [sentMsg, setSentMsg] = useState('')
 
@@ -343,6 +346,8 @@ function NewsletterTab() {
           fromMateo,
           storyAngle,
           articles: selected,
+          tweetImageUrl: tweetImageUrl || undefined,
+          tweetLink: tweetLink || undefined,
           subscribers: stats.subscribers ?? 0,
           totalShipped: stats.totalShipped ?? 0,
           requestsThisMonth: stats.requestsThisMonth ?? 0,
@@ -434,6 +439,46 @@ function NewsletterTab() {
         {selected.length > 0 && (
           <p className="text-xs text-purple-400 font-semibold mt-3">{selected.length} article{selected.length > 1 ? 's' : ''} selected</p>
         )}
+      </div>
+
+      {/* Newsletter content */}
+      {/* Featured X Post */}
+      <div className="space-y-4">
+        <h2 className="font-bold text-white text-base">🐦 Featured X Post</h2>
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Upload Screenshot</label>
+          <input
+            type="file"
+            accept="image/*"
+            className="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-700 file:text-white file:font-bold hover:file:bg-purple-600 cursor-pointer"
+            onChange={async (e) => {
+              const file = e.target.files?.[0]
+              if (!file) return
+              setUploadingTweet(true)
+              try {
+                const form = new FormData()
+                form.append('file', file)
+                const res = await fetch('/api/upload-tweet', { method: 'POST', body: form })
+                const data = await res.json()
+                if (data.url) setTweetImageUrl(data.url)
+                else alert('Upload failed')
+              } finally {
+                setUploadingTweet(false)
+              }
+            }}
+          />
+          {uploadingTweet && <p className="text-xs text-purple-400 mt-1">Uploading...</p>}
+          {tweetImageUrl && (
+            <div className="mt-2">
+              <img src={tweetImageUrl} alt="Tweet preview" className="rounded-lg max-w-sm border border-[#2a3d52]" />
+              <button onClick={() => setTweetImageUrl('')} className="text-xs text-red-400 hover:text-red-300 mt-1 block">Remove</button>
+            </div>
+          )}
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Link to Original Tweet (optional)</label>
+          <input className={inp} value={tweetLink} onChange={e => setTweetLink(e.target.value)} placeholder="https://x.com/..." />
+        </div>
       </div>
 
       {/* Newsletter content */}

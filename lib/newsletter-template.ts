@@ -13,6 +13,8 @@ export interface NewsletterData {
   fromMateo: string        // 2-3 sentence personal note
   storyAngle: string       // dignity-first story, no names
   articles: NewsletterArticle[]
+  tweetImageUrl?: string   // screenshot of featured X post
+  tweetLink?: string       // optional link to original tweet
   ctaUrl?: string
 }
 
@@ -203,6 +205,40 @@ export function buildNewsletterHtml(d: NewsletterData): string {
               </table>
             </td>
           </tr>
+
+          <!-- FEATURED X POST -->
+          ${d.tweetImageUrl ? `
+          <tr>
+            <td style="padding-bottom: 28px;">
+              <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+                <tr>
+                  <td style="padding-right:10px;vertical-align:middle;">
+                    <div style="width:3px;height:22px;background:#dc2626;border-radius:2px;"></div>
+                  </td>
+                  <td style="vertical-align:middle;">
+                    <p style="margin:0;font-size:10px;color:#dc2626;text-transform:uppercase;letter-spacing:2.5px;font-family:Arial,sans-serif;font-weight:bold;">Featured Post</p>
+                  </td>
+                </tr>
+              </table>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background:#161616;border-radius:12px;border:1px solid #2a2a2a;overflow:hidden;">
+                <tr>
+                  <td style="padding: 6px;">
+                    ${d.tweetLink
+                      ? `<a href="${escHtml(d.tweetLink)}" target="_blank" style="display:block;"><img src="${escHtml(d.tweetImageUrl)}" alt="Featured post from X" width="100%" style="display:block;border-radius:8px;max-width:100%;" /></a>`
+                      : `<img src="${escHtml(d.tweetImageUrl)}" alt="Featured post from X" width="100%" style="display:block;border-radius:8px;max-width:100%;" />`
+                    }
+                  </td>
+                </tr>
+                ${d.tweetLink ? `
+                <tr>
+                  <td align="right" style="padding: 8px 14px 10px 14px;">
+                    <a href="${escHtml(d.tweetLink)}" style="font-size:11px;color:#6b7280;text-decoration:none;font-family:Arial,sans-serif;">View on X →</a>
+                  </td>
+                </tr>` : ''}
+              </table>
+            </td>
+          </tr>` : ''}
 
           <!-- CTA -->
           <tr>
