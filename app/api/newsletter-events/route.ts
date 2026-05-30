@@ -22,10 +22,12 @@ export async function GET(req: NextRequest) {
   const events: VeteranEvent[] = []
 
   const searches = [
-    // Midwest — centered on Sioux Falls SD
-    { q: 'veteran', location: 'Sioux Falls, SD', within: '200mi' },
-    // National
-    { q: 'military veteran', location: 'United States', within: '2000mi' },
+    // Midwest fun events
+    { q: 'veteran run walk ride fundraiser', location: 'Sioux Falls, SD', within: '300mi' },
+    { q: 'military appreciation festival concert', location: 'Sioux Falls, SD', within: '300mi' },
+    // National fun events
+    { q: 'veteran charity golf tournament 5k', location: 'United States', within: '2000mi' },
+    { q: 'military appreciation festival expo', location: 'United States', within: '2000mi' },
   ]
 
   for (const s of searches) {
