@@ -9,13 +9,24 @@ interface Article {
   summary: string
 }
 
-const SKIP_DOMAINS = ['blogger.com', 'globenewswire.com', 'yardbarker.com', 'theadvocate.com']
-const SKIP_KEYWORDS = ['world cup', 'nfl', 'nba', 'nhl', 'mlb', 'saints', 'soccer', 'football team', 'sports']
+const SKIP_DOMAINS = [
+  'blogger.com', 'globenewswire.com', 'yardbarker.com', 'theadvocate.com',
+  'prnewswire.com', 'naturalnews.com', 'freerepublic.com', 'prweb.com',
+  'businesswire.com', 'accesswire.com', 'einpresswire.com',
+]
+const SKIP_TITLE_KEYWORDS = [
+  'world cup', 'nfl', 'nba', 'nhl', 'mlb', 'soccer', 'football team',
+  'wi-fi', 'airline', 'hot spot', 'pfas', 'insurance must cover',
+]
+const REQUIRE_TITLE_KEYWORDS = [
+  'veteran', 'veterans', 'military', 'va benefit', 'service member', 'armed forces',
+]
 
 function isRelevant(title: string, url: string): boolean {
   const lower = title.toLowerCase()
   if (SKIP_DOMAINS.some(d => url.includes(d))) return false
-  if (SKIP_KEYWORDS.some(k => lower.includes(k))) return false
+  if (SKIP_TITLE_KEYWORDS.some(k => lower.includes(k))) return false
+  if (!REQUIRE_TITLE_KEYWORDS.some(k => lower.includes(k))) return false
   return true
 }
 
