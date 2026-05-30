@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { RequestRow } from "@/lib/db";
 
-type Tab = "needs_call" | "pending" | "approved" | "denied";
+type Tab = "needs_call" | "pending" | "approved" | "denied" | "newsletter";
 
 interface Props {
   needsCall: RequestRow[];
@@ -263,7 +263,210 @@ const TAB_CONFIG: { id: Tab; label: string; emoji: string; color: string }[] = [
   { id: "pending", label: "Pending Review", emoji: "⏳", color: "text-blue-400 border-blue-500" },
   { id: "approved", label: "Approved / Shipped", emoji: "✅", color: "text-green-400 border-green-500" },
   { id: "denied", label: "Denied", emoji: "✗", color: "text-red-400 border-red-500" },
+  { id: "newsletter", label: "Newsletter", emoji: "📧", color: "text-purple-400 border-purple-500" },
 ];
+
+// ─── Newsletter Tab ──────────────────────────────────────────────────────────
+interface NewsArticle {
+  title: string
+  source: string
+  url: string
+  summary: string
+}
+
+function NewsletterTab() {
+  const [articles, setArticles] = useState<NewsArticle[]>([])
+  const [selected, setSelected] = useState<NewsArticle[]>([])
+  const [fetching, setFetching] = useState(false)
+  const [manualUrl, setManualUrl] = useState('')
+  const [fetchingUrl, setFetchingUrl] = useState(false)
+  const [month, setMonth] = useState('')
+  const [fromMateo, setFromMateo] = useState('')
+  const [storyAngle, setStoryAngle] = useState('')
+  const [sending, setSending] = useState(false)
+  const [sentMsg, setSentMsg] = useState('')
+
+  const fetchArticles = async () => {
+    setFetching(true)
+    try {
+      const res = await fetch('/api/newsletter-articles')
+      const data = await res.json()
+      setArticles(data.articles ?? [])
+    } catch {
+      alert('Failed to fetch articles')
+    } finally {
+      setFetching(false)
+    }
+  }
+
+  const fetchUrl = async () => {
+    if (!manualUrl.trim()) return
+    setFetchingUrl(true)
+    try {
+      const res = await fetch('/api/newsletter-fetch-article', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: manualUrl.trim() }),
+      })
+      const data = await res.json()
+      if (data.error) { alert(data.error); return }
+      const article: NewsArticle = { title: data.title, source: data.source, url: manualUrl.trim(), summary: data.summary }
+      setArticles(prev => [article, ...prev.filter(a => a.url !== article.url)])
+      setSelected(prev => [...prev.filter(a => a.url !== article.url), article])
+      setManualUrl('')
+    } catch {
+      alert('Could not fetch that URL')
+    } finally {
+      setFetchingUrl(false)
+    }
+  }
+
+  const toggleSelect = (a: NewsArticle) => {
+    setSelected(prev =>
+      prev.find(x => x.url === a.url) ? prev.filter(x => x.url !== a.url) : [...prev, a]
+    )
+  }
+
+  const sendNewsletter = async () => {
+    if (!month || !fromMateo || !storyAngle) { alert('Fill in Month, From Mateo, and Story fields first.'); return }
+    if (selected.length === 0) { alert('Select at least one article.'); return }
+    setSending(true)
+    setSentMsg('')
+    try {
+      const statsRes = await fetch('/api/newsletter-stats')
+      const stats = await statsRes.json()
+      const res = await fetch('/api/newsletter-send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          month,
+          fromMateo,
+          storyAngle,
+          articles: selected,
+          subscribers: stats.subscribers ?? 0,
+          totalShipped: stats.totalShipped ?? 0,
+          requestsThisMonth: stats.requestsThisMonth ?? 0,
+        }),
+      })
+      const data = await res.json()
+      if (data.ok) {
+        setSentMsg(`✅ Newsletter sent! Broadcast ID: ${data.broadcastId}`)
+        setMonth(''); setFromMateo(''); setStoryAngle(''); setSelected([])
+      } else {
+        alert(`Send failed: ${data.error}`)
+      }
+    } catch {
+      alert('Send failed — check console')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const inp = 'w-full rounded-xl border border-[#2a3d52] bg-[#0d1b2a] text-white text-sm px-4 py-3 focus:outline-none focus:border-purple-500'
+
+  return (
+    <div className="space-y-8 max-w-3xl">
+
+      {/* Articles */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-bold text-white text-base">📰 Articles</h2>
+          <button
+            onClick={fetchArticles}
+            disabled={fetching}
+            className="px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold transition-colors disabled:opacity-60"
+          >
+            {fetching ? 'Fetching...' : '↻ Auto-fetch Articles'}
+          </button>
+        </div>
+
+        {/* Manual URL add */}
+        <div className="flex gap-2 mb-4">
+          <input
+            className={`${inp} flex-1`}
+            placeholder="Paste article URL to add manually..."
+            value={manualUrl}
+            onChange={e => setManualUrl(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && fetchUrl()}
+          />
+          <button
+            onClick={fetchUrl}
+            disabled={fetchingUrl || !manualUrl.trim()}
+            className="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold transition-colors disabled:opacity-60 shrink-0"
+          >
+            {fetchingUrl ? '...' : '+ Add'}
+          </button>
+        </div>
+
+        {articles.length === 0 && (
+          <p className="text-slate-500 text-sm">No articles yet — auto-fetch or paste a URL above.</p>
+        )}
+
+        <div className="space-y-3">
+          {articles.map(a => {
+            const isSelected = !!selected.find(x => x.url === a.url)
+            return (
+              <div
+                key={a.url}
+                onClick={() => toggleSelect(a)}
+                className={`cursor-pointer rounded-xl border p-4 transition-colors ${
+                  isSelected ? 'border-purple-500 bg-purple-900/20' : 'border-[#2a3d52] bg-[#161616] hover:border-slate-500'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`mt-0.5 w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center text-xs ${
+                    isSelected ? 'bg-purple-600 border-purple-500 text-white' : 'border-slate-600'
+                  }`}>
+                    {isSelected && '✓'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-purple-400 font-bold uppercase tracking-wide mb-1">{a.source}</p>
+                    <p className="text-sm font-semibold text-white leading-snug mb-1">{a.title}</p>
+                    <p className="text-xs text-slate-400 line-clamp-2">{a.summary}</p>
+                    <a href={a.url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-xs text-purple-400 hover:underline mt-1 inline-block">Open →</a>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {selected.length > 0 && (
+          <p className="text-xs text-purple-400 font-semibold mt-3">{selected.length} article{selected.length > 1 ? 's' : ''} selected</p>
+        )}
+      </div>
+
+      {/* Newsletter content */}
+      <div className="space-y-4">
+        <h2 className="font-bold text-white text-base">✍️ Newsletter Content</h2>
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Month (e.g. June 2026) *</label>
+          <input className={inp} value={month} onChange={e => setMonth(e.target.value)} placeholder="June 2026" />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">From Mateo *</label>
+          <textarea className={`${inp} h-28 resize-none`} value={fromMateo} onChange={e => setFromMateo(e.target.value)} placeholder="2–3 sentence personal note from you..." />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">In the Field (Story) *</label>
+          <textarea className={`${inp} h-28 resize-none`} value={storyAngle} onChange={e => setStoryAngle(e.target.value)} placeholder="A dignity-first story — no names needed..." />
+        </div>
+      </div>
+
+      {/* Send */}
+      {sentMsg && (
+        <div className="p-4 rounded-xl bg-green-900/30 border border-green-700/50 text-green-400 text-sm font-semibold">{sentMsg}</div>
+      )}
+      <button
+        onClick={sendNewsletter}
+        disabled={sending}
+        className="w-full py-4 rounded-xl bg-purple-700 hover:bg-purple-600 text-white font-bold text-sm transition-colors disabled:opacity-60"
+      >
+        {sending ? 'Sending...' : '📧 Send Newsletter to All Subscribers'}
+      </button>
+    </div>
+  )
+}
 
 // ─── Manual Add Modal ────────────────────────────────────────────────────────
 function ManualAddModal({ onClose, onAdded }: { onClose: () => void; onAdded: (row: RequestRow) => void }) {
@@ -543,11 +746,12 @@ export default function DashboardClient({ needsCall, pending, approved, denied }
     }
   };
 
-  const counts = {
+  const counts: Record<string, number> = {
     needs_call: localNeedsCall.length,
     pending: localPending.length,
     approved: localApproved.length,
     denied: localDenied.length,
+    newsletter: 0,
   };
 
   const currentList = getList(activeTab);
@@ -624,19 +828,24 @@ export default function DashboardClient({ needsCall, pending, approved, denied }
           })}
         </div>
 
+        {/* Newsletter tab */}
+        {activeTab === 'newsletter' && <NewsletterTab />}
+
         {/* Request cards */}
-        {currentList.length === 0 ? (
-          <div className="text-center py-20 text-slate-500">
-            <div className="text-5xl mb-4">🎉</div>
-            <p className="text-lg font-semibold">Nothing here!</p>
-            <p className="text-sm mt-1">All clear in this queue.</p>
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {currentList.map((req) => (
-              <RequestCard key={req.id} req={req} onAction={handleAction} />
-            ))}
-          </div>
+        {activeTab !== 'newsletter' && (
+          currentList.length === 0 ? (
+            <div className="text-center py-20 text-slate-500">
+              <div className="text-5xl mb-4">🎉</div>
+              <p className="text-lg font-semibold">Nothing here!</p>
+              <p className="text-sm mt-1">All clear in this queue.</p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {currentList.map((req) => (
+                <RequestCard key={req.id} req={req} onAction={handleAction} />
+              ))}
+            </div>
+          )
         )}
       </div>
     </div>
