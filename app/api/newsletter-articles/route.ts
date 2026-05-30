@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const SECRET = proces…CRET
+const SECRET = process.env.NEWSLETTER_SECRET
 
 interface Article {
   title: string
@@ -89,7 +89,7 @@ async function fetchNewsApi(apiKey: string, needed: number): Promise<Article[]> 
   for (const q of queries) {
     if (articles.length >= needed) break
     try {
-      const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&language=en&sortBy=publishedAt&pageSize=10&apiKey=***
+      const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&language=en&sortBy=publishedAt&pageSize=10&apiKey=${apiKey}`
       const res = await fetch(url, { signal: AbortSignal.timeout(5000) })
       const data = await res.json()
 
@@ -125,7 +125,7 @@ async function fetchGNews(apiKey: string, needed: number): Promise<Article[]> {
   for (const q of queries) {
     if (articles.length >= needed) break
     try {
-      const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(q)}&lang=en&max=5&apikey=***
+      const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(q)}&lang=en&max=5&apikey=${apiKey}`
       const res = await fetch(url, { signal: AbortSignal.timeout(5000) })
       const data = await res.json()
 
