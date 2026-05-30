@@ -5,6 +5,14 @@ export interface NewsletterArticle {
   summary: string
 }
 
+export interface NewsletterEvent {
+  title: string
+  date: string
+  location: string
+  url: string
+  description: string
+}
+
 export interface NewsletterData {
   month: string            // e.g. "June 2026"
   subscribers: number
@@ -13,6 +21,7 @@ export interface NewsletterData {
   fromMateo: string        // 2-3 sentence personal note
   storyAngle: string       // dignity-first story, no names
   articles: NewsletterArticle[]
+  events?: NewsletterEvent[]   // upcoming military/veteran events
   tweetImageUrl?: string   // screenshot of featured X post
   tweetLink?: string       // optional link to original tweet
   ctaUrl?: string
@@ -205,6 +214,43 @@ export function buildNewsletterHtml(d: NewsletterData): string {
               </table>
             </td>
           </tr>
+
+          <!-- EVENTS -->
+          ${d.events && d.events.length > 0 ? `
+          <tr>
+            <td style="padding-bottom: 28px;">
+              <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+                <tr>
+                  <td style="padding-right:10px;vertical-align:middle;">
+                    <div style="width:3px;height:22px;background:#dc2626;border-radius:2px;"></div>
+                  </td>
+                  <td style="vertical-align:middle;">
+                    <p style="margin:0;font-size:10px;color:#dc2626;text-transform:uppercase;letter-spacing:2.5px;font-family:Arial,sans-serif;font-weight:bold;">Upcoming Events</p>
+                  </td>
+                </tr>
+              </table>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                ${d.events.map(ev => `
+                <tr>
+                  <td style="padding-bottom:12px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                           style="background:#161616;border-radius:10px;border:1px solid #2a2a2a;">
+                      <tr>
+                        <td style="padding:18px 20px;">
+                          <p style="margin:0 0 4px 0;font-size:11px;color:#dc2626;font-family:Arial,sans-serif;font-weight:bold;">${escHtml(ev.date)} &bull; ${escHtml(ev.location)}</p>
+                          <p style="margin:0 0 6px 0;font-size:15px;font-weight:bold;color:#f9fafb;font-family:Arial,sans-serif;line-height:1.3;">
+                            <a href="${escHtml(ev.url)}" style="color:#f9fafb;text-decoration:none;">${escHtml(ev.title)}</a>
+                          </p>
+                          ${ev.description ? `<p style="margin:0 0 8px 0;font-size:13px;color:#9ca3af;font-family:Arial,sans-serif;line-height:1.6;">${escHtml(ev.description)}</p>` : ''}
+                          <a href="${escHtml(ev.url)}" style="font-size:12px;color:#dc2626;text-decoration:none;font-family:Arial,sans-serif;font-weight:bold;">View event &rarr;</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>`).join('')}
+              </table>
+            </td>
+          </tr>` : ''}
 
           <!-- FEATURED X POST -->
           ${d.tweetImageUrl ? `

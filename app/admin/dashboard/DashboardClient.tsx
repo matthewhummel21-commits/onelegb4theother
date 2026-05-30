@@ -274,10 +274,21 @@ interface NewsArticle {
   summary: string
 }
 
+interface VeteranEvent {
+  title: string
+  date: string
+  location: string
+  url: string
+  description: string
+}
+
 function NewsletterTab() {
   const [articles, setArticles] = useState<NewsArticle[]>([])
   const [selected, setSelected] = useState<NewsArticle[]>([])
   const [fetching, setFetching] = useState(false)
+  const [events, setEvents] = useState<VeteranEvent[]>([])
+  const [selectedEvents, setSelectedEvents] = useState<VeteranEvent[]>([])
+  const [fetchingEvents, setFetchingEvents] = useState(false)
   const [manualUrl, setManualUrl] = useState('')
   const [fetchingUrl, setFetchingUrl] = useState(false)
   const [month, setMonth] = useState('')
@@ -288,6 +299,25 @@ function NewsletterTab() {
   const [uploadingTweet, setUploadingTweet] = useState(false)
   const [sending, setSending] = useState(false)
   const [sentMsg, setSentMsg] = useState('')
+
+  const fetchEvents = async () => {
+    setFetchingEvents(true)
+    try {
+      const res = await fetch('/api/newsletter-events')
+      const data = await res.json()
+      setEvents(data.events ?? [])
+    } catch {
+      alert('Failed to fetch events')
+    } finally {
+      setFetchingEvents(false)
+    }
+  }
+
+  const toggleEvent = (e: VeteranEvent) => {
+    setSelectedEvents(prev =>
+      prev.find(x => x.url === e.url) ? prev.filter(x => x.url !== e.url) : [...prev, e]
+    )
+  }
 
   const fetchArticles = async () => {
     setFetching(true)
@@ -346,6 +376,7 @@ function NewsletterTab() {
           fromMateo,
           storyAngle,
           articles: selected,
+          events: selectedEvents.length > 0 ? selectedEvents : undefined,
           tweetImageUrl: tweetImageUrl || undefined,
           tweetLink: tweetLink || undefined,
           subscribers: stats.subscribers ?? 0,
@@ -442,6 +473,54 @@ function NewsletterTab() {
       </div>
 
       {/* Newsletter content */}
+      {/* Events */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-bold text-white text-base">🎖️ Upcoming Events</h2>
+          <button
+            onClick={fetchEvents}
+            disabled={fetchingEvents}
+            className="px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold transition-colors disabled:opacity-60"
+          >
+            {fetchingEvents ? 'Fetching...' : '↻ Fetch Events'}
+          </button>
+        </div>
+        {events.length === 0 && (
+          <p className="text-slate-500 text-sm">No events yet — hit Fetch Events to pull from Eventbrite.</p>
+        )}
+        <div className="space-y-3">
+          {events.map(ev => {
+            const isSelected = !!selectedEvents.find(x => x.url === ev.url)
+            return (
+              <div
+                key={ev.url}
+                onClick={() => toggleEvent(ev)}
+                className={`cursor-pointer rounded-xl border p-4 transition-colors ${
+                  isSelected ? 'border-purple-500 bg-purple-900/20' : 'border-[#2a3d52] bg-[#161616] hover:border-slate-500'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`mt-0.5 w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center text-xs ${
+                    isSelected ? 'bg-purple-600 border-purple-500 text-white' : 'border-slate-600'
+                  }`}>
+                    {isSelected && '✓'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-red-400 font-bold mb-1">{ev.date} &bull; {ev.location}</p>
+                    <p className="text-sm font-semibold text-white leading-snug mb-1">{ev.title}</p>
+                    {ev.description && <p className="text-xs text-slate-400 line-clamp-2">{ev.description}</p>}
+                    <a href={ev.url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-xs text-purple-400 hover:underline mt-1 inline-block">View event →</a>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        {selectedEvents.length > 0 && (
+          <p className="text-xs text-purple-400 font-semibold mt-3">{selectedEvents.length} event{selectedEvents.length > 1 ? 's' : ''} selected</p>
+        )}
+      </div>
+
       {/* Featured X Post */}
       <div className="space-y-4">
         <h2 className="font-bold text-white text-base">🐦 Featured X Post</h2>
