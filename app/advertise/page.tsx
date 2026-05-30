@@ -3,100 +3,36 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 
-const PACKAGES = [
-  {
-    id: "patch",
-    name: "Patch",
-    price: 250,
-    priceDisplay: "$250",
-    tag: "",
-    summary: "Get your brand in front of our veteran community — one issue, real reach.",
-    deliverables: [
-      "Logo + link in 1 newsletter issue",
-      "Delivered within 30 days of purchase",
-    ],
-  },
-  {
-    id: "shield",
-    name: "Shield",
-    price: 750,
-    priceDisplay: "$750",
-    tag: "Popular",
-    summary: "Three issues plus a social shoutout. Solid exposure, low commitment.",
-    deliverables: [
-      "Logo + link in 3 newsletter issues",
-      "1 social media shoutout (Facebook/Instagram)",
-      "Delivered across 60–90 days",
-    ],
-  },
-  {
-    id: "standard",
-    name: "Standard",
-    price: 1500,
-    priceDisplay: "$1,500",
-    tag: "",
-    summary: "Half a year of newsletter placement and a featured sponsor spotlight.",
-    deliverables: [
-      "Logo + link in 6 newsletter issues",
-      "2 social media shoutouts",
-      "1 featured sponsor block in a newsletter issue",
-      "Delivered across 6 months",
-    ],
-  },
-  {
-    id: "commander",
-    name: "Commander",
-    price: 3000,
-    priceDisplay: "$3,000",
-    tag: "Best Value",
-    summary: "A full year of consistent presence — newsletter and social, month after month.",
-    deliverables: [
-      "Logo + link in 12 newsletter issues",
-      "4 social media shoutouts",
-      "2 featured sponsor blocks",
-      "Delivered across 12 months",
-    ],
-  },
-  {
-    id: "patriot",
-    name: "Patriot",
-    price: 5000,
-    priceDisplay: "$5,000",
-    tag: "Top Tier",
-    summary: "Full-year flagship sponsorship. Maximum visibility across every channel we run.",
-    deliverables: [
-      "Logo + link in every newsletter issue for 12 months",
-      "Monthly featured sponsor block (12 total)",
-      "6 social media posts dedicated to your business",
-      "Event shoutout at One Leg B4 the Other events",
-      "Personal thank-you from our President",
-    ],
-  },
+const TIERS = [
+  { id: "patch",     name: "Patch",     tagline: "Entry-level presence" },
+  { id: "shield",    name: "Shield",    tagline: "Growing reach" },
+  { id: "standard",  name: "Standard",  tagline: "Consistent visibility" },
+  { id: "commander", name: "Commander", tagline: "High-impact partnership" },
+  { id: "patriot",   name: "Patriot",   tagline: "Flagship sponsorship" },
 ];
 
 export default function AdvertisePage() {
-  const [loading, setLoading] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [form, setForm] = useState({ name: "", business: "", email: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
-  async function handleCheckout(pkg: typeof PACKAGES[0]) {
-    setLoading(pkg.id);
-    setError(null);
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selected) return;
+    setStatus("sending");
     try {
-      const res = await fetch("/api/checkout/advertise", {
+      const res = await fetch("/api/advertise-inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packageId: pkg.id }),
+        body: JSON.stringify({ ...form, tier: selected }),
       });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
+      if (res.ok) {
+        setStatus("sent");
       } else {
-        setError(data.error || "Something went wrong. Please try again.");
+        setStatus("error");
       }
     } catch {
-      setError("Network error. Please try again.");
-    } finally {
-      setLoading(null);
+      setStatus("error");
     }
   }
 
@@ -131,112 +67,135 @@ export default function AdvertisePage() {
             Advertise With a Purpose
           </h1>
           <p className="text-white/60 text-lg max-w-2xl mx-auto leading-relaxed">
-            Partner with One Leg B4 the Other and put your brand in front of a loyal, mission-driven community of veterans, donors, and supporters. Every dollar helps fund dignified clothing for veterans in need.
+            Partner with One Leg B4 the Other and put your brand in front of a loyal, mission-driven community of veterans, donors, and supporters. We offer several tiers of partnership — tell us which fits and we&apos;ll be in touch personally.
           </p>
         </motion.div>
       </section>
 
-      {/* Stats strip */}
-      <section className="py-8 px-6 border-y border-white/10 bg-white/5">
-        <div className="max-w-4xl mx-auto grid grid-cols-3 gap-6 text-center">
-          {[
-            { label: "Newsletter Subscribers", value: "142+" },
-            { label: "Veterans Served", value: "100+" },
-            { label: "Mission", value: "Dignity First" },
-          ].map((stat) => (
-            <div key={stat.label}>
-              <div className="text-2xl sm:text-3xl font-extrabold text-white">{stat.value}</div>
-              <div className="text-xs text-white/50 mt-1 font-medium uppercase tracking-wider">{stat.label}</div>
-            </div>
-          ))}
+      {/* Tier cards — names only */}
+      <section className="py-10 px-6">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-center text-white/40 text-sm mb-8 uppercase tracking-widest font-semibold">
+            Select a tier you&apos;re interested in
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {TIERS.map((tier, i) => (
+              <motion.button
+                key={tier.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.07 }}
+                onClick={() => setSelected(tier.id)}
+                className={`rounded-2xl border p-5 flex flex-col items-center gap-2 text-center transition-all cursor-pointer ${
+                  selected === tier.id
+                    ? "border-[#B22234] bg-[#B22234]/15 shadow-[0_0_0_2px_#B22234]"
+                    : "border-white/10 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.07]"
+                }`}
+              >
+                <span className="text-lg font-extrabold tracking-tight">{tier.name}</span>
+                <span className="text-xs text-white/40 leading-snug">{tier.tagline}</span>
+              </motion.button>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Packages */}
-      <section className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {PACKAGES.map((pkg, i) => {
-              const isTopTier = pkg.id === "patriot";
-              const isPopular = pkg.tag === "Popular" || pkg.tag === "Best Value";
-              return (
-                <motion.div
-                  key={pkg.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: i * 0.08 }}
-                  className={`relative rounded-2xl border p-6 flex flex-col gap-5 ${
-                    isTopTier
-                      ? "border-[#B22234] bg-[#B22234]/10"
-                      : isPopular
-                      ? "border-white/30 bg-white/5"
-                      : "border-white/10 bg-white/[0.03]"
-                  }`}
-                >
-                  {/* Tag badge */}
-                  {pkg.tag && (
-                    <span
-                      className={`absolute -top-3 left-6 text-xs font-bold px-3 py-1 rounded-full ${
-                        isTopTier
-                          ? "bg-[#B22234] text-white"
-                          : "bg-white text-black"
-                      }`}
-                    >
-                      {pkg.tag}
-                    </span>
-                  )}
-
-                  <div>
-                    <h2 className="text-xl font-extrabold tracking-tight">{pkg.name}</h2>
-                    <div className="text-3xl font-extrabold mt-1 text-white">{pkg.priceDisplay}</div>
-                    <p className="text-white/50 text-sm mt-2 leading-relaxed">{pkg.summary}</p>
-                  </div>
-
-                  <ul className="flex flex-col gap-2 flex-1">
-                    {pkg.deliverables.map((d) => (
-                      <li key={d} className="flex items-start gap-2 text-sm text-white/80">
-                        <span className="text-[#B22234] mt-0.5 shrink-0">✓</span>
-                        {d}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    onClick={() => handleCheckout(pkg)}
-                    disabled={loading === pkg.id}
-                    className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${
-                      isTopTier
-                        ? "bg-[#B22234] text-white hover:bg-[#8B1A27] disabled:opacity-60"
-                        : "bg-white text-black hover:bg-white/90 disabled:opacity-60"
-                    }`}
-                  >
-                    {loading === pkg.id ? "Redirecting…" : `Get ${pkg.name} — ${pkg.priceDisplay}`}
-                  </button>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {error && (
-            <p className="text-center text-red-400 text-sm mt-6">{error}</p>
-          )}
-
-          {/* Bottom note */}
-          <div className="mt-12 text-center text-white/40 text-sm max-w-xl mx-auto">
-            Questions about a custom package or want to talk before buying?{" "}
-            <a
-              href="mailto:matthew@onelegb4theother.com"
-              className="text-white/70 underline hover:text-white transition-colors"
+      {/* Contact form */}
+      <section className="py-12 px-6">
+        <div className="max-w-lg mx-auto">
+          {status === "sent" ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-16"
             >
-              Email us
-            </a>
-            . We&apos;re happy to work with you.
-          </div>
+              <div className="text-5xl mb-4">🎖️</div>
+              <h2 className="text-2xl font-extrabold mb-3">We&apos;ll be in touch.</h2>
+              <p className="text-white/50 leading-relaxed">
+                Thanks for reaching out. Someone from our team will contact you within 48 hours to talk through your sponsorship.
+              </p>
+              <a href="/" className="inline-block mt-8 text-sm text-white/40 hover:text-white/70 transition-colors underline">
+                Back to main site
+              </a>
+            </motion.div>
+          ) : (
+            <motion.form
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              onSubmit={handleSubmit}
+              className="flex flex-col gap-4"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/50 uppercase tracking-wider">Your Name</label>
+                  <input
+                    required
+                    type="text"
+                    placeholder="Jane Smith"
+                    value={form.name}
+                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/30 transition-colors"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-white/50 uppercase tracking-wider">Business Name</label>
+                  <input
+                    required
+                    type="text"
+                    placeholder="Acme Co."
+                    value={form.business}
+                    onChange={e => setForm(f => ({ ...f, business: e.target.value }))}
+                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/30 transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-white/50 uppercase tracking-wider">Email</label>
+                <input
+                  required
+                  type="email"
+                  placeholder="you@yourbusiness.com"
+                  value={form.email}
+                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/30 transition-colors"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-white/50 uppercase tracking-wider">Anything else? (optional)</label>
+                <textarea
+                  rows={3}
+                  placeholder="Tell us a bit about your business or what you're hoping to get out of the partnership..."
+                  value={form.message}
+                  onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                  className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/30 transition-colors resize-none"
+                />
+              </div>
+
+              {!selected && (
+                <p className="text-xs text-[#B22234] text-center">Select a tier above before submitting.</p>
+              )}
+
+              {status === "error" && (
+                <p className="text-xs text-red-400 text-center">Something went wrong — email us directly at matthew@onelegb4theother.com</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={!selected || status === "sending"}
+                className="w-full py-3.5 rounded-xl bg-[#B22234] text-white font-bold text-sm hover:bg-[#8B1A27] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                {status === "sending" ? "Sending…" : selected ? `Submit — ${TIERS.find(t => t.id === selected)?.name} Tier` : "Submit Inquiry"}
+              </button>
+            </motion.form>
+          )}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 py-10 px-6 text-center text-white/30 text-sm">
+      <footer className="border-t border-white/10 py-10 px-6 text-center text-white/30 text-sm mt-8">
         <p>One Leg B4 the Other · EIN 99-3332965 · 230 S Phillips Ave Suite 203, Sioux Falls SD 57104</p>
         <p className="mt-1">
           <a href="/" className="hover:text-white/60 transition-colors">← Back to main site</a>
