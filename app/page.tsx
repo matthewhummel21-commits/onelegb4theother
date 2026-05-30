@@ -99,6 +99,9 @@ export default function DonationPage() {
             <a href="/shop" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
               Shop
             </a>
+            <a href="/advertise" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
+              Advertise
+            </a>
             <a href="#request" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
               Request Pants
             </a>
@@ -135,6 +138,9 @@ export default function DonationPage() {
           <div className="flex flex-col p-4 gap-3">
             <a href="/shop" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
               🛍️ Shop - Issued With Honor Tee
+            </a>
+            <a href="/advertise" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
+              📣 Advertise With Us
             </a>
             <a href="#request" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
               👖 Request Pants
