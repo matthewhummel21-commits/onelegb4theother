@@ -13,6 +13,14 @@ export interface NewsletterEvent {
   description: string
 }
 
+export interface NewsletterSponsor {
+  name: string
+  logoUrl?: string
+  tagline: string
+  url: string
+  tier?: 'presenting' | 'supporting' | 'community'
+}
+
 export interface NewsletterData {
   month: string            // e.g. "June 2026"
   subscribers: number
@@ -22,8 +30,13 @@ export interface NewsletterData {
   storyAngle: string       // dignity-first story, no names
   articles: NewsletterArticle[]
   events?: NewsletterEvent[]   // upcoming military/veteran events
-  tweetImageUrl?: string   // screenshot of featured X post
-  tweetLink?: string       // optional link to original tweet
+  veteranSpotlight?: string    // anonymous dignity-first story
+  didYouKnow?: string          // one sharp veteran statistic
+  behindScenes?: string        // raw note from Mateo on the week
+  howToHelp?: string[]         // ways to help beyond donating
+  sponsors?: NewsletterSponsor[] // paid partner spotlights
+  tweetImageUrl?: string       // screenshot of featured X post
+  tweetLink?: string           // optional link to original tweet
   ctaUrl?: string
 }
 
@@ -195,6 +208,128 @@ export function buildNewsletterHtml(d: NewsletterData): string {
               </table>
             </td>
           </tr>
+
+          <!-- VETERAN SPOTLIGHT -->
+          ${d.veteranSpotlight ? `
+          <tr>
+            <td style="padding-bottom: 20px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background:linear-gradient(135deg,#1a1a1a,#1c1008);border-radius:12px;border:1px solid #3d2c00;overflow:hidden;">
+                <tr><td style="height:3px;background:linear-gradient(90deg,#b45309,#d97706);"></td></tr>
+                <tr>
+                  <td style="padding:28px 30px;">
+                    <p style="margin:0 0 14px 0;font-size:10px;color:#d97706;text-transform:uppercase;letter-spacing:2.5px;font-family:Arial,sans-serif;font-weight:bold;">Veteran Spotlight</p>
+                    <p style="margin:0;font-size:15px;color:#e5e7eb;font-family:Georgia,serif;line-height:1.9;font-style:italic;">&ldquo;${escHtml(d.veteranSpotlight)}&rdquo;</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>` : ''}
+
+          <!-- DID YOU KNOW -->
+          ${d.didYouKnow ? `
+          <tr>
+            <td style="padding-bottom: 20px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background:#161616;border-radius:12px;border:1px solid #2a2a2a;">
+                <tr>
+                  <td style="padding:20px 28px;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td style="width:44px;vertical-align:top;padding-right:16px;">
+                          <div style="width:44px;height:44px;border-radius:50%;background:#dc2626;text-align:center;line-height:44px;font-size:20px;">💡</div>
+                        </td>
+                        <td style="vertical-align:middle;">
+                          <p style="margin:0 0 4px 0;font-size:10px;color:#dc2626;text-transform:uppercase;letter-spacing:2px;font-family:Arial,sans-serif;font-weight:bold;">Did You Know?</p>
+                          <p style="margin:0;font-size:15px;color:#f9fafb;font-family:Arial,sans-serif;line-height:1.6;font-weight:bold;">${escHtml(d.didYouKnow)}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>` : ''}
+
+          <!-- BEHIND THE SCENES -->
+          ${d.behindScenes ? `
+          <tr>
+            <td style="padding-bottom: 20px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background:#161616;border-radius:12px;border:1px solid #2a2a2a;">
+                <tr>
+                  <td style="padding:24px 28px;">
+                    <p style="margin:0 0 12px 0;font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:2px;font-family:Arial,sans-serif;font-weight:bold;">Behind the Scenes</p>
+                    <p style="margin:0;font-size:14px;color:#d1d5db;font-family:Arial,sans-serif;line-height:1.8;">${escHtml(d.behindScenes)}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>` : ''}
+
+          <!-- HOW TO HELP -->
+          ${d.howToHelp && d.howToHelp.length > 0 ? `
+          <tr>
+            <td style="padding-bottom: 20px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background:#161616;border-radius:12px;border:1px solid #2a2a2a;">
+                <tr>
+                  <td style="padding:24px 28px;">
+                    <p style="margin:0 0 16px 0;font-size:10px;color:#dc2626;text-transform:uppercase;letter-spacing:2.5px;font-family:Arial,sans-serif;font-weight:bold;">Ways to Help</p>
+                    ${d.howToHelp.map((h, i) => `
+                    <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
+                      <tr>
+                        <td style="width:24px;vertical-align:top;padding-right:10px;">
+                          <div style="width:24px;height:24px;border-radius:50%;background:#dc2626;text-align:center;line-height:24px;font-size:11px;font-weight:bold;color:#fff;font-family:Arial,sans-serif;">${i + 1}</div>
+                        </td>
+                        <td style="vertical-align:middle;">
+                          <p style="margin:0;font-size:14px;color:#d1d5db;font-family:Arial,sans-serif;line-height:1.6;">${escHtml(h)}</p>
+                        </td>
+                      </tr>
+                    </table>`).join('')}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>` : ''}
+
+          <!-- SPONSORS -->
+          ${d.sponsors && d.sponsors.length > 0 ? `
+          <tr>
+            <td style="padding-bottom: 20px;">
+              <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+                <tr>
+                  <td style="padding-right:10px;vertical-align:middle;">
+                    <div style="width:3px;height:22px;background:#6b7280;border-radius:2px;"></div>
+                  </td>
+                  <td style="vertical-align:middle;">
+                    <p style="margin:0;font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:2.5px;font-family:Arial,sans-serif;font-weight:bold;">Our Partners</p>
+                  </td>
+                </tr>
+              </table>
+              ${d.sponsors.map(s => `
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background:#161616;border-radius:10px;border:1px solid #2a2a2a;margin-bottom:12px;">
+                <tr>
+                  <td style="padding:20px 22px;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        ${s.logoUrl ? `<td style="width:56px;vertical-align:middle;padding-right:16px;"><img src="${escHtml(s.logoUrl)}" alt="${escHtml(s.name)}" width="48" height="48" style="display:block;border-radius:8px;object-fit:cover;" /></td>` : ''}
+                        <td style="vertical-align:middle;">
+                          <p style="margin:0 0 2px 0;font-size:13px;font-weight:bold;color:#f9fafb;font-family:Arial,sans-serif;">${escHtml(s.name)}</p>
+                          <p style="margin:0;font-size:12px;color:#9ca3af;font-family:Arial,sans-serif;line-height:1.5;">${escHtml(s.tagline)}</p>
+                        </td>
+                        <td style="text-align:right;vertical-align:middle;white-space:nowrap;padding-left:12px;">
+                          <a href="${escHtml(s.url)}" style="display:inline-block;font-size:11px;font-weight:bold;color:#fff;background:#374151;text-decoration:none;padding:8px 16px;border-radius:6px;font-family:Arial,sans-serif;">Visit &rarr;</a>
+                        </td>
+                      </tr>
+                    </table>
+                    <p style="margin:8px 0 0 0;font-size:9px;color:#374151;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:1px;">Paid Partner</p>
+                  </td>
+                </tr>
+              </table>`).join('')}
+            </td>
+          </tr>` : ''}
 
           <!-- WHAT WE'RE READING -->
           <tr>

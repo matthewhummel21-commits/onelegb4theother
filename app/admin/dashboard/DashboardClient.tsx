@@ -297,6 +297,12 @@ function NewsletterTab() {
   const [tweetImageUrl, setTweetImageUrl] = useState('')
   const [tweetLink, setTweetLink] = useState('')
   const [uploadingTweet, setUploadingTweet] = useState(false)
+  const [veteranSpotlight, setVeteranSpotlight] = useState('')
+  const [didYouKnow, setDidYouKnow] = useState('')
+  const [behindScenes, setBehindScenes] = useState('')
+  const [howToHelp, setHowToHelp] = useState('Share this email\nBuy a shirt from our shop\nRefer a veteran who needs help\nVolunteer or donate')
+  const [sponsors, setSponsors] = useState<{name:string;logoUrl:string;tagline:string;url:string}[]>([])
+  const [newSponsor, setNewSponsor] = useState({name:'',logoUrl:'',tagline:'',url:''})
   const [sending, setSending] = useState(false)
   const [sentMsg, setSentMsg] = useState('')
 
@@ -377,6 +383,11 @@ function NewsletterTab() {
           storyAngle,
           articles: selected,
           events: selectedEvents.length > 0 ? selectedEvents : undefined,
+          veteranSpotlight: veteranSpotlight || undefined,
+          didYouKnow: didYouKnow || undefined,
+          behindScenes: behindScenes || undefined,
+          howToHelp: howToHelp ? howToHelp.split('\n').filter(Boolean) : undefined,
+          sponsors: sponsors.length > 0 ? sponsors : undefined,
           tweetImageUrl: tweetImageUrl || undefined,
           tweetLink: tweetLink || undefined,
           subscribers: stats.subscribers ?? 0,
@@ -574,6 +585,70 @@ function NewsletterTab() {
         <div>
           <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">In the Field (Story) *</label>
           <textarea className={`${inp} h-28 resize-none`} value={storyAngle} onChange={e => setStoryAngle(e.target.value)} placeholder="A dignity-first story — no names needed..." />
+        </div>
+      </div>
+
+      {/* Veteran Spotlight */}
+      <div className="space-y-3">
+        <h2 className="font-bold text-white text-base">🎖️ Veteran Spotlight</h2>
+        <p className="text-xs text-slate-500">Anonymous dignity-first story. No names needed.</p>
+        <textarea className={`${inp} h-28 resize-none`} value={veteranSpotlight} onChange={e => setVeteranSpotlight(e.target.value)} placeholder="A veteran in his late 50s reached out this week..." />
+      </div>
+
+      {/* Did You Know */}
+      <div className="space-y-3">
+        <h2 className="font-bold text-white text-base">💡 Did You Know?</h2>
+        <input className={inp} value={didYouKnow} onChange={e => setDidYouKnow(e.target.value)} placeholder="40,000 veterans experience homelessness on any given night in America." />
+      </div>
+
+      {/* Behind the Scenes */}
+      <div className="space-y-3">
+        <h2 className="font-bold text-white text-base">🔧 Behind the Scenes</h2>
+        <p className="text-xs text-slate-500">Raw, real — what your week actually looked like.</p>
+        <textarea className={`${inp} h-24 resize-none`} value={behindScenes} onChange={e => setBehindScenes(e.target.value)} placeholder="This week I drove out to Rapid City to hand-deliver..." />
+      </div>
+
+      {/* How to Help */}
+      <div className="space-y-3">
+        <h2 className="font-bold text-white text-base">🤝 Ways to Help</h2>
+        <p className="text-xs text-slate-500">One item per line.</p>
+        <textarea className={`${inp} h-28 resize-none`} value={howToHelp} onChange={e => setHowToHelp(e.target.value)} />
+      </div>
+
+      {/* Sponsors */}
+      <div className="space-y-4">
+        <h2 className="font-bold text-white text-base">🤝 Partners / Sponsors</h2>
+        <p className="text-xs text-slate-500">Paid partner placements. Add one at a time.</p>
+
+        {sponsors.length > 0 && (
+          <div className="space-y-2">
+            {sponsors.map((s, i) => (
+              <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-[#161616] border border-[#2a3d52]">
+                <div>
+                  <p className="text-sm font-bold text-white">{s.name}</p>
+                  <p className="text-xs text-slate-400">{s.tagline}</p>
+                </div>
+                <button onClick={() => setSponsors(prev => prev.filter((_, j) => j !== i))} className="text-xs text-red-400 hover:text-red-300 ml-4">Remove</button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="space-y-2 p-4 rounded-xl bg-[#161616] border border-[#2a3d52]">
+          <input className={inp} placeholder="Business name *" value={newSponsor.name} onChange={e => setNewSponsor(p => ({...p, name: e.target.value}))} />
+          <input className={inp} placeholder="Tagline / message (1-2 sentences) *" value={newSponsor.tagline} onChange={e => setNewSponsor(p => ({...p, tagline: e.target.value}))} />
+          <input className={inp} placeholder="Website URL *" value={newSponsor.url} onChange={e => setNewSponsor(p => ({...p, url: e.target.value}))} />
+          <input className={inp} placeholder="Logo image URL (optional)" value={newSponsor.logoUrl} onChange={e => setNewSponsor(p => ({...p, logoUrl: e.target.value}))} />
+          <button
+            onClick={() => {
+              if (!newSponsor.name || !newSponsor.tagline || !newSponsor.url) return
+              setSponsors(prev => [...prev, newSponsor])
+              setNewSponsor({name:'',logoUrl:'',tagline:'',url:''})
+            }}
+            className="w-full py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-sm font-bold transition-colors"
+          >
+            + Add Sponsor
+          </button>
         </div>
       </div>
 
