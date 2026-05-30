@@ -22,11 +22,11 @@ const REQUIRE_TITLE_KEYWORDS = [
   'veteran', 'veterans', 'military', 'va benefit', 'service member', 'armed forces',
 ]
 
-function isRelevant(title: string, url: string, requireVeteranTitle = false): boolean {
+function isRelevant(title: string, url: string): boolean {
   const lower = title.toLowerCase()
   if (SKIP_DOMAINS.some(d => url.includes(d))) return false
   if (SKIP_TITLE_KEYWORDS.some(k => lower.includes(k))) return false
-  if (requireVeteranTitle && !REQUIRE_TITLE_KEYWORDS.some(k => lower.includes(k))) return false
+  if (!REQUIRE_TITLE_KEYWORDS.some(k => lower.includes(k))) return false
   return true
 }
 
@@ -84,7 +84,7 @@ async function fetchGNews(apiKey: string): Promise<Article[]> {
 
     for (const a of data.articles ?? []) {
       if (!a.url || !a.description || a.description.length < 50) continue
-      if (!isRelevant(a.title, a.url, true)) continue
+      if (!isRelevant(a.title, a.url)) continue
       if (articles.find(x => x.url === a.url)) continue
 
       articles.push({
