@@ -30,23 +30,17 @@ function isRelevant(title: string, url: string): boolean {
   return true
 }
 
-const REPUTABLE_DOMAINS = [
-  'militarytimes.com', 'stripes.com', 'military.com', 'navytimes.com',
-  'airforcetimes.com', 'armytimes.com', 'marinecorpstimes.com', 'defensenews.com',
-  'npr.org', 'apnews.com', 'reuters.com', 'usatoday.com',
-  'propublica.org', 'govexec.com',
-].join(',')
-
 async function fetchNewsApi(apiKey: string): Promise<Article[]> {
   const queries = [
-    'veteran homelessness OR housing OR clothing OR benefits',
-    'veteran nonprofit OR assistance OR support',
+    'veterans homelessness OR housing OR clothing OR benefits',
+    'veterans nonprofit OR assistance OR legislation',
+    'military veterans VA benefits OR healthcare OR housing',
   ]
   const articles: Article[] = []
 
   for (const q of queries) {
     if (articles.length >= 3) break
-    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&domains=${REPUTABLE_DOMAINS}&language=en&sortBy=publishedAt&pageSize=5&apiKey=${apiKey}`
+    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&language=en&sortBy=publishedAt&pageSize=10&apiKey=${apiKey}`
     const res = await fetch(url)
     const data = await res.json()
 
