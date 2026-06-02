@@ -705,6 +705,9 @@ export default function DonationPage() {
           {/* Photo grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {[
+              { src: "/images/pants-delivery-june2026-1.jpg", label: "Delivering With Honor" },
+              { src: "/images/pants-delivery-june2026-2.jpg", label: "Hands-On Mission" },
+              { src: "/images/pants-delivery-june2026-3.jpg", label: "Veteran to Veteran" },
               { src: "/images/delivery-day-kevin.jpg", label: "Delivery Day" },
               { src: "/images/team-office-shirts.jpg", label: "Smiles & Handshakes" },
               { src: "/images/team-selfie-office.jpg", label: "The Team" },
