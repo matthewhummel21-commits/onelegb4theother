@@ -1,5 +1,0 @@
-allowBuilds:
-  better-sqlite3: set this to true or false
-  msw: true
-  sharp: true
-  unrs-resolver: true
