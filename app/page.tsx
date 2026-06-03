@@ -108,6 +108,9 @@ export default function DonationPage() {
             <a href="#newsletter" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
               Newsletter
             </a>
+            <a href="/admin" className="hidden sm:flex items-center px-3 py-2 rounded-xl border border-white/10 text-white/40 hover:text-white/70 hover:border-white/20 transition-colors text-xs font-mono" title="Admin">
+              ⚙️
+            </a>
             {/* Mobile hamburger */}
             <button
               className="sm:hidden flex flex-col gap-1.5 p-2"
