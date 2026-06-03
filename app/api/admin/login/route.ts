@@ -6,11 +6,7 @@ export async function POST(req: NextRequest) {
     const { password } = await req.json();
 
     if (!password || password !== process.env.ADMIN_PASSWORD) {
-      return NextResponse.json({
-        error: "Invalid password",
-        debug_hasEnvVar: !!process.env.ADMIN_PASSWORD,
-        debug_envLength: process.env.ADMIN_PASSWORD?.length ?? 0,
-      }, { status: 401 });
+      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
     const cookieStore = await cookies();
