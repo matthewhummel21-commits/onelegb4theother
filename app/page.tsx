@@ -96,24 +96,12 @@ export default function DonationPage() {
             <span className="text-white font-extrabold text-lg tracking-tight">One Leg B4 the Other</span>
           </div>
           <div className="flex items-center gap-3">
-            <a href="/shop" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
-              Shop
-            </a>
-            <a href="/advertise" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
-              Advertise
-            </a>
-            <a href="#request" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
-              Request Pants
-            </a>
-            <a href="#newsletter" className="hidden sm:flex items-center px-4 py-2 rounded-xl bg-secondary border border-white/20 text-white text-sm font-bold hover:bg-secondary/80 transition-colors">
-              Newsletter
-            </a>
-            <a href="/admin" className="hidden sm:flex items-center px-3 py-2 rounded-xl border border-white/10 text-white/40 hover:text-white/70 hover:border-white/20 transition-colors text-xs font-mono" title="Admin">
+            <a href="/admin" className="flex items-center px-3 py-2 rounded-xl border border-white/10 text-white/40 hover:text-white/70 hover:border-white/20 transition-colors text-xs font-mono" title="Admin">
               ⚙️
             </a>
-            {/* Mobile hamburger */}
+            {/* Hamburger — all screen sizes */}
             <button
-              className="sm:hidden flex flex-col gap-1.5 p-2"
+              className="flex flex-col gap-1.5 p-2"
               onClick={() => setMobileMenuOpen((o) => !o)}
               aria-label="Menu"
             >
@@ -137,7 +125,7 @@ export default function DonationPage() {
 
       {/* MOBILE MENU */}
       {mobileMenuOpen && (
-        <div className="fixed top-[65px] left-0 right-0 z-40 bg-black/95 backdrop-blur-md border-b border-white/10 sm:hidden">
+        <div className="fixed top-[65px] left-0 right-0 z-40 bg-black/95 backdrop-blur-md border-b border-white/10">
           <div className="flex flex-col p-4 gap-3">
             <a href="/shop" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
               🛍️ Shop - Issued With Honor Tee
