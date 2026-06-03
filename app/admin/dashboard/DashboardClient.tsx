@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { RequestRow } from "@/lib/db";
 
-type Tab = "needs_call" | "pending" | "approved" | "denied" | "newsletter" | "wavebot";
+type Tab = "needs_call" | "pending" | "approved" | "denied" | "newsletter";
 
 interface Props {
   needsCall: RequestRow[];
@@ -264,7 +264,7 @@ const TAB_CONFIG: { id: Tab; label: string; emoji: string; color: string }[] = [
   { id: "approved", label: "Approved / Shipped", emoji: "✅", color: "text-green-400 border-green-500" },
   { id: "denied", label: "Denied", emoji: "✗", color: "text-red-400 border-red-500" },
   { id: "newsletter", label: "Newsletter", emoji: "📧", color: "text-purple-400 border-purple-500" },
-  { id: "wavebot", label: "Wave Bot", emoji: "🌊", color: "text-cyan-400 border-cyan-500" },
+
 ];
 
 // ─── Newsletter Tab ──────────────────────────────────────────────────────────
@@ -283,171 +283,6 @@ interface VeteranEvent {
   description: string
 }
 
-// ─── Wave Bot Tab ───────────────────────────────────────────────────────────
-
-const BOT_ADDRESS  = 'rBsRhY1Kg85rUjfWyT1f4L54aHojGArzGY';
-const RPLS_ISSUER  = 'r93hE5FNShDdUqazHzNvwsCxL9mSqwyiru';
-const RPLS_HEX     = '52504C5300000000000000000000000000000000';
-const MORSE_SEQ    = [3,3,3,7,3,1,7,1,11,1,3,1,1,7,1,7,3,3,1,11,1,3,11,1,1,1,7,1,3,7,1,3,1,1,7,1,1,3,7,3,7,1];
-const MORSE_LABEL: Record<number,string> = {1:'·',3:'—',7:'[L]',11:'[W]'};
-
-type BotState = {
-  xrp: number; rpls: number;
-  sells: {price: number; amount: number}[];
-  buys:  {price: number; amount: number}[];
-  lastUpdated: string;
-  error?: string;
-};
-
-function WaveBotTab() {
-  const [state, setState] = useState<BotState | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [morseIdx, setMorseIdx] = useState(0);
-
-  async function fetchStatus() {
-    try {
-      const res = await fetch('/api/bot-status');
-      const data = await res.json();
-      setState(data);
-      setMorseIdx(data.morseIdx ?? 0);
-    } catch {
-      setState(prev => prev ? { ...prev, error: 'Fetch failed' } : null);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    fetchStatus();
-    const iv = setInterval(fetchStatus, 15000);
-    return () => clearInterval(iv);
-  }, []);
-
-  if (loading) return (
-    <div className="flex items-center justify-center py-32 text-slate-400">
-      <div className="text-center">
-        <div className="text-4xl mb-3 animate-pulse">🌊</div>
-        <p>Connecting to XRPL…</p>
-      </div>
-    </div>
-  );
-
-  if (!state) return <div className="text-center py-20 text-red-400">Could not load bot status.</div>;
-
-  const allOrders = [
-    ...state.sells.map(o => ({ ...o, side: 'sell' as const })),
-    ...state.buys.map(o  => ({ ...o, side: 'buy' as const })),
-  ].sort((a, b) => b.price - a.price);
-
-  const midPrice = state.sells.length && state.buys.length
-    ? (Math.min(...state.sells.map(o=>o.price)) + Math.max(...state.buys.map(o=>o.price))) / 2
-    : state.sells.length ? Math.min(...state.sells.map(o=>o.price)) * 0.98
-    : null;
-
-  const morseProgress = Math.round((morseIdx / MORSE_SEQ.length) * 100);
-
-  return (
-    <div className="space-y-6 py-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-extrabold text-white tracking-tight">🌊 RPLS Wave Machine</h2>
-          <p className="text-xs text-slate-400 mt-0.5 font-mono">{BOT_ADDRESS}</p>
-        </div>
-        <button onClick={fetchStatus} className="text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-800 px-3 py-1.5 rounded-lg transition-colors">
-          ↻ Refresh
-        </button>
-      </div>
-
-      {/* Balances */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
-          <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">XRP Balance</div>
-          <div className="text-2xl font-extrabold text-white">{state.xrp.toFixed(2)}</div>
-          <div className="text-xs text-slate-500 mt-1">XRP</div>
-        </div>
-        <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
-          <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">RPLS Balance</div>
-          <div className="text-2xl font-extrabold text-cyan-400">{state.rpls.toLocaleString()}</div>
-          <div className="text-xs text-slate-500 mt-1">RPLS tokens</div>
-        </div>
-      </div>
-
-      {/* Order ladder */}
-      <div className="bg-slate-800/60 rounded-xl border border-slate-700 overflow-hidden">
-        <div className="px-4 py-3 border-b border-slate-700">
-          <span className="text-sm font-bold text-white">Order Book</span>
-          <span className="text-xs text-slate-500 ml-2">live on XRPL DEX</span>
-        </div>
-        <div className="divide-y divide-slate-700/50">
-          {allOrders.length === 0 && (
-            <div className="text-center py-8 text-slate-500 text-sm">No open orders — bot rebuilding…</div>
-          )}
-          {allOrders.map((o, i) => {
-            const isSell = o.side === 'sell';
-            const isNearMid = midPrice && Math.abs(o.price - midPrice) / midPrice < 0.025;
-            return (
-              <div key={i} className={`flex items-center justify-between px-4 py-2.5 ${
-                isSell ? 'bg-red-950/20' : 'bg-green-950/20'
-              }`}>
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs font-bold w-8 ${isSell ? 'text-red-400' : 'text-green-400'}`}>
-                    {isSell ? 'SELL' : 'BUY'}
-                  </span>
-                  <span className="text-white font-mono text-sm">{o.price.toFixed(8)}</span>
-                  {isNearMid && <span className="text-xs text-yellow-400 bg-yellow-900/30 px-1.5 py-0.5 rounded">near mid</span>}
-                </div>
-                <span className="text-slate-300 text-sm font-mono">{o.amount.toLocaleString()} RPLS</span>
-              </div>
-            );
-          })}
-          {midPrice && (
-            <div className="flex items-center justify-between px-4 py-2 bg-yellow-900/20 border-y border-yellow-800/40">
-              <span className="text-xs font-bold text-yellow-400">⚡ MID</span>
-              <span className="text-yellow-300 font-mono text-sm">{midPrice.toFixed(8)}</span>
-              <span className="text-xs text-slate-500">estimated</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Morse progress */}
-      <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-bold text-white">🔤 Morse Sequence</span>
-          <span className="text-xs text-slate-400">{morseIdx}/{MORSE_SEQ.length} — {morseProgress}%</span>
-        </div>
-        <div className="text-xs font-mono text-slate-300 mb-3 leading-relaxed tracking-widest">
-          {MORSE_SEQ.map((v,i) => (
-            <span key={i} className={`mr-1 ${
-              i < morseIdx ? 'text-cyan-400' :
-              i === morseIdx ? 'text-yellow-300 bg-yellow-900/40 px-0.5 rounded' :
-              'text-slate-600'
-            }`}>{MORSE_LABEL[v]}</span>
-          ))}
-        </div>
-        <div className="w-full bg-slate-700 rounded-full h-1.5">
-          <div className="bg-cyan-500 h-1.5 rounded-full transition-all" style={{width:`${morseProgress}%`}} />
-        </div>
-        <p className="text-xs text-slate-500 mt-2 text-center tracking-widest">O N E &nbsp; L E G &nbsp; A &nbsp; S A L U T E</p>
-      </div>
-
-      {/* Links */}
-      <div className="flex gap-3">
-        <a href={`https://horizonxrpl.com/account/${BOT_ADDRESS}`} target="_blank" rel="noopener noreferrer"
-          className="flex-1 text-center text-xs py-2.5 rounded-lg border border-slate-600 text-slate-300 hover:border-cyan-600 hover:text-cyan-300 transition-colors">
-          View on Horizon ↗
-        </a>
-        <a href={`https://xrpl.to/token/${RPLS_ISSUER}-${RPLS_HEX}`} target="_blank" rel="noopener noreferrer"
-          className="flex-1 text-center text-xs py-2.5 rounded-lg border border-slate-600 text-slate-300 hover:border-cyan-600 hover:text-cyan-300 transition-colors">
-          RPLS on XRPL.to ↗
-        </a>
-      </div>
-
-      <p className="text-center text-xs text-slate-600">Auto-refreshes every 15s · Last: {state.lastUpdated}</p>
-    </div>
-  );
-}
 
 function NewsletterTab() {
   const [articles, setArticles] = useState<NewsArticle[]>([])
@@ -1196,9 +1031,6 @@ export default function DashboardClient({ needsCall, pending, approved, denied }
 
         {/* Newsletter tab */}
         {activeTab === 'newsletter' && <NewsletterTab />}
-
-        {/* Wave Bot tab */}
-        {activeTab === 'wavebot' && <WaveBotTab />}
 
         {/* Request cards */}
         {activeTab !== 'newsletter' && (
