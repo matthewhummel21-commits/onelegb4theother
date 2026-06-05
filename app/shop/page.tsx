@@ -82,7 +82,6 @@ const PRODUCTS = [
     subtitle: "All-over print · Logo on back",
     price: 4000,
     colors: [
-      { key: "Black", label: "Black", hex: "#1A1A1A", img: "/shorts-pj-black-mockup.jpg" },
       { key: "White", label: "White", hex: "#F5F5F5", img: "/shorts-pj-white-mockup.jpg" },
     ],
     sizes: ["XS","S","M","L","XL","2XL"],

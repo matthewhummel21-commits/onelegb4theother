@@ -31,9 +31,8 @@ const FLEECE_VARIANTS: Record<string, Record<string, number>> = {
   "Heather Grey": { S: 5328923102, M: 5328923103, L: 5328923105, XL: 5328923111, "2XL": 5328923115 },
 };
 
-// Women's Lounge Shorts variants — 435299379 (Black + White)
+// Women's Lounge Shorts variants — 435299379 (White only)
 const PJ_VARIANTS: Record<string, Record<string, number>> = {
-  Black: { XS: 5328975196, S: 5328975197, M: 5328975198, L: 5328975199, XL: 5328975200, "2XL": 5328975201 },
   White: { XS: 5328975202, S: 5328975203, M: 5328975204, L: 5328975205, XL: 5328975206, "2XL": 5328975207 },
 };
 
@@ -97,7 +96,7 @@ export async function POST(req: NextRequest) {
       if (!colorMap || !colorMap[size]) return NextResponse.json({ error: "Invalid fleece color or size" }, { status: 400 });
       syncVariantId = colorMap[size];
     } else if (isPJ) {
-      const pjColorMap = PJ_VARIANTS[color] ?? PJ_VARIANTS["Black"];
+      const pjColorMap = PJ_VARIANTS[color] ?? PJ_VARIANTS["White"];
       if (!pjColorMap || !pjColorMap[size]) return NextResponse.json({ error: "Invalid size" }, { status: 400 });
       syncVariantId = pjColorMap[size];
     } else if (isSocks) {

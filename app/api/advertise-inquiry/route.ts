@@ -4,6 +4,11 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
 const TIER_LABELS: Record<string, string> = {
+  // Current tier IDs (updated May 2026)
+  "battle-buddy":      "Battle Buddy ($500/quarter)",
+  "squad-leader":      "Squad Leader ($1,000/quarter)",
+  "mission-commander": "Mission Commander ($2,000/quarter)",
+  // Legacy IDs (kept for safety)
   patch:     "Patch",
   shield:    "Shield",
   standard:  "Standard",

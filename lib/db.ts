@@ -1,8 +1,95 @@
 import { neon } from "@neondatabase/serverless";
+import path from "path";
+
+type SqlTag = (strings: TemplateStringsArray, ...values: unknown[]) => Promise<Record<string, unknown>[]>;
+
+/** SQLite fallback for local dev — same tagged-template API as neon */
+function createLocalSqlite(): SqlTag {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const Database = require("better-sqlite3");
+  const dbPath = path.join(process.cwd(), "local.db");
+  const db = new Database(dbPath);
+
+  return function tag(strings: TemplateStringsArray, ...values: unknown[]): Promise<Record<string, unknown>[]> {
+    let query = "";
+    strings.forEach((s, i) => {
+      query += s;
+      if (i < values.length) query += "?";
+    });
+
+    // SQLite can't bind undefined or booleans — sanitize all values
+    const safeValues = values.map(v =>
+      v === undefined ? null
+      : v === true ? 1
+      : v === false ? 0
+      : v
+    );
+
+    // Convert PostgreSQL syntax → SQLite
+    query = query
+      .replace(/SERIAL PRIMARY KEY/gi, "INTEGER PRIMARY KEY AUTOINCREMENT")
+      .replace(/TIMESTAMP DEFAULT NOW\(\)/gi, "DATETIME DEFAULT CURRENT_TIMESTAMP")
+      .replace(/\bTIMESTAMP\b/gi, "DATETIME")
+      .replace(/BOOLEAN DEFAULT FALSE/gi, "INTEGER DEFAULT 0")
+      .replace(/BOOLEAN DEFAULT TRUE/gi, "INTEGER DEFAULT 1")
+      .replace(/\bBOOLEAN\b/gi, "INTEGER")
+      .replace(/NOW\(\)/gi, "CURRENT_TIMESTAMP");
+
+    const trimmed = query.trim();
+    const upper = trimmed.toUpperCase();
+
+    try {
+      // ALTER TABLE … ADD COLUMN [IF NOT EXISTS] — emulate for SQLite
+      if (upper.includes("ALTER TABLE") && upper.includes("ADD COLUMN")) {
+        // Extract table name and column name so we can check existence first
+        const tableMatch = trimmed.match(/ALTER\s+TABLE\s+(\w+)/i);
+        const colMatch = trimmed.match(/ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?(\w+)/i);
+        if (tableMatch && colMatch) {
+          const [, tableName] = tableMatch;
+          const [, colName] = colMatch;
+          const cols = db.prepare(`PRAGMA table_info(${tableName})`).all() as { name: string }[];
+          if (cols.some(c => c.name === colName)) return Promise.resolve([]); // already exists
+          // Remove IF NOT EXISTS clause before running
+          const safe = trimmed.replace(/\bIF\s+NOT\s+EXISTS\b/gi, "").replace(/\s+/, " ");
+          db.prepare(safe).run();
+        }
+        return Promise.resolve([]);
+      }
+
+      // INSERT … RETURNING id
+      if (upper.startsWith("INSERT") && upper.includes("RETURNING")) {
+        const withoutReturning = trimmed.replace(/\s+RETURNING\s+\w+\s*$/i, "");
+        const info = db.prepare(withoutReturning).run(...safeValues);
+        return Promise.resolve([{ id: info.lastInsertRowid }]);
+      }
+
+      // DDL / DML with no rows returned
+      if (upper.startsWith("CREATE") || upper.startsWith("UPDATE") || upper.startsWith("DELETE")) {
+        db.prepare(trimmed).run(...safeValues);
+        return Promise.resolve([]);
+      }
+
+      // SELECT
+      const rows = db.prepare(trimmed).all(...safeValues) as Record<string, unknown>[];
+      return Promise.resolve(rows.map(r => ({
+        ...r,
+        wants_follow_up_call: Boolean(r.wants_follow_up_call),
+        id_uploaded: Boolean(r.id_uploaded),
+      })));
+
+    } catch (err) {
+      console.error("[SQLite] error:", err, "\nQuery:", trimmed);
+      return Promise.reject(err);
+    }
+  };
+}
+
+let _localDb: SqlTag | null = null;
 
 function getSql() {
   if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is not set. Add Neon storage in Vercel or set DATABASE_URL locally.");
+    if (!_localDb) _localDb = createLocalSqlite();
+    return _localDb;
   }
   return neon(process.env.DATABASE_URL);
 }
