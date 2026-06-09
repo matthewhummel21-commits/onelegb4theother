@@ -3,13 +3,13 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-// T-shirt variants (small logo front + back print) — 432664066
+// T-shirt variants (small logo front + back print) - 432664066
 const SHIRT_VARIANTS: Record<string, number> = {
   XS: 5308241175, S: 5308241177, M: 5308241178, L: 5308241179,
   XL: 5308241181, "2XL": 5308241182, "3XL": 5308241183,
 };
 
-// Large Logo Tee variants (large center logo + left sleeve flag) — 435183890
+// Large Logo Tee variants (large center logo + left sleeve flag) - 435183890
 const LARGE_TEE_VARIANTS: Record<string, number> = {
   XS: 5327718216, S: 5327746590, M: 5327746591, L: 5327746592,
   XL: 5327746594, "2XL": 5327746595, "3XL": 5327746596,
@@ -20,18 +20,18 @@ const STICKER_VARIANTS: Record<string, number> = {
   "Logo": 5327655570,
 };
 
-// Sock variants — 435179129
+// Sock variants - 435179129
 const SOCK_VARIANTS: Record<string, number> = {
   S: 5327650831, M: 5327650832, L: 5327650833,
 };
 
-// Men's Fleece Shorts variants — 435293736
+// Men's Fleece Shorts variants - 435293736
 const FLEECE_VARIANTS: Record<string, Record<string, number>> = {
   Black:        { S: 5328923097, M: 5328923098, L: 5328923099, XL: 5328923100, "2XL": 5328923101 },
   "Heather Grey": { S: 5328923102, M: 5328923103, L: 5328923105, XL: 5328923111, "2XL": 5328923115 },
 };
 
-// Women's Lounge Shorts variants — 435299379 (White only)
+// Women's Lounge Shorts variants - 435299379 (White only)
 const PJ_VARIANTS: Record<string, Record<string, number>> = {
   White: { XS: 5328975202, S: 5328975203, M: 5328975204, L: 5328975205, XL: 5328975206, "2XL": 5328975207 },
 };
@@ -43,7 +43,7 @@ const HAT_VARIANTS: Record<string, number> = {
   "Red/White/Blue": 5327644163,
 };
 
-// Hoodie variants — CC 1567 garment-dyed, Pepper/Grey/True Navy, S-3XL
+// Hoodie variants - CC 1567 garment-dyed, Pepper/Grey/True Navy, S-3XL
 const HOODIE_VARIANTS: Record<string, Record<string, number>> = {
   Pepper:     { S: 5327674379, M: 5327674380, L: 5327674381, XL: 5327674382, "2XL": 5327674383, "3XL": 5327674384 },
   Grey:       { S: 5327674385, M: 5327674386, L: 5327674387, XL: 5327674388, "2XL": 5327674389, "3XL": 5327674390 },
@@ -52,10 +52,10 @@ const HOODIE_VARIANTS: Record<string, Record<string, number>> = {
 
 // Sweatpants variants
 const SWEATS_VARIANTS: Record<string, Record<string, number>> = {
-  // Bella+Canvas — 435175062
+  // Bella+Canvas - 435175062
   Black:          { S: 5327615052, M: 5327615053, L: 5327615054, XL: 5327615055, "2XL": 5327615056, "3XL": 5327615057 },
   "Heather Grey": { S: 5327615058, M: 5327615059, L: 5327615060, XL: 5327615061, "2XL": 5327615062, "3XL": 5327615063 },
-  // Comfort Colors 1469 garment-dyed — 435181837
+  // Comfort Colors 1469 garment-dyed - 435181837
   Pepper:   { S: 5327672970, M: 5327672977, L: 5327672978, XL: 5327672979, "2XL": 5327672980 },
   Espresso: { S: 5327672975, M: 5327672971, L: 5327672972, XL: 5327672973, "2XL": 5327672974 },
 };
@@ -140,11 +140,15 @@ export async function POST(req: NextRequest) {
                 : isLargeTee
                 ? `One Leg B4 the Other — Issued With Honor Tee — Large Logo (${size})`
                 : isSticker
-                ? `One Leg B4 the Other — Logo Sticker (3”×3”)`
+                ? `One Leg B4 the Other — Logo Sticker (3"×3")`
                 : isSocks
                 ? `One Leg B4 the Other — Issued With Honor Socks (${size})`
                 : isHat
                 ? `One Leg B4 the Other — Foam Trucker Hat (${color})`
+                : isFleece
+                ? `One Leg B4 the Other — Men's Fleece Shorts (${color} / ${size})`
+                : isPJ
+                ? `One Leg B4 the Other — Women's Lounge Shorts (${color} / ${size})`
                 : isSweatpants
                 ? `One Leg B4 the Other — Issued With Honor Sweatpants (${color} / ${size})`
                 : `One Leg B4 the Other — Issued With Honor Tee (${size})`,
@@ -158,6 +162,10 @@ export async function POST(req: NextRequest) {
                 ? "Sublimation crew socks. Your purchase helps fund adaptive pants for veterans in need."
                 : isHat
                 ? "Otto Cap foam trucker hat. Your purchase helps fund adaptive pants for veterans in need."
+                : isFleece
+                ? "Men's fleece shorts. Your purchase helps fund adaptive pants for veterans in need."
+                : isPJ
+                ? "Women's lounge shorts. Your purchase helps fund adaptive pants for veterans in need."
                 : isSweatpants
                 ? "Comfort Colors garment-dyed or Bella+Canvas heavyweight sweatpants. Your purchase helps fund adaptive pants for veterans in need."
                 : promo
