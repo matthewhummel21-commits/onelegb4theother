@@ -722,7 +722,7 @@ export default function DonationPage() {
               They Came Home.<br />We Make Sure They Feel Like It.
             </h2>
             <p className="text-gray-400 mb-8 text-lg">
-              They wrote a check with their lives, not knowing what the outcome would be. The least we can do is show up for them.
+              They gave everything — their time, their health, their years. The least we can do is make sure they come home to dignity.
             </p>
             <a href="#donate">
               <ShimmerButton
