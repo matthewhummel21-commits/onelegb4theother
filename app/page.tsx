@@ -96,9 +96,6 @@ export default function DonationPage() {
             <span className="text-white font-extrabold text-lg tracking-tight">One Leg B4 the Other</span>
           </div>
           <div className="flex items-center gap-3">
-            <a href="/admin" className="flex items-center px-3 py-2 rounded-xl border border-white/10 text-white/40 hover:text-white/70 hover:border-white/20 transition-colors text-xs font-mono" title="Admin">
-              ⚙️
-            </a>
             {/* Hamburger — all screen sizes */}
             <button
               className="flex flex-col gap-1.5 p-2"
@@ -318,23 +315,16 @@ export default function DonationPage() {
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <BlurFade delay={0} inView direction="right">
             <div className="relative">
-              <div className="absolute -top-4 -left-4 text-8xl text-primary/20 font-serif leading-none">&ldquo;</div>
-              <div className="bg-card border border-border rounded-3xl p-8 relative z-10">
-                <p className="text-lg leading-relaxed text-foreground mb-6 italic">
-                  "I don't know what you want me to do with my life, but if you want me to do something impactful, you need to tell me - because I'm ready to make that move."
-                </p>
-                <Separator className="mb-6" />
-                <div className="flex items-center gap-4">
-                  <img
-                    src="/images/joseph-christmas-sponsor.jpg"
-                    alt="Joseph Powell"
-                    className="w-12 h-12 rounded-full object-cover object-right"
-                  />
-                  <div>
-                    <p className="font-bold text-foreground">Joseph Powell</p>
-                    <p className="text-sm text-muted-foreground">Founder, One Leg B4 the Other</p>
-                  </div>
-                </div>
+              <div className="rounded-3xl overflow-hidden border border-border shadow-xl aspect-[4/5]">
+                <img
+                  src="/images/joseph-christmas-sponsor.jpg"
+                  alt="Joseph Powell, Founder of One Leg B4 the Other"
+                  className="w-full h-full object-cover object-center"
+                />
+              </div>
+              <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground rounded-2xl px-5 py-3 shadow-lg">
+                <p className="font-bold text-sm">Joseph Powell</p>
+                <p className="text-xs opacity-80">Founder</p>
               </div>
             </div>
           </BlurFade>
