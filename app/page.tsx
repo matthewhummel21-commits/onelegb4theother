@@ -377,7 +377,7 @@ export default function DonationPage() {
             </p>
             <div className="inline-flex items-center gap-3 bg-white/10 rounded-full px-6 py-3">
               <div className="w-2 h-2 rounded-full bg-primary"></div>
-              <p className="font-semibold text-sm tracking-wide">Andrew Miller &middot; Vice President &middot; U.S. Army Veteran</p>
+              <p className="font-semibold text-sm tracking-wide">Andrew Miller &middot; Vice President &middot; U.S. Air Force Veteran</p>
             </div>
           </div>
         </section>
@@ -433,7 +433,7 @@ export default function DonationPage() {
               },
               {
                 name: "Andrew Miller",
-                role: "Vice President · U.S. Army Veteran",
+                role: "Vice President · U.S. Air Force Veteran",
                 detail: "Andrew brings his military experience to veteran relationships and community outreach, ensuring every recipient is met with respect.",
                 img: null,
               },
