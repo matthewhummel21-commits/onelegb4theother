@@ -268,13 +268,19 @@ export default function DonationPage() {
           <p className="text-center text-xs font-bold uppercase tracking-widest text-white/30 mb-6">As Seen On</p>
           <div className="grid grid-cols-2 gap-4">
             <BlurFade inView delay={0}>
-              <div className="rounded-2xl overflow-hidden aspect-video">
-                <img src="/images/news-interview-1.jpg" alt="News coverage" className="w-full h-full object-cover" />
+              <div className="rounded-2xl overflow-hidden aspect-video relative group">
+                <img src="/images/news-interview-1.jpg" alt="Keloland News coverage of One Leg B4 the Other" className="w-full h-full object-cover" />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-4 py-3">
+                  <p className="text-white text-xs font-bold uppercase tracking-wide">📺 Keloland News</p>
+                </div>
               </div>
             </BlurFade>
             <BlurFade inView delay={0.15}>
-              <div className="rounded-2xl overflow-hidden aspect-video">
-                <img src="/images/news-interview-2.jpg" alt="News coverage" className="w-full h-full object-cover" />
+              <div className="rounded-2xl overflow-hidden aspect-video relative group">
+                <img src="/images/news-interview-2.jpg" alt="Keloland News coverage of One Leg B4 the Other" className="w-full h-full object-cover" />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-4 py-3">
+                  <p className="text-white text-xs font-bold uppercase tracking-wide">📺 Keloland News</p>
+                </div>
               </div>
             </BlurFade>
           </div>
@@ -399,6 +405,55 @@ export default function DonationPage() {
               </div>
             </div>
           </BlurFade>
+        </div>
+      </section>
+
+      {/* MEET THE TEAM */}
+      <section className="py-16 px-6 bg-card border-t border-border">
+        <div className="max-w-4xl mx-auto">
+          <BlurFade inView delay={0}>
+            <div className="text-center mb-10">
+              <Badge className="mb-3 bg-primary/10 text-primary border border-primary/20">The People Behind the Mission</Badge>
+              <h2 className="text-2xl font-bold">Meet the Team</h2>
+            </div>
+          </BlurFade>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Joseph Powell",
+                role: "Founder",
+                detail: "Joseph started this mission after a prayer and an epiphany. His family's veteran roots made the answer clear: give pants to those who served.",
+                img: "/images/joseph-christmas-sponsor.jpg",
+              },
+              {
+                name: "Matthew Hummel",
+                role: "President · U.S. Air Force · 20 Years",
+                detail: "Matthew leads day-to-day operations, veteran outreach, and mission strategy. He served as an aircraft maintenance and crash recovery technician.",
+                img: "/images/veteran-pants-fitting.jpg",
+              },
+              {
+                name: "Andrew Miller",
+                role: "Vice President · U.S. Army Veteran",
+                detail: "Andrew brings his military experience to veteran relationships and community outreach, ensuring every recipient is met with respect.",
+                img: null,
+              },
+            ].map((member, i) => (
+              <BlurFade key={member.name} inView delay={i * 0.15}>
+                <div className="text-center">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 mx-auto mb-4 bg-muted flex items-center justify-center">
+                    {member.img ? (
+                      <img src={member.img} alt={member.name} className="w-full h-full object-cover object-top" />
+                    ) : (
+                      <span className="text-3xl">🎖️</span>
+                    )}
+                  </div>
+                  <p className="font-bold text-foreground text-lg">{member.name}</p>
+                  <p className="text-xs text-primary font-semibold mb-3">{member.role}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{member.detail}</p>
+                </div>
+              </BlurFade>
+            ))}
+          </div>
         </div>
       </section>
 
