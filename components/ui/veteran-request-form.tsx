@@ -22,7 +22,6 @@ interface FormData {
   pantFit: string;
   pantColor: string;
   pantBrand: string;
-  householdSize: string;
   annualIncome: string;
   notes: string;
   wantsFollowUpCall: boolean;
@@ -33,7 +32,7 @@ const INITIAL: FormData = {
   address: "", city: "", state: "", zip: "",
   branch: "", yearsServed: "",
   pantType: "jeans", pantSize: "", waist: "", inseam: "", pantFit: "", pantColor: "", pantBrand: "",
-  householdSize: "", annualIncome: "",
+  annualIncome: "",
   notes: "", wantsFollowUpCall: false,
 };
 
@@ -118,6 +117,9 @@ export function VeteranRequestForm() {
       if (form.pantType === "jeans" && !form.waist) e.waist = "Required";
       if (form.pantType === "jeans" && !form.inseam) e.inseam = "Required";
       if (form.pantType === "sweatpants" && !form.pantSize) e.pantSize = "Required";
+    }
+    if (s === 5) {
+      if (!form.annualIncome.trim()) e.annualIncome = "Required — we use this to apply for grants";
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -450,18 +452,14 @@ export function VeteranRequestForm() {
                 <p className="text-sm text-muted-foreground">A little background helps us reach veterans most in need. Everything here is optional.</p>
               </div>
 
-              {/* Household info — soft ask */}
-              <div className="rounded-xl border border-border bg-muted/30 p-5 space-y-4">
-                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Household Info <span className="font-normal normal-case">(optional — kept confidential)</span></p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelClass}>Household Size</label>
-                    <Input type="number" min="1" value={form.householdSize} onChange={set("householdSize")} className={inputClass} placeholder="1" />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Annual Income</label>
-                    <Input value={form.annualIncome} onChange={set("annualIncome")} className={inputClass} placeholder="e.g. $18,000" />
-                  </div>
+              {/* Household income — required for grants */}
+              <div className="rounded-xl border border-border bg-muted/30 p-5 space-y-3">
+                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Household Income <span className="font-normal normal-case">(kept confidential)</span></p>
+                <p className="text-xs text-muted-foreground">We use this to apply for grants that help us serve more veterans.</p>
+                <div>
+                  <label className={labelClass}>Annual Household Income *</label>
+                  <Input value={form.annualIncome} onChange={set("annualIncome")} className={`${inputClass} ${errors.annualIncome ? "border-red-400" : ""}`} placeholder="e.g. $18,000" />
+                  {errors.annualIncome && <p className="text-xs text-red-500 mt-1">{errors.annualIncome}</p>}
                 </div>
               </div>
 

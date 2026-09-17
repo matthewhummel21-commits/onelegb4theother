@@ -99,34 +99,28 @@ export async function POST(req: NextRequest) {
     switch (action) {
       case "approve": {
         if (safeRow.pant_type === "sweatpants") {
-          // Auto-fulfill via Printful
-          const printfulOrderId = await placePrintfulOrder();
-          await updateRequestStatus(Number(id), "approved", {
-            printfulOrderId,
-            verifiedBy: "manual",
-          } as Parameters<typeof updateRequestStatus>[2] & { printfulOrderId: string | null });
+          // Mark approved — order will be placed manually after review
+          await updateRequestStatus(Number(id), "approved", { verifiedBy: "manual" });
 
           await sendTelegram(
-            printfulOrderId
-              ? `✅ <b>Approved + Printful Order Placed</b> [#${id}]\n` +
-                `👤 ${fullName}\n` +
-                `👖 Sweatpants · ${size} · ${safeRow.pant_color || "Black"}\n` +
-                `📦 Printful Order #${printfulOrderId} — shipping to ${fullAddress}`
-              : `✅ <b>Approved</b> [#${id}] — ⚠️ Printful order failed, check size/color\n` +
-                `👤 ${fullName} · ${fullAddress}`
+            `✅ <b>Approved (Order Pending)</b> [#${id}]\n` +
+            `👤 ${fullName}\n` +
+            `👖 Sweatpants · ${size} · ${safeRow.pant_color || "Black"}\n` +
+            `📍 ${fullAddress}\n` +
+            `⏳ Place Printful order manually when ready`
           );
         } else {
-          // Jeans — generate Amazon search link
+          // Jeans — generate Amazon search link for manual ordering
           const searchQuery = `Lee jeans mens ${size}`;
           amazonLink = `https://www.amazon.com/s?k=${encodeURIComponent(searchQuery)}&ref=olb4other`;
           await updateRequestStatus(Number(id), "approved", { amazonLink, verifiedBy: "manual" });
 
           await sendTelegram(
-            `✅ <b>Request Approved</b> [#${id}]\n` +
+            `✅ <b>Request Approved (Order Pending)</b> [#${id}]\n` +
             `👤 ${fullName}\n` +
             `👖 ${type} · ${size}\n` +
             `📍 Ship to: ${fullAddress}\n` +
-            `🛒 <a href="${amazonLink}">Amazon Search</a>`
+            `🛒 <a href="${amazonLink}">Amazon Search</a> — place manually when ready`
           );
         }
         break;
