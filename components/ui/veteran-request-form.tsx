@@ -165,8 +165,20 @@ export function VeteranRequestForm() {
         <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">
           {idFile
             ? "We received your ID and will review your request shortly. If approved, we'll ship directly to you at no cost."
-            : "We'll give you a call to verify your service, then ship directly to you at no cost."}
+            : "We'll review your request and be in touch. Pants ship directly to you at no cost."}
         </p>
+        <button
+          onClick={() => {
+            setSubmitted(false);
+            setForm(INITIAL);
+            setIdFile(null);
+            setStep(1);
+            setErrors({});
+          }}
+          className="mt-8 px-8 py-3 rounded-xl bg-primary text-white font-bold text-sm hover:bg-primary/90 transition-all shadow-md"
+        >
+          Submit Another Request →
+        </button>
       </motion.div>
     );
   }
