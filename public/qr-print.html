@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>One Leg B4 the Other — Request Pants QR</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #fff;
+    color: #111;
+    width: 8.5in;
+    min-height: 11in;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .page {
+    width: 100%;
+    min-height: 11in;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6in;
+    gap: 0;
+  }
+
+  /* Top stripe */
+  .stripe {
+    width: 100%;
+    height: 14px;
+    background: linear-gradient(90deg, #0D1B3E 50%, #b22234 50%);
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+  }
+
+  .card {
+    width: 100%;
+    border: 3px solid #0D1B3E;
+    border-top: none;
+    border-radius: 0 0 20px 20px;
+    padding: 48px 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 36px;
+    background: #fff;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .logo {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+  }
+
+  .header-text h1 {
+    font-size: 28px;
+    font-weight: 900;
+    color: #0D1B3E;
+    line-height: 1.1;
+  }
+
+  .header-text p {
+    font-size: 13px;
+    font-weight: 700;
+    color: #b22234;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 5px;
+  }
+
+  /* Hero text */
+  .hero {
+    text-align: center;
+  }
+
+  .hero h2 {
+    font-size: 38px;
+    font-weight: 900;
+    color: #0D1B3E;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+
+  .hero h2 span {
+    color: #b22234;
+  }
+
+  .hero p {
+    font-size: 17px;
+    color: #444;
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* QR block */
+  .qr-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .qr-wrap {
+    padding: 20px;
+    border: 3px solid #0D1B3E;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 8px 32px rgba(13,27,62,0.10);
+  }
+
+  .qr-wrap img {
+    display: block;
+    width: 260px;
+    height: 260px;
+  }
+
+  .scan-label {
+    font-size: 22px;
+    font-weight: 900;
+    color: #0D1B3E;
+    text-align: center;
+    letter-spacing: -0.3px;
+  }
+
+  .url-label {
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    gap: 28px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .step {
+    flex: 1;
+    max-width: 180px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .step-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #0D1B3E;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .step p {
+    font-size: 13px;
+    color: #444;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  /* Divider */
+  .divider {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+  }
+
+  .footer p {
+    font-size: 12px;
+    color: #999;
+    line-height: 1.7;
+  }
+
+  .footer strong {
+    color: #0D1B3E;
+  }
+
+  .badge {
+    display: inline-block;
+    background: #0D1B3E;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 5px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  @media print {
+    body { background: #fff; }
+    .page { min-height: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="stripe"></div>
+
+  <div class="card">
+
+    <!-- Header -->
+    <div class="header">
+      <img class="logo" src="/logo.png" alt="One Leg B4 the Other logo" />
+      <div class="header-text">
+        <h1>One Leg B4<br/>the Other</h1>
+        <p>Veteran Support &amp; Dignity</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <h2>Need Pants?<br/><span>We've Got You Covered.</span></h2>
+      <p>Free pants for veterans — no cost, no hassle, shipped directly to your door. Scan below to request yours today.</p>
+    </div>
+
+    <!-- QR -->
+    <div class="qr-block">
+      <div class="qr-wrap">
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=520x520&margin=0&color=0D1B3E&data=https%3A%2F%2Fonelegb4theother.com%2F%23request"
+          alt="QR Code — onelegb4theother.com/#request"
+        />
+      </div>
+      <div class="scan-label">📱 Scan to Request Free Pants</div>
+      <div class="url-label">onelegb4theother.com</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <p>Scan the QR code with your phone</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <p>Fill out the short form — takes 2 minutes</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <p>Pants ship free directly to your door</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div class="badge">🎖️ Veteran-Operated Nonprofit</div>
+      <p>
+        <strong>EIN: 99-3332965</strong> &nbsp;·&nbsp;
+        <strong>(605) 277-2721</strong> &nbsp;·&nbsp;
+        230 S Phillips Ave, Suite 203, Sioux Falls SD 57104
+      </p>
+      <p style="margin-top: 6px; color: #bbb; font-size: 11px;">
+        All requests reviewed personally. Your information is kept confidential.
+      </p>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>
