@@ -385,6 +385,25 @@ export function VeteranRequestForm() {
                     {errors.pantSize && <p className="text-xs text-red-500 mt-2">{errors.pantSize}</p>}
                   </div>
                   <div>
+                    <label className={labelClass}>Fit Style <span className="font-normal normal-case">(optional)</span></label>
+                    <div className="flex flex-wrap gap-2">
+                      {["Slim", "Regular", "Relaxed", "Loose"].map(fit => (
+                        <button
+                          key={fit}
+                          type="button"
+                          onClick={() => setForm(prev => ({ ...prev, pantFit: fit }))}
+                          className={`px-4 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all ${
+                            form.pantFit === fit
+                              ? "bg-primary border-primary text-white"
+                              : "border-border hover:border-primary/50"
+                          }`}
+                        >
+                          {fit}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
                     <label className={labelClass}>Color <span className="font-normal normal-case">(optional)</span></label>
                     <div className="grid grid-cols-2 gap-2">
                       {[
@@ -428,13 +447,22 @@ export function VeteranRequestForm() {
                   </div>
                   <div>
                     <label className={labelClass}>Fit Style <span className="font-normal normal-case">(optional)</span></label>
-                    <select value={form.pantFit} onChange={set("pantFit")} className={selectClass}>
-                      <option value="">No preference</option>
-                      <option value="Relaxed / Loose">Relaxed / Loose</option>
-                      <option value="Regular / Straight">Regular / Straight</option>
-                      <option value="Slim / Fitted">Slim / Fitted</option>
-                      <option value="Bootcut">Bootcut</option>
-                    </select>
+                    <div className="flex flex-wrap gap-2">
+                      {["Slim", "Regular", "Relaxed", "Bootcut", "Loose"].map(fit => (
+                        <button
+                          key={fit}
+                          type="button"
+                          onClick={() => setForm(prev => ({ ...prev, pantFit: fit }))}
+                          className={`px-4 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all ${
+                            form.pantFit === fit
+                              ? "bg-primary border-primary text-white"
+                              : "border-border hover:border-primary/50"
+                          }`}
+                        >
+                          {fit}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div>
                     <label className={labelClass}>Color <span className="font-normal normal-case">(optional)</span></label>
