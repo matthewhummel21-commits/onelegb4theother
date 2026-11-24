@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { SiteFooter } from "@/components/site-footer";
+import { CENTS_OF_EVERY_DOLLAR_TO_VETERANS, COST_TO_VETERAN_DOLLARS, PAIRS_POLICY } from "@/lib/site";
 
 // ─── Product catalog ──────────────────────────────────────────────────────────
 
@@ -299,7 +301,7 @@ export default function ShopPage() {
                 Wear<br className="hidden md:block" /> the<br className="hidden md:block" /> Mission.
               </h1>
               <p className="text-white/50 text-lg max-w-md mb-8">
-                Every purchase funds a pair of adaptive pants for a veteran in need. No overhead. Full impact.
+                Purchases help provide pants. Veterans receive {PAIRS_POLICY}.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
                 <a
@@ -315,6 +317,9 @@ export default function ShopPage() {
                   Just Donate →
                 </a>
               </div>
+              <a href="/donation-policy" className="inline-block mt-4 text-xs text-white/50 underline">
+                Donation & refund policy
+              </a>
             </div>
             {/* Hero product stack */}
             <div className="flex-1 flex justify-center">
@@ -369,9 +374,9 @@ export default function ShopPage() {
         {/* Mission stat strip */}
         <div className="grid grid-cols-3 gap-4 mb-16">
           {[
-            { n: "100%", label: "Goes to veterans" },
-            { n: "$0",   label: "Cost to the vet" },
-            { n: "∞",    label: "Pairs per veteran" },
+            { n: `${CENTS_OF_EVERY_DOLLAR_TO_VETERANS}¢`, label: "Of every $1 to veterans" },
+            { n: `$${COST_TO_VETERAN_DOLLARS}`, label: "Cost to the veteran" },
+            { n: "As needed", label: "Pairs per veteran" },
           ].map(s => (
             <div key={s.n} className="text-center border border-white/5 rounded-2xl py-6 bg-[#111111]">
               <p className="text-3xl font-black text-[#b22234]">{s.n}</p>
@@ -391,7 +396,9 @@ export default function ShopPage() {
         <p className="text-center text-white/20 text-sm mt-16">
           Secure checkout via Stripe · Fulfilled by Printful · Ships in 3–5 days · Free shipping on all orders
         </p>
+        <p className="text-center text-white/40 text-sm mt-4">Veterans receive {PAIRS_POLICY}.</p>
       </div>
+      <SiteFooter />
 
     </main>
   );

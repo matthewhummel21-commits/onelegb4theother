@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { SiteFooter } from "@/components/site-footer";
+import { ContactEmail, PhoneLink } from "@/components/site-contact";
 
 const TIERS = [
   {
@@ -112,7 +114,7 @@ export default function AdvertisePage() {
             Sponsor Opportunities
           </span>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
-            Advertise With a Purpose
+            Become a Sponsor
           </h1>
           <p className="text-white/60 text-lg max-w-2xl mx-auto leading-relaxed">
             Partner with One Leg B4 the Other and put your brand in front of a loyal, mission-driven community of veterans, donors, and supporters — across our newsletter, website, social media, and live events.
@@ -256,7 +258,7 @@ export default function AdvertisePage() {
               )}
 
               {status === "error" && (
-                <p className="text-xs text-red-400 text-center">Something went wrong — email us at matthew@onelegb4theother.com</p>
+                <p className="text-xs text-red-400 text-center">Something went wrong — email <ContactEmail className="underline" /> or call <PhoneLink className="underline" />.</p>
               )}
 
               <button
@@ -276,12 +278,7 @@ export default function AdvertisePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 py-10 px-6 text-center text-white/30 text-sm mt-8">
-        <p>One Leg B4 the Other · EIN 99-3332965 · 230 S Phillips Ave Suite 203, Sioux Falls SD 57104</p>
-        <p className="mt-1">
-          <a href="/" className="hover:text-white/60 transition-colors">← Back to main site</a>
-        </p>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

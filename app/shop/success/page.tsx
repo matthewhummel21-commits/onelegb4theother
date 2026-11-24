@@ -33,7 +33,7 @@ function SuccessContent() {
             <span className="text-[#b22234]">Real Difference.</span>
           </h1>
           <p className="text-white/60 text-lg max-w-xl mx-auto leading-relaxed">
-            Your shirt is in production. But more importantly — your $55 just funded a brand new pair of pants for a veteran who earned it.
+            Your shirt is in production. Purchases help provide pants. Veterans receive as many pairs as they need.
           </p>
           {sessionId && (
             <p className="text-white/20 text-xs mt-4">Order ref: {sessionId.slice(-12).toUpperCase()}</p>
@@ -43,7 +43,7 @@ function SuccessContent() {
         {/* Impact cards */}
         <div className="grid md:grid-cols-3 gap-4 mb-12">
           {[
-            { icon: "👖", title: "Pants Funded", desc: "A veteran on our waitlist just moved one step closer to receiving a brand new pair of pants — with dignity." },
+            { icon: "👖", title: "Pants Funded", desc: "This order helps provide pants. Veterans receive as many pairs as they need." },
             { icon: "📦", title: "Shirt In Production", desc: "Your Issued With Honor tee is being printed and fulfilled via Printful. Ships in 3–5 business days." },
             { icon: "🤝", title: "Mission Grows", desc: "Every purchase helps us tell the story and fund more veterans. You're part of building this movement." },
           ].map((card, i) => (

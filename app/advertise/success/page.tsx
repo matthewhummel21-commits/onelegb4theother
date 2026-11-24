@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { ContactEmail, PhoneLink } from "@/components/site-contact";
 
 export default function AdvertiseSuccessPage() {
   return (
@@ -17,10 +18,7 @@ export default function AdvertiseSuccessPage() {
           Thank you for sponsoring One Leg B4 the Other. Your payment was received and we&apos;ll be in touch within 48 hours to confirm your package details and get your logo and link set up.
         </p>
         <p className="text-white/40 text-sm mb-8">
-          Questions? Email{" "}
-          <a href="mailto:matthew@onelegb4theother.com" className="text-white/60 underline hover:text-white transition-colors">
-            matthew@onelegb4theother.com
-          </a>
+          Questions? Email <ContactEmail className="text-white/60 underline hover:text-white" /> or call <PhoneLink className="text-white/60 underline hover:text-white" />.
         </p>
         <a
           href="/"

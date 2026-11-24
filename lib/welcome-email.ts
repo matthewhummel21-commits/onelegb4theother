@@ -1,3 +1,5 @@
+import { CONTACT_EMAIL, EIN, PAIR_COST_DOLLARS, PAIRS_POLICY, PHONE_DISPLAY, SITE_URL, VETERANS_WAITING, formatAddressLine } from "@/lib/site";
+
 export function buildWelcomeEmailHtml(firstName?: string): string {
   const name = firstName ? firstName.trim() : null
   const greeting = name ? `Hey ${name},` : 'Hey,'
@@ -105,13 +107,13 @@ export function buildWelcomeEmailHtml(firstName?: string): string {
 
               <!-- CTA -->
               <p style="color:#d1d5db;font-size:15px;line-height:1.6;margin:0 0 24px;">
-                Right now, <strong style="color:#ffffff;">33 veterans</strong> are on our waitlist. $35 covers a pair of jeans — and it goes directly to them.
+                Right now, <strong style="color:#ffffff;">${VETERANS_WAITING} veterans</strong> are on our waitlist. $${PAIR_COST_DOLLARS} is about what jeans cost. Veterans receive ${PAIRS_POLICY}.
               </p>
 
               <table cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
                 <tr>
                   <td style="background:#b22234;border-radius:12px;">
-                    <a href="https://onelegb4theother.com/#donate" style="display:inline-block;padding:16px 36px;color:#ffffff;font-size:16px;font-weight:900;text-decoration:none;letter-spacing:0.02em;">
+                    <a href="${SITE_URL}/#donate" style="display:inline-block;padding:16px 36px;color:#ffffff;font-size:16px;font-weight:900;text-decoration:none;letter-spacing:0.02em;">
                       Help a Veteran Now →
                     </a>
                   </td>
@@ -130,10 +132,10 @@ export function buildWelcomeEmailHtml(firstName?: string): string {
           <tr>
             <td style="padding:32px 0 0;text-align:center;">
               <p style="color:#374151;font-size:12px;margin:0 0 8px;">
-                One Leg B4 the Other · 230 S Phillips Ave Suite 203 · Sioux Falls, SD 57104
+                One Leg B4 the Other · ${formatAddressLine()} · ${PHONE_DISPLAY} · ${CONTACT_EMAIL}
               </p>
               <p style="color:#374151;font-size:12px;margin:0 0 8px;">
-                EIN: 99-3332965 · 501(c)(3) Nonprofit · Veteran-Led
+                EIN: ${EIN} · 501(c)(3) Nonprofit · Veteran-Led
               </p>
               <p style="color:#374151;font-size:12px;margin:0;">
                 <a href="https://onelegb4theother.com" style="color:#6b7280;text-decoration:none;">Website</a>

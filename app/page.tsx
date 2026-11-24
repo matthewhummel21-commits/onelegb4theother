@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { Button } from "@/components/ui/button";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -11,23 +10,37 @@ import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { VeteranRequestForm } from "@/components/ui/veteran-request-form";
+import { NewsCoverage } from "@/components/news-coverage";
+import { SponsorsSection } from "@/components/sponsors-section";
+import { SiteFooter } from "@/components/site-footer";
+import { ContactEmail, PhoneLink, SocialLinks } from "@/components/site-contact";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  EIN,
+  FOUNDED_YEAR,
+  FUNDS_GOAL,
+  FUNDS_GOAL_PERIOD_LABEL,
+  FUNDS_RAISED,
+  GOAL_PROGRESS_PERCENT,
+  HOME_STATS,
+  IRS_TEOS_URL,
+  LEADERSHIP,
+  MISSION_DETAIL,
+  MISSION_LINE,
+  MONEY_ALLOCATION,
+  PAIR_COST_DOLLARS,
+  PAIRS_POLICY,
+  STORY_STATS,
+  VETERANS_WAITING,
+  formatAddressLine,
+} from "@/lib/site";
 
 const PRESET_AMOUNTS = [20, 35, 50, 100, 500, 1000];
 
-const RAISED = 11340;
-const GOAL = 20000;
-const PROGRESS = Math.round((RAISED / GOAL) * 100);
-const VETERANS_WAITING = 33;
-
-const STATS = [
-  { value: 500, suffix: "+", label: "Veterans Supported" },
-  { value: 33, suffix: "+", label: "On the Waitlist Now" },
-  { value: 94, suffix: "¢", label: "Of every $1 to veterans" },
-];
-
 export default function DonationPage() {
   const [mode, setMode] = useState<"monthly" | "once">("monthly");
-  const [selected, setSelected] = useState<number | null>(35);
+  const [selected, setSelected] = useState<number | null>(PAIR_COST_DOLLARS);
   const [custom, setCustom] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [merchSize, setMerchSize] = useState<string | null>(null);
@@ -79,7 +92,7 @@ export default function DonationPage() {
   }, []);
 
   const finalAmount = custom ? parseFloat(custom) : selected;
-  const isJeansPair = finalAmount === 35;
+  const isJeansPair = finalAmount === PAIR_COST_DOLLARS;
 
   return (
     <main className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden">
@@ -91,14 +104,31 @@ export default function DonationPage() {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-white/10"
       >
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-white font-extrabold text-lg tracking-tight">One Leg B4 the Other</span>
-          </div>
-          <div className="flex items-center gap-3">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-2">
+          <Link href="/" className="text-white font-extrabold text-[15px] sm:text-lg tracking-tight leading-tight">One Leg B4 the Other</Link>
+          <div className="flex items-center gap-1.5 sm:gap-3 ml-auto">
+            <Link href="/shop" className="px-2 py-2 text-white text-[11px] sm:text-sm font-bold whitespace-nowrap hover:text-white/80">
+              Shop
+            </Link>
+            <a
+              href="#request"
+              className="px-2.5 sm:px-4 py-2 rounded-xl border border-white/40 text-white text-[11px] sm:text-sm font-bold whitespace-nowrap hover:bg-white hover:text-gray-900 transition-colors"
+            >
+              Request Pants
+            </a>
+            <a href="#donate">
+              <ShimmerButton
+                background="rgb(178,34,52)"
+                shimmerColor="#ffffff"
+                borderRadius="12px"
+                className="px-2.5 sm:px-6 py-2 text-[11px] sm:text-sm font-bold"
+              >
+                Donate Now
+              </ShimmerButton>
+            </a>
             {/* Hamburger — all screen sizes */}
             <button
-              className="flex flex-col gap-1.5 p-2"
+              className="flex flex-col gap-1.5 p-1.5"
               onClick={() => setMobileMenuOpen((o) => !o)}
               aria-label="Menu"
             >
@@ -106,30 +136,20 @@ export default function DonationPage() {
               <span className={`block w-6 h-0.5 bg-white transition-all ${mobileMenuOpen ? "opacity-0" : ""}`} />
               <span className={`block w-6 h-0.5 bg-white transition-all ${mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
             </button>
-            <a href="#donate">
-              <ShimmerButton
-                background="rgb(178,34,52)"
-                shimmerColor="#ffffff"
-                borderRadius="12px"
-                className="px-6 py-2 text-sm font-bold"
-              >
-                Donate Now
-              </ShimmerButton>
-            </a>
           </div>
         </div>
-      </motion.nav>
-
-      {/* MOBILE MENU */}
-      {mobileMenuOpen && (
-        <div className="fixed top-[65px] left-0 right-0 z-40 bg-black/95 backdrop-blur-md border-b border-white/10">
+        {mobileMenuOpen && (
+        <div className="absolute top-full left-0 right-0 z-40 bg-black/95 backdrop-blur-md border-b border-white/10">
           <div className="flex flex-col p-4 gap-3">
-            <a href="/shop" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
+            <Link href="/shop" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
               🛍️ Shop - Issued With Honor Tee
-            </a>
-            <a href="/advertise" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
-              📣 Advertise With Us
-            </a>
+            </Link>
+            <Link href="/advertise" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
+              📣 Become a Sponsor
+            </Link>
+            <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
+              🇺🇸 Accountability
+            </Link>
             <a href="#request" onClick={() => setMobileMenuOpen(false)} className="flex items-center px-4 py-3 rounded-xl bg-secondary border border-white/20 text-white font-bold hover:bg-secondary/80 transition-colors">
               👖 Request Pants
             </a>
@@ -141,10 +161,11 @@ export default function DonationPage() {
             </a>
           </div>
         </div>
-      )}
+        )}
+      </motion.nav>
 
       {/* HERO */}
-      <section className="relative min-h-screen flex items-end pb-24 overflow-hidden bg-black pt-16">
+      <section className="relative min-h-screen flex items-end pb-16 overflow-hidden bg-black pt-28 sm:pt-24">
         <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-950 to-black" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_30%_40%,rgba(178,34,52,0.35),transparent)]" />
         <div className="absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(ellipse_80%_80%_at_100%_0%,rgba(60,59,110,0.30),transparent)]" />
@@ -174,7 +195,7 @@ export default function DonationPage() {
               transition={{ delay: 0.45, duration: 0.6 }}
               className="text-xs font-bold tracking-[0.25em] text-gray-500 uppercase mb-2"
             >
-              Beyond the Uniform · Est. 2024
+              Beyond the Uniform · Est. {FOUNDED_YEAR} · Sioux Falls, South Dakota
             </motion.p>
 
             <motion.p
@@ -199,22 +220,28 @@ export default function DonationPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 mb-16"
+              className="flex flex-col gap-3 mb-10"
             >
-              <a href="#donate">
-                <ShimmerButton
-                  background="rgb(178,34,52)"
-                  shimmerColor="#ffffff"
-                  borderRadius="16px"
-                  className="h-14 px-10 text-lg font-bold w-full sm:w-auto"
+              <div className="flex flex-row gap-3">
+                <a
+                  href="#request"
+                  className="flex-1 inline-flex items-center justify-center h-14 px-3 rounded-2xl bg-white text-gray-900 text-sm sm:text-lg font-bold text-center leading-tight hover:bg-gray-100 transition-colors"
                 >
-                  Help a Veteran Now →
-                </ShimmerButton>
-              </a>
-              <a href="#story">
-                <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-bold border-2 border-white bg-white/15 text-white hover:bg-white hover:text-gray-900 rounded-2xl">
-                  Our Story
-                </Button>
+                  Request Pants
+                </a>
+                <a href="#donate" className="flex-1">
+                  <ShimmerButton
+                    background="rgb(178,34,52)"
+                    shimmerColor="#ffffff"
+                    borderRadius="16px"
+                    className="h-14 w-full px-3 text-sm sm:text-lg font-bold whitespace-normal text-center leading-tight"
+                  >
+                    Help a Veteran Now →
+                  </ShimmerButton>
+                </a>
+              </div>
+              <a href="#story" className="text-sm font-semibold text-white/80 underline underline-offset-4 w-fit hover:text-white">
+                Our Story
               </a>
             </motion.div>
 
@@ -226,19 +253,19 @@ export default function DonationPage() {
               className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 max-w-lg"
             >
               <div className="flex justify-between text-sm mb-3">
-                <span className="text-white font-bold text-base">${RAISED.toLocaleString()} raised</span>
-                <span className="text-gray-400">Goal: ${GOAL.toLocaleString()}</span>
+                <span className="text-white font-bold text-base">${FUNDS_RAISED.toLocaleString()} raised</span>
+                <span className="text-gray-400">Goal: ${FUNDS_GOAL.toLocaleString()}</span>
               </div>
               <div className="h-3 bg-white/10 rounded-full overflow-hidden mb-3">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: `${PROGRESS}%` }}
+                  animate={{ width: `${GOAL_PROGRESS_PERCENT}%` }}
                   transition={{ delay: 1.1, duration: 1.2, ease: "easeOut" }}
                   className="h-full rounded-full bg-gradient-to-r from-primary to-red-400"
                 />
               </div>
               <p className="text-sm text-gray-400">
-                <span className="text-white font-semibold">{PROGRESS}%</span> of monthly goal ·{" "}
+                <span className="text-white font-semibold">{GOAL_PROGRESS_PERCENT}%</span> of {FUNDS_GOAL_PERIOD_LABEL} ·{" "}
                 <span className="text-primary font-semibold">{VETERANS_WAITING} veterans on the waitlist</span>
               </p>
             </motion.div>
@@ -251,9 +278,12 @@ export default function DonationPage() {
             transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
             className="hidden lg:flex flex-col items-center justify-end pb-8 shrink-0"
           >
-            <img
+            <Image
               src="/logo.png"
-              alt="One Leg B4 the Other"
+              alt="One Leg B4 the Other logo"
+              width={720}
+              height={720}
+              priority
               className="w-[460px] h-auto"
               style={{ filter: 'drop-shadow(0 0 60px rgba(178,34,52,0.6)) drop-shadow(0 0 120px rgba(60,59,110,0.4))' }}
             />
@@ -262,35 +292,12 @@ export default function DonationPage() {
         </div>
       </section>
 
-      {/* AS SEEN ON */}
-      <section className="py-10 px-6 bg-black border-b border-white/10">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-center text-xs font-bold uppercase tracking-widest text-white/30 mb-6">As Seen On</p>
-          <div className="grid grid-cols-2 gap-4">
-            <BlurFade inView delay={0}>
-              <div className="rounded-2xl overflow-hidden aspect-video relative group">
-                <img src="/images/news-interview-1.jpg" alt="Keloland News coverage of One Leg B4 the Other" className="w-full h-full object-cover" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-4 py-3">
-                  <p className="text-white text-xs font-bold uppercase tracking-wide">📺 Keloland News</p>
-                </div>
-              </div>
-            </BlurFade>
-            <BlurFade inView delay={0.15}>
-              <div className="rounded-2xl overflow-hidden aspect-video relative group">
-                <img src="/images/news-interview-2.jpg" alt="Keloland News coverage of One Leg B4 the Other" className="w-full h-full object-cover" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-4 py-3">
-                  <p className="text-white text-xs font-bold uppercase tracking-wide">📺 Keloland News</p>
-                </div>
-              </div>
-            </BlurFade>
-          </div>
-        </div>
-      </section>
+      <NewsCoverage />
 
       {/* ANIMATED STATS */}
       <section className="bg-primary py-14 px-6">
         <div className="max-w-4xl mx-auto grid grid-cols-3 gap-8 text-center">
-          {STATS.map((s, i) => (
+          {HOME_STATS.map((s, i) => (
             <BlurFade key={s.label} delay={i * 0.15} inView>
               <p className="text-4xl md:text-5xl font-extrabold text-white">
                 <NumberTicker value={s.value} className="text-white" />
@@ -309,7 +316,7 @@ export default function DonationPage() {
             <div className="rounded-3xl border border-border bg-background p-10 md:p-14 text-center">
               <div className="text-5xl mb-6">👖</div>
               <p className="text-xl md:text-2xl font-semibold leading-relaxed text-foreground">
-                Veterans receive a brand new pair of civilian pants, issued from a place of honor and respect. Getting dressed with confidence is something they earned in uniform &mdash; we&rsquo;re making sure they carry it into civilian life.
+                {MISSION_DETAIL} Getting dressed with dignity is something they earned in uniform.
               </p>
             </div>
           </BlurFade>
@@ -321,11 +328,13 @@ export default function DonationPage() {
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-16 items-center">
           <BlurFade delay={0} inView direction="right">
             <div className="relative">
-              <div className="rounded-3xl overflow-hidden border border-border shadow-xl aspect-[4/5]">
-                <img
+              <div className="rounded-3xl overflow-hidden border border-border shadow-xl aspect-[4/5] relative">
+                <Image
                   src="/images/joseph-christmas-sponsor.jpg"
-                  alt="Joseph Powell, Founder of One Leg B4 the Other"
-                  className="w-full h-full object-cover object-center"
+                  alt="Joseph Powell, founder of One Leg B4 the Other, with pants donated for veterans in Sioux Falls"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 480px"
+                  className="object-cover object-center"
                 />
               </div>
               <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground rounded-2xl px-5 py-3 shadow-lg">
@@ -349,11 +358,7 @@ export default function DonationPage() {
                 Because these veterans wrote a check with their lives, not knowing what the outcome would be. We owe them more than we give them.
               </p>
               <div className="grid grid-cols-3 gap-4">
-                {[
-                  { value: 12, label: "States Reached" },
-                  { value: 33, suffix: "+", label: "On the Waitlist" },
-                  { value: 933, label: "Community Supporters" },
-                ].map((s) => (
+                {STORY_STATS.map((s) => (
                   <div key={s.label} className="text-center p-4 rounded-2xl bg-card border border-border">
                     <p className="text-2xl font-extrabold text-primary">
                       <NumberTicker value={s.value} className="text-primary" />{s.suffix ?? ""}
@@ -366,22 +371,6 @@ export default function DonationPage() {
           </BlurFade>
         </div>
       </section>
-
-      {/* VETERAN VOICE */}
-      <BlurFade inView delay={0}>
-        <section className="py-20 px-6 bg-secondary text-secondary-foreground">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="text-5xl mb-8">🇺🇸</div>
-            <p className="text-3xl md:text-4xl font-bold italic leading-snug mb-8">
-              &ldquo;It&rsquo;s not about the pants. It&rsquo;s the door it opens &mdash; a conversation, a connection, a reminder that someone sees you.&rdquo;
-            </p>
-            <div className="inline-flex items-center gap-3 bg-white/10 rounded-full px-6 py-3">
-              <div className="w-2 h-2 rounded-full bg-primary"></div>
-              <p className="font-semibold text-sm tracking-wide">Andrew Miller &middot; Vice President &middot; U.S. Air Force Veteran</p>
-            </div>
-          </div>
-        </section>
-      </BlurFade>
 
       {/* PRESIDENT MESSAGE */}
       <section className="py-20 px-6 bg-background border-t border-border">
@@ -397,7 +386,9 @@ export default function DonationPage() {
                 <p>It&rsquo;s not complicated. A veteran needs pants &mdash; we get them pants. We show up, share some stories, and hope those pants help spark that inner soldier or airman in them. After all, they gave everything. The least we can do is show up.</p>
               </blockquote>
               <div className="mt-8 flex items-center gap-4">
-                <img src="/images/veteran-pants-fitting.jpg" alt="Matthew Hummel" className="w-12 h-12 rounded-full object-cover object-top" />
+                <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0">
+                  <Image src="/images/veteran-pants-fitting.jpg" alt="Matthew Hummel, president of One Leg B4 the Other" fill sizes="48px" className="object-cover object-top" />
+                </div>
                 <div>
                   <p className="font-bold text-foreground">Matthew Hummel</p>
                   <p className="text-sm text-muted-foreground">President &middot; U.S. Air Force Veteran &middot; 20 Years of Service</p>
@@ -418,33 +409,14 @@ export default function DonationPage() {
             </div>
           </BlurFade>
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                name: "Joseph Powell",
-                role: "Founder",
-                detail: "Joseph started this mission after a prayer and an epiphany. His family's veteran roots made the answer clear: give pants to those who served.",
-                img: "/images/joseph-christmas-sponsor.jpg",
-              },
-              {
-                name: "Matthew Hummel",
-                role: "President · U.S. Air Force · 20 Years",
-                detail: "Matthew leads day-to-day operations, veteran outreach, and mission strategy. He served as an aircraft maintenance and crash recovery technician.",
-                img: "/images/veteran-pants-fitting.jpg",
-              },
-              {
-                name: "Andrew Miller",
-                role: "Vice President · U.S. Air Force Veteran",
-                detail: "Andrew brings his military experience to veteran relationships and community outreach, ensuring every recipient is met with respect.",
-                img: null,
-              },
-            ].map((member, i) => (
+            {LEADERSHIP.map((member, i) => (
               <BlurFade key={member.name} inView delay={i * 0.15}>
                 <div className="text-center">
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 mx-auto mb-4 bg-muted flex items-center justify-center">
-                    {member.img ? (
-                      <img src={member.img} alt={member.name} className="w-full h-full object-cover object-top" />
+                  <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 mx-auto mb-4 bg-secondary text-secondary-foreground flex items-center justify-center">
+                    {member.image ? (
+                      <Image src={member.image} alt={member.name} fill sizes="96px" className="object-cover object-top" />
                     ) : (
-                      <span className="text-3xl">🎖️</span>
+                      <span className="text-2xl font-bold tracking-wide" aria-hidden="true">{member.initials}</span>
                     )}
                   </div>
                   <p className="font-bold text-foreground text-lg">{member.name}</p>
@@ -457,6 +429,29 @@ export default function DonationPage() {
         </div>
       </section>
 
+      <section id="accountability" className="py-16 px-6 bg-background border-t border-border">
+        <div className="max-w-3xl mx-auto">
+          <BlurFade inView delay={0}>
+            <Badge className="mb-3 bg-primary/10 text-primary border border-primary/20">Accountability</Badge>
+            <h2 className="text-2xl font-bold mb-3">Veteran-led. Public record. Sioux Falls.</h2>
+            <p className="text-muted-foreground leading-relaxed mb-4">{MISSION_LINE} {MISSION_DETAIL}</p>
+            <p className="text-sm leading-relaxed mb-2">
+              501(c)(3) · Established {FOUNDED_YEAR} · EIN{" "}
+              <a href={IRS_TEOS_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary underline">{EIN}</a>
+              {" "}(IRS Tax Exempt Organization Search)
+            </p>
+            <p className="text-sm text-muted-foreground mb-2">{formatAddressLine()}</p>
+            <p className="text-sm mb-4">
+              <PhoneLink className="font-semibold text-primary" />
+              {" · "}
+              <ContactEmail className="font-semibold text-primary" />
+            </p>
+            <SocialLinks className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4" />
+            <a href="/about" className="text-sm font-bold text-primary underline">Full accountability page</a>
+          </BlurFade>
+        </div>
+      </section>
+
       {/* DONATION FORM */}
       <section className="py-20 px-6 bg-background" id="donate">
         <div className="max-w-xl mx-auto">
@@ -465,7 +460,7 @@ export default function DonationPage() {
               <Badge className="mb-3 bg-primary/10 text-primary border border-primary/20">Make an Impact</Badge>
               <h2 className="text-4xl font-extrabold tracking-tight">Fund a Veteran&rsquo;s Dignity</h2>
               <p className="text-muted-foreground mt-3">
-                $35 is roughly the cost of one pair of jeans. Your donation goes directly to veterans.
+                ${PAIR_COST_DOLLARS} is about what jeans cost. Veterans receive {PAIRS_POLICY}.
               </p>
             </div>
           </BlurFade>
@@ -476,7 +471,7 @@ export default function DonationPage() {
               {(["monthly", "once"] as const).map((m) => (
                 <button
                   key={m}
-                  onClick={() => { setMode(m); setSelected(35); setCustom(""); }}
+                  onClick={() => { setMode(m); setSelected(PAIR_COST_DOLLARS); setCustom(""); }}
                   className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all ${
                     mode === m
                       ? "bg-primary text-primary-foreground shadow-md"
@@ -509,8 +504,8 @@ export default function DonationPage() {
                   }`}
                 >
                   ${amount}
-                  {amount === 35 && (
-                    <span className="block text-xs font-normal opacity-70 mt-0.5">≈ 1 pair of jeans</span>
+                  {amount === PAIR_COST_DOLLARS && (
+                    <span className="block text-xs font-normal opacity-70 mt-0.5">about a pair of jeans</span>
                   )}
                 </motion.button>
               ))}
@@ -536,7 +531,7 @@ export default function DonationPage() {
                 className="mb-6 p-5 rounded-2xl bg-primary/8 border border-primary/20 text-sm"
               >
                 {isJeansPair ? (
-                  <p className="text-foreground">⚡ <strong>$35</strong> is roughly the cost of one pair of jeans - that&rsquo;s exactly what goes to a veteran on our waitlist.</p>
+                  <p className="text-foreground">⚡ <strong>${PAIR_COST_DOLLARS}</strong> is about what jeans cost. Veterans receive {PAIRS_POLICY}.</p>
                 ) : (
                   <p className="text-foreground">⚡ Your <strong>${finalAmount}</strong> goes directly to putting veterans on their feet. Thank you.</p>
                 )}
@@ -566,6 +561,8 @@ export default function DonationPage() {
               <span>🏅 501(c)(3) tax-deductible</span>
               <span>·</span>
               <span>✅ Cancel anytime</span>
+              <span>·</span>
+              <a href="/donation-policy" className="underline hover:text-foreground">Donation & refund policy</a>
             </div>
           </BlurFade>
         </div>
@@ -581,24 +578,25 @@ export default function DonationPage() {
             </div>
           </BlurFade>
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { icon: "👖", pct: 90, label: "Buying & delivering pants to veterans directly", color: "text-primary" },
-              { icon: "🚗", pct: 7, label: "Transportation, outreach & community events", color: "text-secondary" },
-              { icon: "📣", pct: 3, label: "Awareness & fundraising to grow our reach", color: "text-accent-foreground" },
-            ].map((item, i) => (
+            {MONEY_ALLOCATION.map((item, i) => {
+              const color = i === 0 ? "text-primary" : i === 1 ? "text-secondary" : "text-accent-foreground";
+              return (
               <BlurFade key={item.label} inView delay={i * 0.15}>
                 <div className="rounded-2xl border border-border bg-background p-6 text-center">
                   <div className="text-3xl mb-3">{item.icon}</div>
-                  <p className={`text-4xl font-extrabold mb-2 ${item.color}`}>
-                    <NumberTicker value={item.pct} className={item.color} />%
+                  <p className={`text-4xl font-extrabold mb-2 ${color}`}>
+                    <NumberTicker value={item.pct} className={color} />%
                   </p>
                   <p className="text-sm text-muted-foreground">{item.label}</p>
                 </div>
               </BlurFade>
-            ))}
+            );
+            })}
           </div>
         </div>
       </section>
+
+      <SponsorsSection />
 
       {/* VETERAN REQUEST */}
       <section className="py-20 px-6 bg-card border-t border-border" id="request">
@@ -606,10 +604,13 @@ export default function DonationPage() {
           <BlurFade inView delay={0}>
             <div className="text-center mb-10">
               <Badge className="mb-3 bg-secondary/10 text-secondary border border-secondary/20">Are You a Veteran in Need?</Badge>
-              <h2 className="text-4xl font-extrabold tracking-tight mb-3">Request Pants - No Cost to You</h2>
+              <h2 className="text-4xl font-extrabold tracking-tight mb-3">Request Pants – No Cost to You</h2>
               <p className="text-muted-foreground leading-relaxed max-w-lg mx-auto">
-                If you&rsquo;re a veteran facing hardship, we&rsquo;ll ship pants directly to your door at no charge.
-                Know a vet who needs help? Fill this out on their behalf.
+                If you&rsquo;re a veteran facing hardship, we&rsquo;ll ship pants to you at no charge — {PAIRS_POLICY}.
+                Know a vet who needs help? Fill this out on their behalf. Every request is reviewed by a person.
+              </p>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Questions? Call <PhoneLink className="font-semibold text-foreground" />.
               </p>
               <div className="mt-4 inline-flex gap-6 text-sm text-muted-foreground">
                 <span>✅ U.S. Military Veteran</span>
@@ -624,6 +625,10 @@ export default function DonationPage() {
             <div className="bg-background rounded-3xl border border-border p-8">
               <VeteranRequestForm />
             </div>
+            <p className="text-center text-xs text-muted-foreground mt-4">
+              <a href="/privacy" className="underline font-semibold hover:text-foreground">Privacy policy</a>
+              {" "}— what this form collects, who sees it, and how to ask us to delete it.
+            </p>
           </BlurFade>
         </div>
       </section>
@@ -635,7 +640,7 @@ export default function DonationPage() {
             <div className="text-center mb-10">
               <h2 className="text-2xl font-bold mb-3">Wear the Mission</h2>
               <p className="text-muted-foreground max-w-lg mx-auto">
-                Every shirt sold funds a pair of pants for a veteran. That&apos;s the whole deal.
+                Every shirt sold helps provide pants. Veterans receive {PAIRS_POLICY}.
               </p>
             </div>
           </BlurFade>
@@ -681,7 +686,7 @@ export default function DonationPage() {
                 </div>
 
                 <p className="text-xs text-emerald-600 font-semibold mb-5 flex items-center gap-1">
-                  <span>✓</span> Your purchase sends a pair of pants to a veteran
+                  <span>✓</span> Your purchase helps provide pants for veterans
                 </p>
 
                 {/* Size Selector */}
@@ -748,15 +753,19 @@ export default function DonationPage() {
               { src: "/images/team-office-shirts.jpg", label: "Smiles & Handshakes" },
               { src: "/images/team-selfie-office.jpg", label: "The Team" },
               { src: "/images/booth-car-show.jpg", label: "Community Event" },
-              { src: "/images/joseph-christmas-sponsor.jpg", label: "Veteran Recipients" },
+              // Founder portrait was reused here as "Veteran Recipients".
+              // TODO(board): No separate recipient photo is in the repo. This existing shot shows donated pants.
+              { src: "/images/christmas-tree-donations.jpg", label: "Pants Ready to Give" },
               { src: "/images/sorting-pants.jpg", label: "Behind the Scenes" },
             ].map((photo, i) => (
               <BlurFade key={i} inView delay={i * 0.1}>
                 <div className="aspect-square rounded-2xl overflow-hidden relative group">
-                  <img
+                  <Image
                     src={photo.src}
-                    alt={photo.label}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    alt={`${photo.label}, One Leg B4 the Other in Sioux Falls`}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 280px"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
                     <p className="text-xs text-white font-semibold">{photo.label}</p>
@@ -800,19 +809,7 @@ export default function DonationPage() {
         </div>
       </section>
 
-      <footer className="py-10 px-6 bg-black border-t border-white/10 text-center text-xs text-gray-500">
-        <p className="font-bold text-white mb-1">One Leg B4 the Other</p>
-        <p className="mb-1">230 S Phillips Ave, Suite 203 · Sioux Falls, SD 57104</p>
-        <p className="mb-1">(605) 277-2721</p>
-        <p className="mb-3">EIN: 99-3332965 · 501(c)(3) Nonprofit · Veteran-Led</p>
-        <div className="flex justify-center gap-6 mb-4">
-          <a href="https://onelegb4theother.com" className="hover:text-white transition-colors">Home</a>
-          <a href="https://onelegb4theother.com/#donate" className="hover:text-white transition-colors">Donate</a>
-          <a href="https://onelegb4theother.com/#request" className="hover:text-white transition-colors">Request Pants</a>
-          <a href="https://onelegb4theother.com/shop" className="hover:text-white transition-colors">Shop</a>
-        </div>
-        <p>© {new Date().getFullYear()} One Leg B4 the Other · All rights reserved</p>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

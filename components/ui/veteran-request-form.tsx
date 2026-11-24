@@ -3,6 +3,16 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Input } from "@/components/ui/input";
+import { INCOME_GUIDELINE, PHONE_DISPLAY } from "@/lib/site";
+
+const INCOME_RANGES = [
+  "Under $25,000",
+  "$25,000–$50,000",
+  "$50,000–$75,000",
+  "$75,000–$100,000",
+  "Over $100,000",
+  "Prefer not to say",
+];
 
 interface FormData {
   firstName: string;
@@ -118,9 +128,6 @@ export function VeteranRequestForm() {
       if (form.pantType === "jeans" && !form.inseam) e.inseam = "Required";
       if (form.pantType === "sweatpants" && !form.pantSize) e.pantSize = "Required";
     }
-    if (s === 5) {
-      if (!form.annualIncome.trim()) e.annualIncome = "Required — we use this to apply for grants";
-    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -147,7 +154,7 @@ export function VeteranRequestForm() {
       if (!res.ok) throw new Error();
       setSubmitted(true);
     } catch {
-      alert("Something went wrong. Please try again or call (605) 277-2721.");
+      alert(`Something went wrong. Please try again or call ${PHONE_DISPLAY}.`);
     } finally {
       setSubmitting(false);
     }
@@ -473,14 +480,24 @@ export function VeteranRequestForm() {
                 <p className="text-sm text-muted-foreground">A little background helps us reach veterans most in need. Everything here is optional.</p>
               </div>
 
-              {/* Household income — required for grants */}
               <div className="rounded-xl border border-border bg-muted/30 p-5 space-y-3">
-                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Household Income <span className="font-normal normal-case">(kept confidential)</span></p>
-                <p className="text-xs text-muted-foreground">We use this to apply for grants that help us serve more veterans.</p>
-                <div>
-                  <label className={labelClass}>Annual Household Income *</label>
-                  <Input value={form.annualIncome} onChange={set("annualIncome")} className={`${inputClass} ${errors.annualIncome ? "border-red-400" : ""}`} placeholder="e.g. $18,000" />
-                  {errors.annualIncome && <p className="text-xs text-red-500 mt-1">{errors.annualIncome}</p>}
+                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Household income <span className="font-normal normal-case">(optional)</span></p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{INCOME_GUIDELINE}</p>
+                <div className="flex flex-wrap gap-2">
+                  {INCOME_RANGES.map((range) => (
+                    <button
+                      key={range}
+                      type="button"
+                      onClick={() => setForm((prev) => ({ ...prev, annualIncome: prev.annualIncome === range ? "" : range }))}
+                      className={`px-4 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all ${
+                        form.annualIncome === range
+                          ? "bg-primary border-primary text-white"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      {range}
+                    </button>
+                  ))}
                 </div>
               </div>
 
