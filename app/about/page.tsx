@@ -108,7 +108,7 @@ export default function AboutPage() {
           </ul>
 
           <h2 className="text-2xl font-bold mb-6">Leadership</h2>
-          <div className="grid sm:grid-cols-3 gap-8 mb-12">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {LEADERSHIP.map((member) => (
               <div key={member.name} className="text-center">
                 <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 mx-auto mb-4 bg-secondary text-secondary-foreground flex items-center justify-center">

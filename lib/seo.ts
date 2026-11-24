@@ -3,6 +3,7 @@ import {
   ADDRESS,
   EIN,
   FOUNDED_YEAR,
+  LEADERSHIP,
   MISSION_LINE,
   PHONE_TEL,
   SITE_NAME,
@@ -74,6 +75,12 @@ export function organizationJsonLd() {
       "@type": "AdministrativeArea",
       name: "Sioux Falls, South Dakota",
     },
+    member: LEADERSHIP.map((person) => ({
+      "@type": "Person",
+      name: person.name,
+      jobTitle: person.role,
+      ...(person.image ? { image: `${SITE_URL}${person.image}` } : {}),
+    })),
     ...(isContactEmailSet() ? { email: CONTACT_EMAIL } : {}),
     ...(sameAs.length > 0 ? { sameAs } : {}),
   };

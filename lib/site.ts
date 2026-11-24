@@ -11,7 +11,8 @@
  * - CONTACT_EMAIL: Joseph@onelegb4theother.com (public inbox only; no personal emails)
  * - ADDRESS.suite: 203
  * - Phone (605) 777-7511, the 24/7 answering line (the office line is not staffed)
- * - Board: Matthew Hummel, President; Joseph Powell, Founder; Rachael Larson, Director
+ * - Board, in order: Matthew Hummel, President; Andrew Miller, Vice President;
+ *   Joseph Powell, Founder; Rachael Larson, Secretary; Daniel Armstrong, Board Member
  * - Income is a soft guideline (about 150% of the federal poverty level,
  *   roughly $23,475/yr for a single person). A person reviews every request.
  *   Never auto-deny.
@@ -23,7 +24,7 @@
  * - SOCIAL_LINKS (profile URLs are not in the repo)
  * - NEWS_STORIES urls (Keloland article URLs are not in the repo)
  * - SPONSORS (the sponsor page promises a logo section; no logos are in the repo)
- * - A photo for Rachael Larson (initials stand in)
+ * - Photos for Andrew Miller, Rachael Larson, and Daniel Armstrong (initials stand in)
  */
 
 export const SITE_NAME = "One Leg B4 the Other";
@@ -164,7 +165,7 @@ export type Leader = {
   initials: string;
 };
 
-/** Confirmed board. Do not list personal emails. Do not add officers who are not on this list. */
+/** Confirmed board, in order. Do not list personal emails. Initials stand in when no photo is in the repo. */
 export const LEADERSHIP: Leader[] = [
   {
     name: "Matthew Hummel",
@@ -173,6 +174,14 @@ export const LEADERSHIP: Leader[] = [
       "Matthew leads day-to-day operations, veteran outreach, and mission strategy. He served as an aircraft maintenance and crash recovery technician for 20 years.",
     image: "/images/veteran-pants-fitting.jpg",
     initials: "MH",
+  },
+  {
+    name: "Andrew Miller",
+    role: "Vice President",
+    detail:
+      "Andrew brings his military experience to veteran relationships and community outreach, ensuring every recipient is met with respect.",
+    image: null,
+    initials: "AM",
   },
   {
     name: "Joseph Powell",
@@ -184,11 +193,17 @@ export const LEADERSHIP: Leader[] = [
   },
   {
     name: "Rachael Larson",
-    role: "Director",
-    detail: "Rachael Larson serves as a director of One Leg B4 the Other.",
-    // No photo is in the repo. Initials stand in. Do not display a personal email.
+    role: "Secretary",
+    detail: "Secretary of One Leg B4 the Other.",
     image: null,
     initials: "RL",
+  },
+  {
+    name: "Daniel Armstrong",
+    role: "Board Member",
+    detail: "Board member of One Leg B4 the Other.",
+    image: null,
+    initials: "DA",
   },
 ];
 

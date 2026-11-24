@@ -401,7 +401,7 @@ export default function DonationPage() {
 
       {/* MEET THE TEAM */}
       <section className="py-16 px-6 bg-card border-t border-border">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <BlurFade inView delay={0}>
             <div className="text-center mb-10">
               <Badge className="mb-3 bg-primary/10 text-primary border border-primary/20">The People Behind the Mission</Badge>
