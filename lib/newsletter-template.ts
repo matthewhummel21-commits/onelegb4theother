@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, EIN, PHONE_DISPLAY, formatAddressLine } from "@/lib/site";
+import { CONTACT_EMAIL, EIN, PHONE_DISPLAY, PHONE_NOTE, PHONE_TEL, formatAddressLine } from "@/lib/site";
 
 export interface NewsletterArticle {
   title: string
@@ -380,7 +380,8 @@ export function buildNewsletterHtml(d: NewsletterData): string {
   <!-- FOOTER -->
   <tr><td align="center" style="padding-top:8px;padding-bottom:40px;border-top:1px solid #1f1f1f;">
     <p style="margin:16px 0 4px;font-size:13px;font-weight:bold;color:#4b5563;font-family:Arial,sans-serif;">One Leg B4 the Other</p>
-    <p style="margin:0 0 4px;font-size:11px;color:#374151;font-family:Arial,sans-serif;">${formatAddressLine()} &bull; ${PHONE_DISPLAY} &bull; ${CONTACT_EMAIL}</p>
+    <p style="margin:0 0 4px;font-size:11px;color:#374151;font-family:Arial,sans-serif;">${formatAddressLine()} &bull; <a href="tel:${PHONE_TEL}" style="color:#374151;text-decoration:none;">${PHONE_DISPLAY}</a> &bull; ${CONTACT_EMAIL}</p>
+    <p style="margin:0 0 4px;font-size:11px;color:#374151;font-family:Arial,sans-serif;">${PHONE_NOTE}.</p>
     <p style="margin:0 0 14px;font-size:11px;color:#374151;font-family:Arial,sans-serif;">EIN: ${EIN} &bull; 501(c)(3) Veteran-Led Nonprofit</p>
     <p style="margin:0;font-size:11px;font-family:Arial,sans-serif;">
       <a href="${site}" style="color:#4b5563;text-decoration:none;">Website</a>

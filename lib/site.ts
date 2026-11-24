@@ -10,7 +10,7 @@
  * - PAIRS_POLICY: "as many pairs as they need". Never "one pair" or "up to 7".
  * - CONTACT_EMAIL: Joseph@onelegb4theother.com (public inbox only; no personal emails)
  * - ADDRESS.suite: 203
- * - Phone (605) 277-2721
+ * - Phone (605) 777-7511, the 24/7 answering line (the office line is not staffed)
  * - Board: Matthew Hummel, President; Joseph Powell, Founder; Rachael Larson, Director
  * - Income is a soft guideline (about 150% of the federal poverty level,
  *   roughly $23,475/yr for a single person). A person reviews every request.
@@ -34,8 +34,10 @@ export const EIN = "99-3332965";
 /** IRS Tax Exempt Organization Search. Visitors look the EIN up here. */
 export const IRS_TEOS_URL = "https://apps.irs.gov/app/eos/";
 
-export const PHONE_DISPLAY = "(605) 277-2721";
-export const PHONE_TEL = "+16052772721";
+/** 24/7 answering line. The office phone is not staffed. */
+export const PHONE_DISPLAY = "(605) 777-7511";
+export const PHONE_TEL = "+16057777511";
+export const PHONE_NOTE = "Call anytime, our answering line picks up 24/7";
 
 /** Confirmed public contact. Do not publish anyone's personal email. */
 export const CONTACT_EMAIL = "Joseph@onelegb4theother.com";

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { SiteFooter } from "@/components/site-footer";
-import { ContactEmail, PhoneLink } from "@/components/site-contact";
+import { ContactEmail, PhoneLink, PhoneNote } from "@/components/site-contact";
 
 const TIERS = [
   {
@@ -91,15 +92,15 @@ export default function AdvertisePage() {
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-white/10">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="/" className="text-white font-extrabold text-lg tracking-tight hover:opacity-80 transition-opacity">
+          <Link href="/" className="text-white font-extrabold text-lg tracking-tight hover:opacity-80 transition-opacity">
             One Leg B4 the Other
-          </a>
-          <a
+          </Link>
+          <Link
             href="/#donate"
             className="px-4 py-2 rounded-xl bg-[#B22234] text-white text-sm font-bold hover:bg-[#8B1A27] transition-colors"
           >
             Donate
-          </a>
+          </Link>
         </div>
       </nav>
 
@@ -187,9 +188,9 @@ export default function AdvertisePage() {
               <p className="text-white/50 leading-relaxed">
                 Thanks for reaching out. Someone from our team will contact you within 48 hours to discuss your sponsorship.
               </p>
-              <a href="/" className="inline-block mt-8 text-sm text-white/40 hover:text-white/70 transition-colors underline">
+              <Link href="/" className="inline-block mt-8 text-sm text-white/40 hover:text-white/70 transition-colors underline">
                 Back to main site
-              </a>
+              </Link>
             </motion.div>
           ) : (
             <motion.form
@@ -258,7 +259,10 @@ export default function AdvertisePage() {
               )}
 
               {status === "error" && (
-                <p className="text-xs text-red-400 text-center">Something went wrong — email <ContactEmail className="underline" /> or call <PhoneLink className="underline" />.</p>
+                <>
+                  <p className="text-xs text-red-400 text-center">Something went wrong — email <ContactEmail className="underline" /> or call <PhoneLink className="underline" />.</p>
+                  <PhoneNote className="text-xs text-white/50 text-center" />
+                </>
               )}
 
               <button

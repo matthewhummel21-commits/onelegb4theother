@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Input } from "@/components/ui/input";
-import { INCOME_GUIDELINE, PHONE_DISPLAY } from "@/lib/site";
+import { INCOME_GUIDELINE, PHONE_DISPLAY, PHONE_NOTE } from "@/lib/site";
 
 const INCOME_RANGES = [
   "Under $25,000",
@@ -154,7 +154,7 @@ export function VeteranRequestForm() {
       if (!res.ok) throw new Error();
       setSubmitted(true);
     } catch {
-      alert(`Something went wrong. Please try again or call ${PHONE_DISPLAY}.`);
+      alert(`Something went wrong. Please try again or call ${PHONE_DISPLAY}. ${PHONE_NOTE}.`);
     } finally {
       setSubmitting(false);
     }
@@ -237,7 +237,7 @@ export function VeteranRequestForm() {
             <div className="space-y-5">
               <div>
                 <h3 className="text-lg font-bold text-foreground mb-1">Who are you?</h3>
-                <p className="text-sm text-muted-foreground">Just the basics — we'll take care of the rest.</p>
+                <p className="text-sm text-muted-foreground">Just the basics — we&apos;ll take care of the rest.</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -268,7 +268,7 @@ export function VeteranRequestForm() {
             <div className="space-y-5">
               <div>
                 <h3 className="text-lg font-bold text-foreground mb-1">Where do we ship?</h3>
-                <p className="text-sm text-muted-foreground">We'll send the pants directly to your door, free of charge.</p>
+                <p className="text-sm text-muted-foreground">We&apos;ll send the pants directly to your door, free of charge.</p>
               </div>
               <div>
                 <label className={labelClass}>Street Address *</label>
@@ -528,7 +528,7 @@ export function VeteranRequestForm() {
                   </div>
                 )}
                 {!idFile && (
-                  <p className="text-xs text-muted-foreground">No file? No problem — we'll call you to verify instead.</p>
+                  <p className="text-xs text-muted-foreground">No file? No problem — we&apos;ll call you to verify instead.</p>
                 )}
                 <input ref={fileInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={e => setIdFile(e.target.files?.[0] || null)} />
               </div>
@@ -561,7 +561,7 @@ export function VeteranRequestForm() {
                   {form.wantsFollowUpCall && <span className="text-white text-xs font-bold">✓</span>}
                 </div>
                 <div>
-                  <p className="font-bold text-sm text-foreground">I'd welcome a follow-up call 📞</p>
+                  <p className="font-bold text-sm text-foreground">I&apos;d welcome a follow-up call 📞</p>
                   <p className="text-xs text-muted-foreground mt-0.5">Sometimes we just want to hear your story. No obligation — just a conversation.</p>
                 </div>
               </button>

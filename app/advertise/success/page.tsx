@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { ContactEmail, PhoneLink } from "@/components/site-contact";
+import { ContactEmail, PhoneLink, PhoneNote } from "@/components/site-contact";
 
 export default function AdvertiseSuccessPage() {
   return (
@@ -20,12 +21,13 @@ export default function AdvertiseSuccessPage() {
         <p className="text-white/40 text-sm mb-8">
           Questions? Email <ContactEmail className="text-white/60 underline hover:text-white" /> or call <PhoneLink className="text-white/60 underline hover:text-white" />.
         </p>
-        <a
+        <PhoneNote className="text-white/40 text-sm mb-8" />
+        <Link
           href="/"
           className="inline-block px-8 py-3 rounded-xl bg-[#B22234] text-white font-bold hover:bg-[#8B1A27] transition-colors"
         >
           Back to Main Site
-        </a>
+        </Link>
       </motion.div>
     </main>
   );

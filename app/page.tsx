@@ -13,7 +13,7 @@ import { VeteranRequestForm } from "@/components/ui/veteran-request-form";
 import { NewsCoverage } from "@/components/news-coverage";
 import { SponsorsSection } from "@/components/sponsors-section";
 import { SiteFooter } from "@/components/site-footer";
-import { ContactEmail, PhoneLink, SocialLinks } from "@/components/site-contact";
+import { ContactEmail, PhoneLink, PhoneNote, SocialLinks } from "@/components/site-contact";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -57,7 +57,7 @@ export default function DonationPage() {
         body: JSON.stringify({ amount: finalAmount, mode }),
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
+      if (data.url) window.location.assign(data.url);
       else alert("Something went wrong. Please try again.");
     } catch {
       alert("Something went wrong. Please try again.");
@@ -76,7 +76,7 @@ export default function DonationPage() {
         body: JSON.stringify({ size: merchSize }),
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
+      if (data.url) window.location.assign(data.url);
     } catch {
       alert("Something went wrong. Try again.");
     } finally {
@@ -441,11 +441,12 @@ export default function DonationPage() {
               {" "}(IRS Tax Exempt Organization Search)
             </p>
             <p className="text-sm text-muted-foreground mb-2">{formatAddressLine()}</p>
-            <p className="text-sm mb-4">
+            <p className="text-sm mb-1">
               <PhoneLink className="font-semibold text-primary" />
               {" · "}
               <ContactEmail className="font-semibold text-primary" />
             </p>
+            <PhoneNote className="text-sm text-muted-foreground mb-4" />
             <SocialLinks className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4" />
             <a href="/about" className="text-sm font-bold text-primary underline">Full accountability page</a>
           </BlurFade>
@@ -612,6 +613,7 @@ export default function DonationPage() {
               <p className="mt-3 text-sm text-muted-foreground">
                 Questions? Call <PhoneLink className="font-semibold text-foreground" />.
               </p>
+              <PhoneNote className="mt-1 text-sm text-muted-foreground" />
               <div className="mt-4 inline-flex gap-6 text-sm text-muted-foreground">
                 <span>✅ U.S. Military Veteran</span>
                 <span>·</span>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { InnerPage } from "@/components/inner-page";
-import { ContactEmail, PhoneLink } from "@/components/site-contact";
+import { ContactEmail, PhoneLink, PhoneNote } from "@/components/site-contact";
 import { pageMetadata } from "@/lib/seo";
 import { EIN, PAIR_COST_DOLLARS, PAIRS_POLICY, SITE_NAME } from "@/lib/site";
 
@@ -56,6 +56,7 @@ export default function DonationPolicyPage() {
                 email <ContactEmail className="font-semibold text-primary" /> and we will review it. The board
                 has not set a fixed refund window.
               </p>
+              <PhoneNote className="mt-2" />
               <p className="mt-3">
                 Shop items are made to order and shipped by our print partner. If an order arrives wrong or
                 damaged, contact us the same way and we will help.

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState } from "react";
+import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { CENTS_OF_EVERY_DOLLAR_TO_VETERANS, COST_TO_VETERAN_DOLLARS, PAIRS_POLICY } from "@/lib/site";
 
@@ -103,14 +104,6 @@ const PROMO_CODES: Record<string, Record<string, number>> = {
 function ProductCard({ product, appliedCode }: { product: Product; appliedCode: string | null }) {
   const [activeColor, setActiveColor] = useState<string>(product.colors[0].key);
   const [activeSize, setActiveSize] = useState<string | null>(null);
-
-  // Reset selected size if it's not available in the newly selected color
-  useEffect(() => {
-    if (activeSize && !getSizes().includes(activeSize)) {
-      setActiveSize(null);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeColor]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [flipped, setFlipped] = useState(false);
@@ -122,26 +115,22 @@ function ProductCard({ product, appliedCode }: { product: Product; appliedCode: 
 
   const colorObj = (product.colors as readonly Color[]).find(c => c.key === activeColor) ?? product.colors[0];
 
-  // Dynamic sizes for items that vary by color
-  const getSizes = () => {
-    if ("dynamicSizes" in product && product.dynamicSizes) {
-      const isGD = (colorObj as { gd?: boolean }).gd;
-      return isGD ? SIZES_SWEATS_GD : SIZES_GD;
-    }
-    return [...product.sizes];
-  };
+  const availableSizes: readonly string[] = ("dynamicSizes" in product && product.dynamicSizes)
+    ? ((colorObj as { gd?: boolean }).gd ? SIZES_SWEATS_GD : SIZES_GD)
+    : product.sizes;
+  const selectedSize = activeSize && availableSizes.includes(activeSize) ? activeSize : null;
 
   const hasBack = "backImg" in colorObj && (colorObj as { backImg?: string }).backImg;
 
   const handleBuy = async () => {
-    if (product.sizes.length > 0 && !activeSize) return;
+    if (product.sizes.length > 0 && !selectedSize) return;
     setLoading(true);
     setError(null);
     try {
       const body: Record<string, string | undefined> = {
         product: product.id,
         color: activeColor,
-        size: activeSize ?? undefined,
+        size: selectedSize ?? undefined,
         promoCode: appliedCode ?? undefined,
       };
       const res = await fetch("/api/checkout", {
@@ -150,12 +139,12 @@ function ProductCard({ product, appliedCode }: { product: Product; appliedCode: 
         body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (data.url) { window.location.href = data.url; }
+      if (data.url) { window.location.assign(data.url); }
       else { setError(data.error || "Something went wrong."); setLoading(false); }
     } catch { setError("Network error."); setLoading(false); }
   };
 
-  const needsSize = product.sizes.length > 0 && !activeSize;
+  const needsSize = product.sizes.length > 0 && !selectedSize;
 
   return (
     <div className="group bg-[#111111] rounded-2xl overflow-hidden border border-white/5 hover:border-white/15 transition-all duration-300 flex flex-col">
@@ -222,7 +211,7 @@ function ProductCard({ product, appliedCode }: { product: Product; appliedCode: 
         {product.sizes.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {[...product.sizes].map(s => {
-              const available = getSizes().includes(s);
+              const available = availableSizes.includes(s);
               return (
                 <button
                   key={s}
@@ -232,7 +221,7 @@ function ProductCard({ product, appliedCode }: { product: Product; appliedCode: 
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
                     !available
                       ? "border-white/5 text-white/20 line-through cursor-not-allowed"
-                      : activeSize === s
+                      : selectedSize === s
                         ? "bg-white text-black border-white"
                         : "border-white/15 text-white/60 hover:border-white/50 hover:text-white"
                   }`}
@@ -249,7 +238,7 @@ function ProductCard({ product, appliedCode }: { product: Product; appliedCode: 
         {/* Buy button */}
         <button
           onClick={handleBuy}
-          disabled={loading || (getSizes().length > 0 && !activeSize)}
+          disabled={loading || (availableSizes.length > 0 && !selectedSize)}
           className={`mt-auto w-full py-3 rounded-xl text-sm font-extrabold uppercase tracking-wide transition-all ${
             loading || needsSize
               ? "bg-white/5 text-white/30 cursor-not-allowed"
@@ -282,12 +271,12 @@ export default function ShopPage() {
       {/* ── NAV ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="/" className="text-white font-extrabold text-lg tracking-tight">
+          <Link href="/" className="text-white font-extrabold text-lg tracking-tight">
             One Leg B4 the Other
-          </a>
-          <a href="/#donate" className="px-4 py-2 rounded-xl bg-[#b22234] text-white text-sm font-bold hover:bg-[#8b0000] transition-colors">
+          </Link>
+          <Link href="/#donate" className="px-4 py-2 rounded-xl bg-[#b22234] text-white text-sm font-bold hover:bg-[#8b0000] transition-colors">
             Donate
-          </a>
+          </Link>
         </div>
       </nav>
 
@@ -310,16 +299,16 @@ export default function ShopPage() {
                 >
                   Shop Now
                 </a>
-                <a
+                <Link
                   href="/#donate"
                   className="px-8 py-4 rounded-2xl border border-white/20 text-white font-extrabold text-base hover:bg-white/5 transition-colors"
                 >
                   Just Donate →
-                </a>
+                </Link>
               </div>
-              <a href="/donation-policy" className="inline-block mt-4 text-xs text-white/50 underline">
+              <Link href="/donation-policy" className="inline-block mt-4 text-xs text-white/50 underline">
                 Donation & refund policy
-              </a>
+              </Link>
             </div>
             {/* Hero product stack */}
             <div className="flex-1 flex justify-center">

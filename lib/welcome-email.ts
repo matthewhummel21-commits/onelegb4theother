@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, EIN, PAIR_COST_DOLLARS, PAIRS_POLICY, PHONE_DISPLAY, SITE_URL, VETERANS_WAITING, formatAddressLine } from "@/lib/site";
+import { CONTACT_EMAIL, EIN, PAIR_COST_DOLLARS, PAIRS_POLICY, PHONE_DISPLAY, PHONE_NOTE, PHONE_TEL, SITE_URL, VETERANS_WAITING, formatAddressLine } from "@/lib/site";
 
 export function buildWelcomeEmailHtml(firstName?: string): string {
   const name = firstName ? firstName.trim() : null
@@ -132,7 +132,10 @@ export function buildWelcomeEmailHtml(firstName?: string): string {
           <tr>
             <td style="padding:32px 0 0;text-align:center;">
               <p style="color:#374151;font-size:12px;margin:0 0 8px;">
-                One Leg B4 the Other · ${formatAddressLine()} · ${PHONE_DISPLAY} · ${CONTACT_EMAIL}
+                One Leg B4 the Other · ${formatAddressLine()} · <a href="tel:${PHONE_TEL}" style="color:#6b7280;text-decoration:none;">${PHONE_DISPLAY}</a> · ${CONTACT_EMAIL}
+              </p>
+              <p style="color:#374151;font-size:12px;margin:0 0 8px;">
+                ${PHONE_NOTE}.
               </p>
               <p style="color:#374151;font-size:12px;margin:0 0 8px;">
                 EIN: ${EIN} · 501(c)(3) Nonprofit · Veteran-Led

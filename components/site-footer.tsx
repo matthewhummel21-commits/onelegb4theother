@@ -1,4 +1,4 @@
-import { ContactEmail, PhoneLink, SocialLinks } from "@/components/site-contact";
+import { ContactEmail, PhoneLink, PhoneNote, SocialLinks } from "@/components/site-contact";
 import { EIN, IRS_TEOS_URL, SITE_NAME, formatAddressLine } from "@/lib/site";
 
 const LINKS = [
@@ -20,6 +20,7 @@ export function SiteFooter() {
       <p className="mb-1">
         <PhoneLink className="hover:text-white transition-colors" />
       </p>
+      <PhoneNote className="mb-3 text-gray-400" />
       <p className="mb-3">
         <ContactEmail className="hover:text-white transition-colors" />
       </p>

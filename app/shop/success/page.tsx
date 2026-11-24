@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 function SuccessContent() {
@@ -18,8 +19,8 @@ function SuccessContent() {
       {/* NAV */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-white/10">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="/" className="text-white font-extrabold text-lg tracking-tight">One Leg B4 the Other</a>
-          <a href="/#donate" className="px-4 py-2 rounded-xl bg-[#b22234] text-white text-sm font-bold hover:bg-[#8b0000] transition-colors">Donate</a>
+          <Link href="/" className="text-white font-extrabold text-lg tracking-tight">One Leg B4 the Other</Link>
+          <Link href="/#donate" className="px-4 py-2 rounded-xl bg-[#b22234] text-white text-sm font-bold hover:bg-[#8b0000] transition-colors">Donate</Link>
         </div>
       </nav>
 
@@ -92,24 +93,24 @@ function SuccessContent() {
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
+          <Link
             href="/shop"
             className="px-8 py-4 rounded-2xl bg-[#b22234] text-white font-extrabold text-base hover:bg-[#8b0000] transition-colors text-center"
           >
             Buy Another Shirt
-          </a>
-          <a
+          </Link>
+          <Link
             href="/#donate"
             className="px-8 py-4 rounded-2xl border-2 border-white/20 text-white font-extrabold text-base hover:bg-white/5 transition-colors text-center"
           >
             Make a Donation
-          </a>
-          <a
+          </Link>
+          <Link
             href="/"
             className="px-8 py-4 rounded-2xl border border-white/10 text-white/60 font-bold text-base hover:text-white hover:border-white/30 transition-colors text-center"
           >
             Back to Home
-          </a>
+          </Link>
         </div>
 
       </div>

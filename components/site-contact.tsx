@@ -1,6 +1,7 @@
 import {
   CONTACT_EMAIL,
   PHONE_DISPLAY,
+  PHONE_NOTE,
   PHONE_TEL,
   SOCIAL_LINKS,
   isContactEmailSet,
@@ -12,6 +13,10 @@ export function PhoneLink({ className = "" }: { className?: string }) {
       {PHONE_DISPLAY}
     </a>
   );
+}
+
+export function PhoneNote({ className = "" }: { className?: string }) {
+  return <p className={className}>{PHONE_NOTE}</p>;
 }
 
 export function ContactEmail({ className = "" }: { className?: string }) {

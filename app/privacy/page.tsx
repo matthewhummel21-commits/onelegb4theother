@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { InnerPage } from "@/components/inner-page";
-import { ContactEmail, PhoneLink } from "@/components/site-contact";
+import { ContactEmail, PhoneLink, PhoneNote } from "@/components/site-contact";
 import { pageMetadata } from "@/lib/seo";
 import { INCOME_GUIDELINE, PANT_OPTIONS_LABEL, SITE_NAME } from "@/lib/site";
 
@@ -70,6 +70,7 @@ export default function PrivacyPage() {
                 Call <PhoneLink className="font-semibold text-primary" /> or email <ContactEmail className="font-semibold text-primary" /> and
                 ask us to delete your request. Tell us the name and phone number on the form so we can find it.
               </p>
+              <PhoneNote className="text-sm text-muted-foreground mt-2" />
             </section>
 
             <section>

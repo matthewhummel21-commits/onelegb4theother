@@ -3,7 +3,7 @@ import Image from "next/image";
 import { InnerPage } from "@/components/inner-page";
 import { NewsCoverage } from "@/components/news-coverage";
 import { SponsorsSection } from "@/components/sponsors-section";
-import { ContactEmail, PhoneLink, SocialLinks } from "@/components/site-contact";
+import { ContactEmail, PhoneLink, PhoneNote, SocialLinks } from "@/components/site-contact";
 import { pageMetadata } from "@/lib/seo";
 import {
   ADDRESS,
@@ -74,11 +74,12 @@ export default function AboutPage() {
               . Look this number up in the IRS Tax Exempt Organization Search.
             </p>
             <p className="mb-2">{formatAddressLine()}</p>
-            <p className="mb-2">
+            <p className="mb-1">
               <PhoneLink className="font-semibold text-primary" />
               {" · "}
               <ContactEmail />
             </p>
+            <PhoneNote className="mb-2 text-muted-foreground" />
             <p className="text-muted-foreground">
               Pants offered through the request form: {PANT_OPTIONS_LABEL}. No cost to the veteran.
               Veterans receive {PAIRS_POLICY}.
@@ -140,11 +141,12 @@ export default function AboutPage() {
             <br />
             {ADDRESS.city}, {ADDRESS.regionName}
           </p>
-          <p className="text-sm mb-4">
+          <p className="text-sm mb-1">
             <PhoneLink className="font-semibold text-primary" />
             <span className="text-muted-foreground"> · </span>
             <ContactEmail />
           </p>
+          <PhoneNote className="text-sm text-muted-foreground mb-4" />
           <SocialLinks className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-8" />
           <p className="text-sm">
             <a href="/privacy" className="underline font-semibold">Privacy policy</a>
