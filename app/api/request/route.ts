@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { put } from "@vercel/blob";
 import { initDb, insertRequest } from "@/lib/db";
+import { withinRateLimit } from "@/lib/rate-limit";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -116,8 +117,19 @@ function buildEmailHtml(fields: Record<string, string>) {
   `;
 }
 
+const MAX_ID_BYTES = 8 * 1024 * 1024;
+const ID_EXTENSIONS = new Set(["pdf", "jpg", "jpeg", "png"]);
+
+function clip(value: string | undefined, max: number): string {
+  return (value || "").slice(0, max);
+}
+
 export async function POST(req: NextRequest) {
   try {
+    if (!withinRateLimit(req, "pants-request", 5, 10 * 60 * 1000)) {
+      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+    }
+
     // Ensure DB table exists
     await initDb();
 
@@ -161,8 +173,14 @@ export async function POST(req: NextRequest) {
     let idUploaded = false;
 
     if (idFile) {
+      const ext = idFile.name.split(".").pop()?.toLowerCase() || "";
+      if (!ID_EXTENSIONS.has(ext) || idFile.size > MAX_ID_BYTES) {
+        return NextResponse.json(
+          { error: "ID file must be a PDF, JPG, or PNG under 8 MB." },
+          { status: 400 }
+        );
+      }
       try {
-        const ext = idFile.name.split(".").pop()?.toLowerCase() || "bin";
         const blobName = `vet-ids/${Date.now()}-${firstName || "unknown"}-${lastName || "unknown"}.${ext}`;
         const blob = await put(blobName, idFile, { access: "public" });
         idFilePath = blob.url;
@@ -182,18 +200,18 @@ export async function POST(req: NextRequest) {
     // ── Save to Neon Postgres ────────────────────────────────────────────────
     const requestId = await insertRequest({
       status,
-      firstName: firstName || null,
-      lastName: lastName || null,
-      email: email || null,
-      phone: phone || null,
-      address: address || null,
-      city: city || null,
-      state: state || null,
-      zip: zip || null,
-      branch: branch || null,
-      yearsServed: yearsServed || null,
-      householdSize: householdSize || null,
-      annualIncome: annualIncome || null,
+      firstName: clip(firstName, 80) || null,
+      lastName: clip(lastName, 80) || null,
+      email: clip(email, 160) || null,
+      phone: clip(phone, 40) || null,
+      address: clip(address, 200) || null,
+      city: clip(city, 80) || null,
+      state: clip(state, 40) || null,
+      zip: clip(zip, 12) || null,
+      branch: clip(branch, 40) || null,
+      yearsServed: clip(yearsServed, 40) || null,
+      householdSize: clip(householdSize, 20) || null,
+      annualIncome: clip(annualIncome, 40) || null,
       pantType: pantType || null,
       pantFit: pantFit || null,
       pantColor: pantColor || null,
@@ -203,7 +221,7 @@ export async function POST(req: NextRequest) {
       waist: waist || null,
       inseam: inseam || null,
       referredBy: referredBy || null,
-      notes: notes || null,
+      notes: clip(notes, 2000) || null,
       idUploaded,
       idFilePath,
       verifiedBy: verifiedBy || null,

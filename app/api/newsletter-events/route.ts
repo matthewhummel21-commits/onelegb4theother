@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const SECRET = process.env.NEWSLETTER_SECRET
+import { staffUnauthorized } from '@/lib/staff-auth'
 
 interface VeteranEvent {
   title: string
@@ -11,10 +10,8 @@ interface VeteranEvent {
 }
 
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get('x-secret')
-  if (SECRET && secret !== SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = await staffUnauthorized(req, 'NEWSLETTER_SECRET')
+  if (denied) return denied
 
   const token = process.env.EVENTBRITE_TOKEN
   if (!token) return NextResponse.json({ error: 'EVENTBRITE_TOKEN not set' }, { status: 500 })

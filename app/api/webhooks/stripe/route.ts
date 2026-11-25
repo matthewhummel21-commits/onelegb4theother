@@ -6,9 +6,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY!;
 const PRINTFUL_STORE_ID = process.env.PRINTFUL_STORE_ID!;
 
-// Notification config — fallback to working BCHAMP bot/chat if env vars not set
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8782782833:AAH27kzx0MV2it34JG9nFrR49YgSNuBGdqI";
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || "8767594772";
+// Telegram alerts use env only. Do not put a bot token in this file.
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 const RACHAEL_EMAIL = "rachael.ann.larson@gmail.com";
 
 async function sendDonationAlerts({
@@ -38,15 +38,19 @@ async function sendDonationAlerts({
     `— One Leg B4 the Other`,
   ].join("\n");
 
-  try {
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: tgMsg }),
-    });
-    console.log(`📱 Telegram alert sent for ${amountLabel} donation`);
-  } catch (err) {
-    console.error("Telegram notification error:", err);
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+    console.error("Telegram alert skipped: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is not set");
+  } else {
+    try {
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: tgMsg }),
+      });
+      console.log(`📱 Telegram alert sent for ${amountLabel} donation`);
+    } catch (err) {
+      console.error("Telegram notification error:", err);
+    }
   }
 
   // 2. Email Rachael via Resend

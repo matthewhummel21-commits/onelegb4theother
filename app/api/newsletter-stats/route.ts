@@ -1,18 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { getAllRequests } from '@/lib/db'
-
-const SECRET = process.env.NEWSLETTER_STATS_SECRET
+import { staffUnauthorized } from '@/lib/staff-auth'
 
 export async function GET(req: NextRequest) {
   const resend = new Resend(process.env.RESEND_API_KEY)
   const audienceId = process.env.RESEND_AUDIENCE_ID!
 
-  // Simple secret-header auth
-  const secret = req.headers.get('x-secret')
-  if (SECRET && secret !== SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = await staffUnauthorized(req, 'NEWSLETTER_STATS_SECRET')
+  if (denied) return denied
 
   const [contactsRes, requests] = await Promise.all([
     resend.contacts.list({ audienceId }),

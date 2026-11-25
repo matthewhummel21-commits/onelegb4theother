@@ -1,11 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { staffUnauthorized } from '@/lib/staff-auth'
+import { withinRateLimit } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
+  const denied = await staffUnauthorized(req, 'NEWSLETTER_SECRET')
+  if (denied) return denied
+  if (!withinRateLimit(req, 'fetch-article', 20, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
+  }
+
   const { url } = await req.json()
-  if (!url) return NextResponse.json({ error: 'URL required' }, { status: 400 })
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    return NextResponse.json({ error: 'URL required' }, { status: 400 })
+  }
+  if (parsed.protocol !== 'https:') {
+    return NextResponse.json({ error: 'Only https links can be fetched' }, { status: 400 })
+  }
 
   try {
-    const res = await fetch(url, {
+    const res = await fetch(parsed.href, {
       headers: { 'User-Agent': 'Mozilla/5.0' },
       signal: AbortSignal.timeout(8000),
     })
@@ -24,7 +40,7 @@ export async function POST(req: NextRequest) {
       get(/<meta[^>]+name="description"[^>]+content="([^"]+)"/) ||
       get(/<meta[^>]+content="([^"]+)"[^>]+name="description"/)
 
-    const domain = new URL(url).hostname.replace('www.', '')
+    const domain = parsed.hostname.replace('www.', '')
 
     return NextResponse.json({ title, summary: summary.slice(0, 300), source: domain })
   } catch {

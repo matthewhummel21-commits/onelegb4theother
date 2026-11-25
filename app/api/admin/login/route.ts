@@ -1,16 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { expectedAdminSession } from "@/lib/admin-session";
+import { withinRateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
-    const { password } = await req.json();
+    if (!withinRateLimit(req, "admin-login", 8, 15 * 60 * 1000)) {
+      return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
+    }
 
-    if (!password || password !== process.env.ADMIN_PASSWORD) {
+    const { password } = await req.json();
+    const sessionValue = await expectedAdminSession();
+
+    if (!password || !sessionValue || password !== process.env.ADMIN_PASSWORD) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
     const cookieStore = await cookies();
-    cookieStore.set("admin_session", "1", {
+    cookieStore.set("admin_session", sessionValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

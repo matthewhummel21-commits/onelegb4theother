@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isAdminSession } from "@/lib/admin-session";
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Protect all /admin/* routes except /admin (login page) and /api/admin/login
@@ -10,7 +11,7 @@ export function middleware(req: NextRequest) {
 
   if (isAdminProtected) {
     const session = req.cookies.get("admin_session");
-    if (!session || session.value !== "1") {
+    if (!(await isAdminSession(session?.value))) {
       // For API routes, return 401
       if (pathname.startsWith("/api/")) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

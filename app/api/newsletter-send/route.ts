@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { buildNewsletterHtml, NewsletterData } from '@/lib/newsletter-template'
-
-const SECRET = process.env.NEWSLETTER_STATS_SECRET
+import { staffUnauthorized } from '@/lib/staff-auth'
+import { withinRateLimit } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
   const resend = new Resend(process.env.RESEND_API_KEY)
   const audienceId = process.env.RESEND_AUDIENCE_ID!
 
-  const secret = req.headers.get('x-secret')
-  if (SECRET && secret !== SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const denied = await staffUnauthorized(req, 'NEWSLETTER_STATS_SECRET')
+  if (denied) return denied
+  if (!withinRateLimit(req, 'newsletter-send', 5, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
   }
 
   let data: NewsletterData

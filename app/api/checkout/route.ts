@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { withinRateLimit } from "@/lib/rate-limit";
+import { safeSiteOrigin } from "@/lib/safe-origin";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -62,6 +64,10 @@ const SWEATS_VARIANTS: Record<string, Record<string, number>> = {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!withinRateLimit(req, "checkout", 20, 10 * 60 * 1000)) {
+      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+    }
+
     const { product, size, color, promoCode } = await req.json();
     const isSweatpants = product === "sweatpants";
     const isHat = product === "hat";
@@ -126,7 +132,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid promo code" }, { status: 400 });
     }
 
-    const origin = req.headers.get("origin") || "https://onelegb4theother.org";
+    const origin = safeSiteOrigin(req.headers.get("origin"));
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -215,7 +221,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (err: unknown) {
     console.error("Checkout error:", err);
-    const message = err instanceof Error ? err.message : "Internal error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }

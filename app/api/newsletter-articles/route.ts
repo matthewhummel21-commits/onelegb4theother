@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const SECRET = process.env.NEWSLETTER_SECRET
+import { staffUnauthorized } from '@/lib/staff-auth'
 
 interface Article {
   title: string
@@ -151,10 +150,8 @@ async function fetchGNews(apiKey: string, needed: number): Promise<Article[]> {
 }
 
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get('x-secret')
-  if (SECRET && secret !== SECRET) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = await staffUnauthorized(req, 'NEWSLETTER_SECRET')
+  if (denied) return denied
 
   // 1. Try RSS first — best quality
   const rssArticles = await fetchRssArticles()
