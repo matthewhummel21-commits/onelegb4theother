@@ -181,11 +181,17 @@ export async function POST(req: NextRequest) {
         );
       }
       try {
-        const blobName = `vet-ids/${Date.now()}-${firstName || "unknown"}-${lastName || "unknown"}.${ext}`;
-        const blob = await put(blobName, idFile, { access: "public" });
-        idFilePath = blob.url;
+        const blobName = `vet-ids/${crypto.randomUUID()}.${ext}`;
+        const blob = await put(blobName, idFile, {
+          access: "private",
+          addRandomSuffix: true,
+          contentType: idFile.type || undefined,
+          cacheControlMaxAge: 60,
+        });
+        // Store the pathname, not a URL. The admin page reads it through a logged-in route.
+        idFilePath = blob.pathname;
         idUploaded = true;
-        console.log(`Uploaded ID to Vercel Blob: ${idFilePath}`);
+        console.log("Uploaded private ID file for a pants request");
       } catch (blobErr) {
         console.error("Vercel Blob upload error:", blobErr);
         // Continue without file — degrade gracefully

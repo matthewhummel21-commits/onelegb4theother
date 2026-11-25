@@ -258,6 +258,22 @@ export async function getAllRequests(): Promise<RequestRow[]> {
   return rows as RequestRow[];
 }
 
+export async function listIdFileReferences(): Promise<{ id: number; id_file_path: string }[]> {
+  const sql = getSql();
+  const rows = await sql`
+    SELECT id, id_file_path
+    FROM requests
+    WHERE id_file_path IS NOT NULL AND id_file_path <> ''
+    ORDER BY id
+  `;
+  return rows as { id: number; id_file_path: string }[];
+}
+
+export async function updateIdFilePath(id: number, idFilePath: string): Promise<void> {
+  const sql = getSql();
+  await sql`UPDATE requests SET id_file_path = ${idFilePath} WHERE id = ${id}`;
+}
+
 export async function getRequestById(id: number): Promise<RequestRow | null> {
   const sql = getSql();
   const rows = await sql`

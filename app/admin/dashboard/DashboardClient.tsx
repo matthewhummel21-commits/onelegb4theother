@@ -103,7 +103,7 @@ function RequestCard({
       {/* ID file link */}
       {req.id_file_path && (
         <a
-          href={req.id_file_path}
+          href={`/api/admin/id-file/${req.id}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 bg-blue-900/20 border border-blue-800/40 px-3 py-1.5 rounded-lg transition-colors"
