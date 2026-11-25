@@ -504,7 +504,7 @@ export function VeteranRequestForm() {
               {/* ID upload */}
               <div className="rounded-xl border border-border bg-muted/30 p-5 space-y-3">
                 <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Verify Service <span className="font-normal normal-case">(optional — speeds up approval)</span></p>
-                <p className="text-sm text-foreground">Upload your <strong>DD-214</strong> or <strong>Veteran ID</strong> to skip the verification call.</p>
+                <p className="text-sm text-foreground">Upload your <strong>DD-214</strong> or <strong>Veteran ID</strong> to skip the verification call. We use it only to verify veteran status, and we delete the file right after review.</p>
                 {!idFile ? (
                   <button
                     type="button"

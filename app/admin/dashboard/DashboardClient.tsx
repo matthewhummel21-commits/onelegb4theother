@@ -34,6 +34,42 @@ function RequestCard({
   const [loading, setLoading] = useState(false);
   const [callNotes, setCallNotes] = useState(req.call_notes || "");
   const [showCallForm, setShowCallForm] = useState(false);
+  const [documentType, setDocumentType] = useState(req.id_document_type || "");
+  const [idBusy, setIdBusy] = useState(false);
+  const [idFilePath, setIdFilePath] = useState(req.id_file_path);
+  const [idReview, setIdReview] = useState({
+    status: req.id_review_status,
+    at: req.id_reviewed_at,
+    by: req.id_reviewed_by,
+    note: req.id_review_note,
+  });
+
+  const reviewIdFile = async (decision: "verified" | "rejected") => {
+    if (!documentType) return;
+    const label = decision === "verified" ? "verified" : "rejected";
+    if (!window.confirm(`Mark this ID as ${label} and permanently delete the file? This cannot be undone.`)) return;
+    setIdBusy(true);
+    try {
+      const res = await fetch(`/api/admin/id-file/${req.id}/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ decision, documentType }),
+      });
+      if (!res.ok) throw new Error("failed");
+      const data = await res.json();
+      setIdFilePath(null);
+      setIdReview({
+        status: data.idReviewStatus,
+        at: data.idReviewedAt,
+        by: data.idReviewedBy,
+        note: null,
+      });
+    } catch {
+      alert("Could not delete the file. Nothing was cleared.");
+    } finally {
+      setIdBusy(false);
+    }
+  };
 
   const fullName = `${req.first_name || ""} ${req.last_name || ""}`.trim();
   const fullAddress = [req.address, req.city, req.state, req.zip].filter(Boolean).join(", ");
@@ -100,16 +136,54 @@ function RequestCard({
         )}
       </div>
 
-      {/* ID file link */}
-      {req.id_file_path && (
-        <a
-          href={`/api/admin/id-file/${req.id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 bg-blue-900/20 border border-blue-800/40 px-3 py-1.5 rounded-lg transition-colors"
-        >
-          📎 View Uploaded ID
-        </a>
+      {idFilePath && (
+        <div className="space-y-2">
+          <a
+            href={`/api/admin/id-file/${req.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 bg-blue-900/20 border border-blue-800/40 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            📎 View Uploaded ID
+          </a>
+          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wide">
+            Document type
+          </label>
+          <select
+            value={documentType}
+            onChange={(e) => setDocumentType(e.target.value)}
+            className="w-full h-10 rounded-lg border border-[#2a3d52] bg-[#0d1b2a] text-white text-sm px-3"
+          >
+            <option value="">Choose…</option>
+            <option value="dd214">DD-214</option>
+            <option value="va_id">VA ID card</option>
+            <option value="other">Other</option>
+          </select>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              type="button"
+              disabled={idBusy || !documentType}
+              onClick={() => reviewIdFile("verified")}
+              className="flex-1 px-3 py-2 rounded-lg bg-green-700 hover:bg-green-600 text-white text-xs font-bold disabled:opacity-50"
+            >
+              {idBusy ? "Working..." : "Verified & delete file"}
+            </button>
+            <button
+              type="button"
+              disabled={idBusy || !documentType}
+              onClick={() => reviewIdFile("rejected")}
+              className="flex-1 px-3 py-2 rounded-lg bg-red-900 hover:bg-red-800 text-white text-xs font-bold disabled:opacity-50"
+            >
+              Reject & delete file
+            </button>
+          </div>
+        </div>
+      )}
+      {idReview.status && (
+        <p className="text-xs text-slate-300">
+          {idReview.note
+            || `ID ${idReview.status}${documentType ? ` · ${documentType === "dd214" ? "DD-214" : documentType === "va_id" ? "VA ID card" : "Other"}` : ""} · ${idReview.by || "admin"}${idReview.at ? ` · ${formatDate(idReview.at)}` : ""}. File deleted.`}
+        </p>
       )}
 
       {/* Printful auto-fulfilled (sweatpants) */}
@@ -726,6 +800,12 @@ function ManualAddModal({ onClose, onAdded }: { onClose: () => void; onAdded: (r
         wants_follow_up_call: false,
         id_uploaded: false,
         id_file_path: null,
+        id_uploaded_at: null,
+        id_review_status: null,
+        id_reviewed_at: null,
+        id_reviewed_by: null,
+        id_document_type: null,
+        id_review_note: null,
         verified_by: "referral",
         call_notes: null,
         amazon_link: null,

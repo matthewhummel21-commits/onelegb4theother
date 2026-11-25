@@ -122,6 +122,12 @@ export type RequestRow = {
   wants_follow_up_call: boolean;
   id_uploaded: boolean;
   id_file_path: string | null;
+  id_uploaded_at: string | null;
+  id_review_status: string | null;
+  id_reviewed_at: string | null;
+  id_reviewed_by: string | null;
+  id_document_type: string | null;
+  id_review_note: string | null;
   call_notes: string | null;
   verified_by: string | null;
   amazon_link: string | null;
@@ -216,7 +222,7 @@ export async function insertRequest(data: {
       household_size, annual_income,
       pant_type, pant_fit, pant_color, pant_brand, pant_size, waist, inseam,
       referred_by, notes,
-      wants_follow_up_call, id_uploaded, id_file_path, verified_by
+      wants_follow_up_call, id_uploaded, id_file_path, id_uploaded_at, verified_by
     ) VALUES (
       ${data.status},
       ${data.firstName ?? null},
@@ -243,6 +249,7 @@ export async function insertRequest(data: {
       ${data.wantsFollowUpCall ?? false},
       ${data.idUploaded ?? false},
       ${data.idFilePath ?? null},
+      ${data.idUploaded ? new Date().toISOString() : null},
       ${data.verifiedBy ?? null}
     )
     RETURNING id
@@ -264,6 +271,42 @@ export async function listIdFileReferences(): Promise<{ id: number; id_file_path
     SELECT id, id_file_path
     FROM requests
     WHERE id_file_path IS NOT NULL AND id_file_path <> ''
+    ORDER BY id
+  `;
+  return rows as { id: number; id_file_path: string }[];
+}
+
+export const ID_FILE_EXPIRED_NOTE = "ID file expired, re-request if needed";
+
+export async function clearIdFileAfterReview(input: {
+  id: number;
+  status: "verified" | "rejected" | "expired";
+  reviewedBy: string;
+  documentType: string | null;
+  note: string | null;
+}): Promise<void> {
+  const sql = getSql();
+  await sql`
+    UPDATE requests
+    SET id_file_path = NULL,
+        id_review_status = ${input.status},
+        id_reviewed_at = NOW(),
+        id_reviewed_by = ${input.reviewedBy},
+        id_document_type = ${input.documentType},
+        id_review_note = ${input.note}
+    WHERE id = ${input.id}
+  `;
+}
+
+export async function listUnreviewedIdFiles(): Promise<{ id: number; id_file_path: string }[]> {
+  const sql = getSql();
+  const rows = await sql`
+    SELECT id, id_file_path
+    FROM requests
+    WHERE id_file_path IS NOT NULL
+      AND id_file_path <> ''
+      AND id_review_status IS NULL
+      AND COALESCE(id_uploaded_at, created_at) < NOW() - INTERVAL '30 days'
     ORDER BY id
   `;
   return rows as { id: number; id_file_path: string }[];

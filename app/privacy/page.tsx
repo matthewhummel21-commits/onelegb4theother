@@ -44,7 +44,7 @@ export default function PrivacyPage() {
                 <li>Household income range, if you choose to give one. You can skip it. {INCOME_GUIDELINE}</li>
                 <li>Anything you write in the notes</li>
                 <li>Whether you want a follow-up call</li>
-                <li>A DD-214 or VA ID file, if you choose to upload one. The upload is optional.</li>
+                <li>A DD-214 or VA ID file, if you choose to upload one. The upload is optional. It is used only to verify veteran status and is deleted right after review, or after 30 days if it is not reviewed.</li>
               </ul>
             </section>
 
@@ -59,7 +59,8 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-xl font-bold mb-2">How long we keep it</h2>
               <p className="text-muted-foreground">
-                The board has not set a final retention period. Draft: we keep a request only as long as we
+                An uploaded ID is deleted right after the board reviews it, or after 30 days if it is not reviewed.
+                The board has not set a final retention period for the rest of the request. Draft: we keep a request only as long as we
                 need it to send the pants and for ordinary nonprofit records. We delete it when you ask.
               </p>
             </section>
