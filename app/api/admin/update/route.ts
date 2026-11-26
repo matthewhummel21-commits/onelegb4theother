@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { isAdminSession } from "@/lib/admin-session";
 import { getRequestById, updateRequestStatus } from "@/lib/db";
 
 // ─── Telegram helper ─────────────────────────────────────────────────────────
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
   // Auth check
   const cookieStore = await cookies();
   const session = cookieStore.get("admin_session");
-  if (!session || session.value !== "1") {
+  if (!(await isAdminSession(session?.value))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

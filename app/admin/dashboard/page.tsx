@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { isAdminSession } from "@/lib/admin-session";
 import { initDb, getAllRequests, RequestRow } from "@/lib/db";
 import DashboardClient from "./DashboardClient";
 
@@ -10,7 +11,7 @@ export default async function DashboardPage() {
   // Auth check
   const cookieStore = await cookies();
   const session = cookieStore.get("admin_session");
-  if (!session || session.value !== "1") {
+  if (!(await isAdminSession(session?.value))) {
     redirect("/admin");
   }
 

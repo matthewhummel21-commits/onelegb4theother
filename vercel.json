@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/expire-id-files",
-      "schedule": "15 8 * * *"
+      "schedule": "0 8 * * *"
     }
   ]
 }
