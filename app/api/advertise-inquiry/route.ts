@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { withinRateLimit } from "@/lib/rate-limit";
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
-
 const TIER_LABELS: Record<string, string> = {
   // Current tier IDs (updated May 2026)
   "battle-buddy":      "Battle Buddy ($500/quarter)",
@@ -30,6 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     const tierLabel = TIER_LABELS[tier] ?? tier;
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
       from: "One Leg B4 the Other <newsletter@onelegb4theother.com>",

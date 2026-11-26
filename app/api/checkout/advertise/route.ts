@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 import { withinRateLimit } from "@/lib/rate-limit";
 import { safeSiteOrigin } from "@/lib/safe-origin";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+import { getStripe } from "@/lib/stripe";
 
 const PACKAGES: Record<string, { name: string; price: number; description: string }> = {
   patch: {
@@ -47,6 +45,7 @@ export async function POST(req: NextRequest) {
     }
 
     const origin = safeSiteOrigin(req.headers.get("origin"));
+    const stripe = getStripe();
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],

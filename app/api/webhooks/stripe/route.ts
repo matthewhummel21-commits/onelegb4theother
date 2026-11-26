@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { Resend } from "resend";
+import { getStripe } from "@/lib/stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY!;
 const PRINTFUL_STORE_ID = process.env.PRINTFUL_STORE_ID!;
 
@@ -87,9 +87,10 @@ export async function POST(req: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   let event: Stripe.Event;
+  const stripe = webhookSecret ? getStripe() : null;
 
   try {
-    if (webhookSecret) {
+    if (webhookSecret && stripe) {
       event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
     } else {
       // No secret yet — parse raw (development only)

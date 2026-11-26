@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 import { withinRateLimit } from "@/lib/rate-limit";
 import { safeSiteOrigin } from "@/lib/safe-origin";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+import { getStripe } from "@/lib/stripe";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,6 +19,7 @@ export async function POST(req: NextRequest) {
     const amountCents = Math.round(numeric * 100);
     const isMonthly = mode === "monthly";
     const origin = safeSiteOrigin(req.headers.get("origin"));
+    const stripe = getStripe();
 
     if (isMonthly) {
       // Recurring donation — create a subscription via Stripe

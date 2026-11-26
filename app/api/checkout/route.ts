@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 import { withinRateLimit } from "@/lib/rate-limit";
 import { safeSiteOrigin } from "@/lib/safe-origin";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+import { getStripe } from "@/lib/stripe";
 
 // T-shirt variants (small logo front + back print) - 432664066
 const SHIRT_VARIANTS: Record<string, number> = {
@@ -133,6 +131,7 @@ export async function POST(req: NextRequest) {
     }
 
     const origin = safeSiteOrigin(req.headers.get("origin"));
+    const stripe = getStripe();
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
